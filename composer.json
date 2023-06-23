@@ -1,0 +1,48 @@
+{
+    "name": "dvsa/mot-cpms-client",
+    "description": "CPMS Common Client Module",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": "^8.0",
+        "dvsa/mot-cpms-notifications": "^1.0.0",
+        "laminas/laminas-mvc": "^3.3.0",
+        "laminas/laminas-cache": "^3.1.3",
+        "laminas/laminas-log": "^2.13",
+        "laminas/laminas-filter": "^2.13",
+        "laminas/laminas-dependency-plugin": "^2.2",
+        "laminas/laminas-cache-storage-adapter-filesystem": "^2.0",
+        "laminas/laminas-cache-storage-adapter-memory": "^2.0",
+        "laminas/laminas-cache-storage-adapter-apcu": "^2.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5",
+        "laminas/laminas-component-installer": "^2.5",
+        "laminas/laminas-test": "^4.0.0",
+        "captainhook/captainhook": "^5.16",
+        "captainhook/plugin-composer": "^5.3",
+        "friendsofphp/php-cs-fixer": "^3.17"
+    },
+    "autoload": {
+        "psr-0": {
+            "CpmsClient\\": "src/",
+            "CpmsClientTest\\": "test/"
+        },
+        "classmap": [
+            "./Module.php",
+            "./test/CpmsClientTest/Module.php"
+        ]
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "scripts" : {
+        "test": "vendor/bin/phpunit -c phpunit.xml"
+    },
+    "config": {
+        "allow-plugins": {
+            "laminas/laminas-component-installer": true,
+            "laminas/laminas-dependency-plugin": true,
+            "captainhook/plugin-composer": true
+        }
+    }
+}

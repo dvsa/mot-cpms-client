@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<phpunit bootstrap="./test/Bootstrap.php"
+         colors="true"
+         stopOnFailure="false"
+         timeoutForSmallTests="120"
+         timeoutForMediumTests="360"
+         timeoutForLargeTests="600"
+         beStrictAboutTestsThatDoNotTestAnything="true"
+>
+    <testsuites>
+        <testsuite name="CPMS Client Test Suite">
+            <directory>./test/CpmsClientTest</directory>
+        </testsuite>
+    </testsuites>
+    <php>
+        <ini name="memory_limit" value="-1"/>
+    </php>
+    <coverage processUncoveredFiles="true">
+        <include>
+            <directory suffix=".php">./src</directory>
+        </include>
+        <report>
+            <html outputDirectory="build/code-coverage/"/>
+        </report>
+    </coverage>
+</phpunit>
