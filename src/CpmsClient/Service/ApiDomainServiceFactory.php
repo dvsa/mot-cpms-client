@@ -59,6 +59,6 @@ class ApiDomainServiceFactory implements FactoryInterface
             $currentDomain = $config['cpms_api']['home_domain'];
         }
 
-        return str_replace('payment-app', 'payment-service', $currentDomain);
+        return str_replace('payment-app', 'payment-service', $currentDomain ?? '');
     }
 }
