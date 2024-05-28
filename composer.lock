@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "de988191846f384fba485407c4a34a3b",
+    "content-hash": "3117d62e3d83de4b370c70b13218814e",
     "packages": [
         {
             "name": "aws/aws-crt-php",
-            "version": "v1.2.2",
+            "version": "v1.2.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/awslabs/aws-crt-php.git",
-                "reference": "2f1dc7b7eda080498be96a4a6d683a41583030e9"
+                "reference": "0ea1f04ec5aa9f049f97e012d1ed63b76834a31b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/awslabs/aws-crt-php/zipball/2f1dc7b7eda080498be96a4a6d683a41583030e9",
-                "reference": "2f1dc7b7eda080498be96a4a6d683a41583030e9",
+                "url": "https://api.github.com/repos/awslabs/aws-crt-php/zipball/0ea1f04ec5aa9f049f97e012d1ed63b76834a31b",
+                "reference": "0ea1f04ec5aa9f049f97e012d1ed63b76834a31b",
                 "shasum": ""
             },
             "require": {
@@ -56,26 +56,26 @@
             ],
             "support": {
                 "issues": "https://github.com/awslabs/aws-crt-php/issues",
-                "source": "https://github.com/awslabs/aws-crt-php/tree/v1.2.2"
+                "source": "https://github.com/awslabs/aws-crt-php/tree/v1.2.5"
             },
-            "time": "2023-07-20T16:49:55+00:00"
+            "time": "2024-04-19T21:30:56+00:00"
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.283.3",
+            "version": "3.288.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "4cc8d6c7e856de80d9316f659c4c626d3713f6c1"
+                "reference": "a1dfa12c7165de0b731ae8074c4ba1f3ae733f89"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/4cc8d6c7e856de80d9316f659c4c626d3713f6c1",
-                "reference": "4cc8d6c7e856de80d9316f659c4c626d3713f6c1",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/a1dfa12c7165de0b731ae8074c4ba1f3ae733f89",
+                "reference": "a1dfa12c7165de0b731ae8074c4ba1f3ae733f89",
                 "shasum": ""
             },
             "require": {
-                "aws/aws-crt-php": "^1.0.4",
+                "aws/aws-crt-php": "^1.2.3",
                 "ext-json": "*",
                 "ext-pcre": "*",
                 "ext-simplexml": "*",
@@ -151,9 +151,9 @@
             "support": {
                 "forum": "https://forums.aws.amazon.com/forum.jspa?forumID=80",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.283.3"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.288.1"
             },
-            "time": "2023-10-12T18:14:56+00:00"
+            "time": "2023-11-22T19:35:38+00:00"
         },
         {
             "name": "brick/math",
@@ -261,21 +261,21 @@
         },
         {
             "name": "dvsa/mot-cpms-notifications",
-            "version": "v2.0.0",
+            "version": "v3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dvsa/mot-cpms-notifications.git",
-                "reference": "6f1e537f3f1cb29aba91fbd26abff993f54f131a"
+                "reference": "314f0015ec2aa35fc8fcae71888b406a4bff419a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dvsa/mot-cpms-notifications/zipball/6f1e537f3f1cb29aba91fbd26abff993f54f131a",
-                "reference": "6f1e537f3f1cb29aba91fbd26abff993f54f131a",
+                "url": "https://api.github.com/repos/dvsa/mot-cpms-notifications/zipball/314f0015ec2aa35fc8fcae71888b406a4bff419a",
+                "reference": "314f0015ec2aa35fc8fcae71888b406a4bff419a",
                 "shasum": ""
             },
             "require": {
-                "dvsa/mot-cpms-queues": "v2.0.0",
-                "php": "^8.1",
+                "dvsa/mot-cpms-queues": "^3.0.0",
+                "php": "^8.2",
                 "ramsey/uuid": "^4.2.1"
             },
             "require-dev": {
@@ -295,27 +295,27 @@
             ],
             "support": {
                 "issues": "https://github.com/dvsa/mot-cpms-notifications/issues",
-                "source": "https://github.com/dvsa/mot-cpms-notifications/tree/v2.0.0"
+                "source": "https://github.com/dvsa/mot-cpms-notifications/tree/v3.0.0"
             },
-            "time": "2023-10-13T07:23:26+00:00"
+            "time": "2024-07-25T13:07:43+00:00"
         },
         {
             "name": "dvsa/mot-cpms-queues",
-            "version": "v2.0.0",
+            "version": "v3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dvsa/mot-cpms-queues.git",
-                "reference": "1ba921819fb6d4db05e8cae332a6bca37994f348"
+                "reference": "ff936d64328dff26b1085a0e97f37dacc667d5d3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dvsa/mot-cpms-queues/zipball/1ba921819fb6d4db05e8cae332a6bca37994f348",
-                "reference": "1ba921819fb6d4db05e8cae332a6bca37994f348",
+                "url": "https://api.github.com/repos/dvsa/mot-cpms-queues/zipball/ff936d64328dff26b1085a0e97f37dacc667d5d3",
+                "reference": "ff936d64328dff26b1085a0e97f37dacc667d5d3",
                 "shasum": ""
             },
             "require": {
-                "aws/aws-sdk-php": "^3.273",
-                "php": "^8.1",
+                "aws/aws-sdk-php": "^3.288.1",
+                "php": "^8.2",
                 "ramsey/uuid": "^4.2.1",
                 "seld/jsonlint": "^1.8"
             },
@@ -336,9 +336,9 @@
             ],
             "support": {
                 "issues": "https://github.com/dvsa/mot-cpms-queues/issues",
-                "source": "https://github.com/dvsa/mot-cpms-queues/tree/v2.0.0"
+                "source": "https://github.com/dvsa/mot-cpms-queues/tree/v3.0.0"
             },
-            "time": "2023-09-29T07:56:04+00:00"
+            "time": "2024-07-17T14:36:28+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -667,16 +667,16 @@
         },
         {
             "name": "laminas/laminas-cache",
-            "version": "3.11.0",
+            "version": "3.12.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laminas/laminas-cache.git",
-                "reference": "76cc49af422a9cf5deff9cd0f63cbda29ae88d14"
+                "reference": "bf8bc7f92e15925991c46079c6cd727372af5a46"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laminas/laminas-cache/zipball/76cc49af422a9cf5deff9cd0f63cbda29ae88d14",
-                "reference": "76cc49af422a9cf5deff9cd0f63cbda29ae88d14",
+                "url": "https://api.github.com/repos/laminas/laminas-cache/zipball/bf8bc7f92e15925991c46079c6cd727372af5a46",
+                "reference": "bf8bc7f92e15925991c46079c6cd727372af5a46",
                 "shasum": ""
             },
             "require": {
@@ -684,7 +684,7 @@
                 "laminas/laminas-eventmanager": "^3.4",
                 "laminas/laminas-servicemanager": "^3.21",
                 "laminas/laminas-stdlib": "^3.6",
-                "php": "~8.1.0 || ~8.2.0",
+                "php": "~8.1.0 || ~8.2.0 || ~8.3.0",
                 "psr/cache": "^1.0",
                 "psr/clock": "^1.0",
                 "psr/simple-cache": "^1.0",
@@ -764,35 +764,35 @@
                     "type": "community_bridge"
                 }
             ],
-            "time": "2023-07-31T10:31:52+00:00"
+            "time": "2024-01-19T20:42:11+00:00"
         },
         {
             "name": "laminas/laminas-cache-storage-adapter-apcu",
-            "version": "2.4.0",
+            "version": "2.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laminas/laminas-cache-storage-adapter-apcu.git",
-                "reference": "89561dee942fbdb76647ec939f0dfa6a1db6f9f4"
+                "reference": "7b857ceb93a177d1a5de81c7f1e647ea1e7ca6e7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laminas/laminas-cache-storage-adapter-apcu/zipball/89561dee942fbdb76647ec939f0dfa6a1db6f9f4",
-                "reference": "89561dee942fbdb76647ec939f0dfa6a1db6f9f4",
+                "url": "https://api.github.com/repos/laminas/laminas-cache-storage-adapter-apcu/zipball/7b857ceb93a177d1a5de81c7f1e647ea1e7ca6e7",
+                "reference": "7b857ceb93a177d1a5de81c7f1e647ea1e7ca6e7",
                 "shasum": ""
             },
             "require": {
                 "ext-apcu": "^5.1.10",
-                "laminas/laminas-cache": "^3.0",
-                "php": "~8.0.0 || ~8.1.0 || ~8.2.0"
+                "laminas/laminas-cache": "^3.12.0",
+                "php": "~8.1.0 || ~8.2.0 || ~8.3.0"
             },
             "provide": {
                 "laminas/laminas-cache-storage-implementation": "1.0"
             },
             "require-dev": {
                 "laminas/laminas-cache-storage-adapter-test": "^2.0",
-                "laminas/laminas-coding-standard": "~2.4.0",
+                "laminas/laminas-coding-standard": "~2.5.0",
                 "psalm/plugin-phpunit": "^0.18.0",
-                "vimeo/psalm": "^5.0.0"
+                "vimeo/psalm": "^5.18"
             },
             "type": "library",
             "extra": {
@@ -828,7 +828,7 @@
                     "type": "community_bridge"
                 }
             ],
-            "time": "2022-12-05T11:22:35+00:00"
+            "time": "2024-01-08T08:58:18+00:00"
         },
         {
             "name": "laminas/laminas-cache-storage-adapter-filesystem",
@@ -1035,28 +1035,28 @@
         },
         {
             "name": "laminas/laminas-dependency-plugin",
-            "version": "2.2.0",
+            "version": "2.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laminas/laminas-dependency-plugin.git",
-                "reference": "73cfb63ddca9d6bfedad5e0a038f6d55063975a3"
+                "reference": "d98c34fc81f65564ef97e045a381ac3419958615"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laminas/laminas-dependency-plugin/zipball/73cfb63ddca9d6bfedad5e0a038f6d55063975a3",
-                "reference": "73cfb63ddca9d6bfedad5e0a038f6d55063975a3",
+                "url": "https://api.github.com/repos/laminas/laminas-dependency-plugin/zipball/d98c34fc81f65564ef97e045a381ac3419958615",
+                "reference": "d98c34fc81f65564ef97e045a381ac3419958615",
                 "shasum": ""
             },
             "require": {
-                "composer-plugin-api": "^1.1 || ^2.0",
-                "php": "^7.3 || ~8.0.0 || ~8.1.0"
+                "composer-plugin-api": ">=1.1.0 <2.3.0",
+                "php": "~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0"
             },
             "require-dev": {
-                "composer/composer": "^1.9 || ^2.0",
-                "laminas/laminas-coding-standard": "^2.2.1",
-                "mikey179/vfsstream": "^1.6.10@alpha",
+                "composer/composer": ">=1.9.0 <2.3.0",
+                "laminas/laminas-coding-standard": "~2.5.0",
+                "mikey179/vfsstream": "^1.6.11",
                 "phpunit/phpunit": "^9.5.5",
-                "psalm/plugin-phpunit": "^0.15.1",
+                "psalm/plugin-phpunit": "^0.18.0",
                 "roave/security-advisories": "dev-master",
                 "vimeo/psalm": "^4.5"
             },
@@ -1076,7 +1076,7 @@
             "description": "Replace zendframework and zfcampus packages with their Laminas Project equivalents.",
             "support": {
                 "issues": "https://github.com/laminas/laminas-dependency-plugin/issues",
-                "source": "https://github.com/laminas/laminas-dependency-plugin/tree/2.2.0"
+                "source": "https://github.com/laminas/laminas-dependency-plugin/tree/2.6.0"
             },
             "funding": [
                 {
@@ -1084,7 +1084,7 @@
                     "type": "community_bridge"
                 }
             ],
-            "time": "2021-09-08T17:51:35+00:00"
+            "time": "2023-12-14T20:02:33+00:00"
         },
         {
             "name": "laminas/laminas-escaper",
@@ -3786,33 +3786,33 @@
         },
         {
             "name": "laminas/laminas-component-installer",
-            "version": "2.8.0",
+            "version": "3.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laminas/laminas-component-installer.git",
-                "reference": "3c998d2b2755985c71cd4d5d9b294228f63d3a65"
+                "reference": "e4c15d50c5dcbe0207285659f083df70bb256bb6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laminas/laminas-component-installer/zipball/3c998d2b2755985c71cd4d5d9b294228f63d3a65",
-                "reference": "3c998d2b2755985c71cd4d5d9b294228f63d3a65",
+                "url": "https://api.github.com/repos/laminas/laminas-component-installer/zipball/e4c15d50c5dcbe0207285659f083df70bb256bb6",
+                "reference": "e4c15d50c5dcbe0207285659f083df70bb256bb6",
                 "shasum": ""
             },
             "require": {
-                "composer-plugin-api": "^1.0 || ^2.0",
-                "php": "^7.4 || ~8.0.0 || ~8.1.0"
+                "composer-plugin-api": "^2.0",
+                "php": "~8.1.0 || ~8.2.0 || ~8.3.0"
             },
             "conflict": {
                 "zendframework/zend-component-installer": "*"
             },
             "require-dev": {
-                "composer/composer": "^2.1.9@RC",
-                "laminas/laminas-coding-standard": "~2.3.0",
-                "mikey179/vfsstream": "^1.6.10",
-                "phpunit/phpunit": "^9.5.19",
-                "psalm/plugin-phpunit": "^0.16.1",
-                "vimeo/psalm": "^4.22.0",
-                "webmozart/assert": "^1.10.0"
+                "composer/composer": "^2.6.4",
+                "laminas/laminas-coding-standard": "~2.5.0",
+                "mikey179/vfsstream": "^1.6.11",
+                "phpunit/phpunit": "^10.4",
+                "psalm/plugin-phpunit": "^0.18.0",
+                "vimeo/psalm": "^5.15.0",
+                "webmozart/assert": "^1.11.0"
             },
             "type": "composer-plugin",
             "extra": {
@@ -3849,7 +3849,7 @@
                     "type": "community_bridge"
                 }
             ],
-            "time": "2022-07-03T21:27:51+00:00"
+            "time": "2023-11-21T15:32:55+00:00"
         },
         {
             "name": "laminas/laminas-test",
@@ -7103,8 +7103,8 @@
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "php": "^8.1"
+        "php": "^8.2"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "plugin-api-version": "2.2.0"
 }
