@@ -1,58 +1,49 @@
 <?php
 namespace CpmsClient\Service;
 
+use Exception;
 use Laminas\Cache\Storage\StorageInterface;
 use Laminas\Log\LoggerAwareTrait;
+use Laminas\Log\LoggerInterface;
 
 /**
  * Class ApiService
- * @method get
- * @method post
- * @method put
- * @method delete
  *
  * @package CpmsClient\Service
  */
 class CacheAwareApiService
 {
     use LoggerAwareTrait;
-    /**
-     * @var ApiService
-     */
-    protected $serviceProxy;
 
-    /** @var  StorageInterface */
-    protected $cacheStorage;
+    protected ApiService $serviceProxy;
 
-    public function __construct(ApiService $service)
+    protected StorageInterface $cacheStorage;
+
+    public function __construct(ApiService $service, LoggerInterface $logger, StorageInterface $cacheStorage)
     {
         $this->serviceProxy = $service;
+        $this->logger = $logger;
+        $this->cacheStorage = $cacheStorage;
     }
 
     /**
-     * @return StorageInterface
+     * @throws Exception
      */
-    public function getCacheStorage()
+    public function getCacheStorage(): StorageInterface
     {
         return $this->cacheStorage;
     }
 
-    /**
-     * @param StorageInterface $cacheStorage
-     */
-    public function setCacheStorage($cacheStorage)
+    public function setCacheStorage(StorageInterface $cacheStorage): void
     {
         $this->cacheStorage = $cacheStorage;
     }
 
     /**
-     * @param $method
-     * @param $arg
-     *
-     * @return mixed
      * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws Exception
      */
-    public function __call($method, $arg)
+    public function __call(string $method, array $arg): mixed
     {
         $cacheKey = 'cache_' . md5(json_encode(array($method, $arg, $this->serviceProxy->getOptions()->getClientId())));
 
@@ -68,20 +59,12 @@ class CacheAwareApiService
         }
     }
 
-    /**
-     * @param $method
-     *
-     * @return bool
-     */
-    public function useCache($method)
+    public function useCache(string $method): bool
     {
         return ($method == strtolower($method));
     }
 
-    /**
-     * @return ApiService
-     */
-    public function getServiceProxy()
+    public function getServiceProxy(): ApiService
     {
         return $this->serviceProxy;
     }

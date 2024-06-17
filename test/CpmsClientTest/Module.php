@@ -16,12 +16,12 @@ namespace CpmsClientTest;
 class Module
 {
 
-    public function getConfig()
+    public function getConfig(): array
     {
         return include __DIR__ . '/../test.global.php';
     }
 
-    public function getAutoloaderConfig()
+    public function getAutoloaderConfig(): array
     {
         return array(
             'Laminas\Loader\StandardAutoloader' => array(

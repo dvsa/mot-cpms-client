@@ -10,10 +10,12 @@ use PHPUnit\Framework\TestCase;
  */
 class CpmsNotificationAcknowledgementFailedTest extends TestCase
 {
+    protected $backupStaticAttributes = null;
+    protected $runTestInSeparateProcess = null;
     /**
      * @covers ::__construct
      */
-    public function testCanInstantiate()
+    public function testCanInstantiate(): void
     {
         // ----------------------------------------------------------------
         // setup your test
@@ -35,7 +37,7 @@ class CpmsNotificationAcknowledgementFailedTest extends TestCase
     /**
      * @covers ::__construct
      */
-    public function testIsException()
+    public function testIsException(): void
     {
         // ----------------------------------------------------------------
         // setup your test

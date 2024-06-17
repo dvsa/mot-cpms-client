@@ -2,7 +2,7 @@
 namespace CpmsClient\Client;
 
 use CpmsClient\Service\LoggerFactory;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Laminas\Http\Client;
 use Laminas\Http\Client as HttpClient;
 use Laminas\Http\Request;
@@ -25,9 +25,13 @@ class RestClientFactory implements FactoryInterface
      * @return HttpRestJsonClient
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
+     *
+     * Required suppression due to un-typed parameter in parent class
+     * @psalm-suppress MissingParamType
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null): HttpRestJsonClient
     {
+        $clientOption = null;
         $domain                = $container->get('cpms\service\domain');
         $config                = $container->get('config');
         $adapter               = $config['cpms_api']['rest_client']['adapter'];

@@ -1,8 +1,17 @@
 <?php
 namespace CpmsClientTest\Client;
 
+use CpmsClient\Client\ClientOptions;
+use CpmsClient\Client\HttpRestJsonClient;
 use CpmsClient\Service\ApiDomainServiceFactory;
+use CpmsClient\Service\ApiService;
 use CpmsClientTest\Bootstrap;
+use Laminas\Cache\Storage\Adapter\Apcu;
+use Laminas\Cache\Storage\Adapter\Filesystem;
+use Laminas\Cache\Storage\Adapter\Memory;
+use Laminas\Cache\Storage\StorageInterface;
+use Laminas\Http\Headers;
+use Laminas\ServiceManager\ServiceManager;
 use PHPUnit\Framework\TestCase;
 use Laminas\Http\PhpEnvironment\Request;
 
@@ -13,9 +22,7 @@ use Laminas\Http\PhpEnvironment\Request;
  */
 class RestClientTest extends TestCase
 {
-
-    /** @var  \Laminas\ServiceManager\ServiceManager */
-    protected $serviceManager;
+    protected ServiceManager $serviceManager;
 
     public function setUp(): void
     {
@@ -23,19 +30,19 @@ class RestClientTest extends TestCase
         $this->serviceManager->setAllowOverride(true);
     }
 
-    public function testClientInstance()
+    public function testClientInstance(): void
     {
         /** @var \CpmsClient\Service\ApiService $service */
         $service = $this->serviceManager->get('cpms\service\api');
         $service->addHeader('Custom', 'Header');
 
-        $this->assertInstanceOf('CpmsClient\Service\ApiService', $service);
-        $this->assertInstanceOf('CpmsClient\Client\HttpRestJsonClient', $service->getClient());
-        $this->assertInstanceOf('CpmsClient\Client\ClientOptions', $service->getClient()->getOptions());
-        $this->assertInstanceOf('Laminas\Cache\Storage\StorageInterface', $service->getCacheStorage());
+        $this->assertInstanceOf(ApiService::class, $service);
+        $this->assertInstanceOf(HttpRestJsonClient::class, $service->getClient());
+        $this->assertInstanceOf(ClientOptions::class, $service->getClient()->getOptions());
+        $this->assertInstanceOf(StorageInterface::class, $service->getCacheStorage());
     }
 
-    public function testResetHeaders()
+    public function testResetHeaders(): void
     {
         $service = $this->serviceManager->get('cpms\service\api');
 
@@ -45,11 +52,13 @@ class RestClientTest extends TestCase
 
         /** @var \Laminas\Http\Request $request */
         $request = $service->getClient()->resetHeaders();
+        $headers = $request->getHeaders();
 
-        $this->assertEquals(0, count($request->getHeaders()));
+        $this->assertInstanceOf(Headers::class, $headers);
+        $this->assertCount(0, $headers);
     }
 
-    public function testEmptyDomain()
+    public function testEmptyDomain(): void
     {
         $config = $this->serviceManager->get('config');
         $host   = $config['cpms_api']['rest_client']['options']['domain'];
@@ -68,18 +77,18 @@ class RestClientTest extends TestCase
         $this->assertSame($host, $domain);
     }
 
-    public function testCacheAdapters()
+    public function testCacheAdapters(): void
     {
         /** @var \Laminas\Cache\Storage\StorageInterface $cache */
         $cache = $this->serviceManager->get('filesystem');
-        $this->assertInstanceOf('Laminas\Cache\Storage\Adapter\Filesystem', $cache);
+        $this->assertInstanceOf(Filesystem::class, $cache);
 
         $cache = $this->serviceManager->get('array');
-        $this->assertInstanceOf('Laminas\Cache\Storage\Adapter\Memory', $cache);
+        $this->assertInstanceOf(Memory::class, $cache);
 
-        if (extension_loaded('apc') and ini_get('apc.enable_cli')) {
+        if (extension_loaded('apc') and ini_get('apc.enable_cli') === '1') {
             $cache = $this->serviceManager->get('apc');
-            $this->assertInstanceOf('Laminas\Cache\Storage\Adapter\Apcu', $cache);
+            $this->assertInstanceOf(Apcu::class, $cache);
         }
     }
 }

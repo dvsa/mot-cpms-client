@@ -4,7 +4,7 @@ namespace CpmsClient\Service;
 use CpmsClient\Authenticate\IdentityProviderInterface;
 use CpmsClient\Client\HttpRestJsonClient;
 use CpmsClient\Client\NotificationsClient;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 /**
@@ -19,15 +19,13 @@ class ApiServiceFactory implements FactoryInterface
     /**
      * Create API Service
      *
-     * @param ContainerInterface $container
-     *
-     * @param $requestedName
-     * @param array|null $options
-     * @return ApiService|mixed
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
+     *
+     * Required suppression due to un-typed parameter in parent class
+     * @psalm-suppress MissingParamType
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null): ApiService
     {
         $config        = $container->get('config');
         $restClient    = $config['cpms_api']['rest_client']['alias'];
@@ -72,15 +70,10 @@ class ApiServiceFactory implements FactoryInterface
         /** @var NotificationsClient */
         $notificationsClient = $container->get($notificationsClientName);
 
-        /** @var ApiService $service */
-        $service = new $serviceClass();
         $cache->getOptions()->setNamespace($cacheNameSpace);
-        $service->setLogger($logger);
-        $service->setClient($httpRestJsonClient);
-        $service->setOptions($httpRestJsonClient->getOptions());
-        $service->setCacheStorage($cache);
-        $service->setEnableCache($enableCache);
-        $service->setNotificationsClient($notificationsClient);
+
+        /** @var ApiService $service */
+        $service = new $serviceClass($logger, $httpRestJsonClient, $cache, $enableCache, $notificationsClient);
 
         return $service;
     }

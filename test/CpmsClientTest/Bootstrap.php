@@ -3,6 +3,7 @@
 namespace CpmsClientTest;
 
 use Laminas\Mvc\Application;
+use Laminas\ServiceManager\ServiceManager;
 
 /**
  * Test bootstrap, for setting up auto loading
@@ -11,15 +12,14 @@ use Laminas\Mvc\Application;
 class Bootstrap
 {
 
-    /** @var  \Laminas\ServiceManager\ServiceManager */
-    protected static $serviceManager;
+    protected static ServiceManager $serviceManager;
 
-    /** @var  string This is the root directory where the test is run from which likely the test directory */
-    protected static $dir;
+    /** This is the root directory where the test is run from which likely the test directory */
+    protected static string $dir;
 
-    protected static $application;
+    protected static Application $application;
 
-    protected static $instance;
+    protected static ?self $instance;
 
     protected function __construct()
     {
@@ -30,43 +30,43 @@ class Bootstrap
      */
     public static function getInstance()
     {
-        if (!static::$instance) {
+        if (!isset(static::$instance)) {
             static::$instance = new self();
         }
 
         return static::$instance;
     }
 
-    /**
-     * @param        $dir
-     * @param string $testModule
-     */
-    public function init($dir, $testModule = null)
+    public function init(string $dir, array $testModule = null): void
     {
         static::$dir = $dir;
 
         $this->setPaths();
 
         $zf2ModulePaths = array(dirname(dirname($dir)));
-        if (($path = static::findParentPath('vendor'))) {
+        $path = static::findParentPath('vendor');
+        if ($path !== false && $path !== '') {
             $zf2ModulePaths[] = $path;
         }
-        if (($path = static::findParentPath('src')) !== $zf2ModulePaths[0]) {
+        $path = static::findParentPath('src');
+        if ($path !== false && $path !== '' && $path !== $zf2ModulePaths[0]) {
             $zf2ModulePaths[] = $path;
         }
 
         $zf2ModulePaths[] = './';
 
+        /** @psalm-suppress UnresolvableInclude */
         $config = include $dir . '/../config/application.config.php';
 
-        if (!empty($testModule)) {
-            foreach ((array)$testModule as $mod) {
+        if ($testModule !== null && count($testModule) >= 1) {
+            foreach ($testModule as $mod) {
                 if (!in_array($mod, $config['modules'])) {
                     $config['modules'][] = $mod;
                 }
             }
         }
 
+        /** @psalm-suppress UnresolvableInclude */
         include $dir . '/../init_autoloader.php';
 
         $application    = Application::init($config);
@@ -79,7 +79,7 @@ class Bootstrap
     /**
      * set paths
      */
-    protected function setPaths()
+    protected function setPaths(): void
     {
         $basePath = realpath(static::$dir) . '/';
 
@@ -95,11 +95,14 @@ class Bootstrap
         );
 
         if (file_exists(static::$dir . "/autoload_classmap.php")) {
+            /** @psalm-suppress UnresolvableInclude */
             $classList = include static::$dir . "/autoload_classmap.php";
 
             spl_autoload_register(
                 function ($class) use ($classList, $basePath) {
+                    /** @psalm-suppress UnresolvableInclude */
                     if (isset($classList[$class])) {
+                        /** @psalm-suppress UnresolvableInclude */
                         include $classList[$class];
                     } else {
                         $filename = str_replace('\\\\', '/', $class) . '.php';
@@ -147,4 +150,4 @@ class Bootstrap
 
 $path = realpath(__DIR__ . '/../');
 chdir(dirname($path));
-Bootstrap::getInstance()->init($path, array('CpmsClientTest'));
+Bootstrap::getInstance()->init($path, ['CpmsClientTest']);

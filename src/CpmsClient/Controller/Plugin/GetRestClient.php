@@ -1,7 +1,7 @@
 <?php
 namespace CpmsClient\Controller\Plugin;
 
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 
@@ -29,8 +29,6 @@ class GetRestClient extends AbstractPlugin
      */
     public function __invoke()
     {
-        $client = $this->container->get('cpms\service\api');
-
-        return $client;
+        return $this->container->get('cpms\service\api');
     }
 }

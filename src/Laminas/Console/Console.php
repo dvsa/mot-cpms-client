@@ -9,12 +9,15 @@ namespace Laminas\Console;
 // Remove once laminas/laminas-test 4.0.X is released.
 class Console
 {
-    public static function isConsole()
+    /**
+     * @return false
+     */
+    public static function isConsole(): bool
     {
         return false;
     }
 
-    public static function overrideIsConsole($param)
+    public static function overrideIsConsole(mixed $param): void
     {
         return;
     }

@@ -18,19 +18,11 @@ class NotificationsClient
 
     /**
      * our client for talking to our queues
-     *
-     * @var Queues
      */
-    protected $queuesClient;
+    protected Queues $queuesClient;
 
-    /**
-     * our constructor
-     *
-     * @param Queues $queuesClient
-     *        how we will talk to our queues
-     * @param Logger $logger
-     *        how we will report on what happens
-     */
+    protected LoggerInterface | Logger $logger;
+
     public function __construct(Queues $queuesClient, LoggerInterface $logger)
     {
         $this->queuesClient = $queuesClient;
@@ -41,10 +33,8 @@ class NotificationsClient
      * get the next batch of messages from the notifications queue
      *
      * if there are no messages, this will return an empty list
-     *
-     * @return array
      */
-    public function getNotifications()
+    public function getNotifications(): array
     {
         // shorthand
         $queuesClient = $this->queuesClient;
@@ -77,12 +67,8 @@ class NotificationsClient
     /**
      * confirm that a message can be dropped from the queue that it
      * came from
-     *
-     * @param  QueueMessage $metadata
-     *         the metadata message that we're done with
-     * @return void
      */
-    public function confirmMessageHandled(QueueMessage $metadata)
+    public function confirmMessageHandled(QueueMessage $metadata): void
     {
         $this->queuesClient->confirmMessageHandled($metadata);
     }
@@ -97,10 +83,8 @@ class NotificationsClient
      * returns the client we are using to talk to our queues
      *
      * mainly here to help with unit testing
-     *
-     * @return Queues
      */
-    public function getQueuesClient()
+    public function getQueuesClient(): Queues
     {
         return $this->queuesClient;
     }

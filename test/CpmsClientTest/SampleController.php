@@ -10,7 +10,7 @@ use Laminas\Mvc\Controller\AbstractActionController;
  */
 class SampleController extends AbstractActionController
 {
-    public function indexAction()
+    public function indexAction(): \Laminas\Http\Response
     {
         /** @var \Laminas\Http\Response $response */
         $response = $this->getResponse();

@@ -3,8 +3,11 @@
 namespace CpmsClient\Client;
 
 use CpmsClient\Service\LoggerFactory;
-use Interop\Container\ContainerInterface;
+use DVSA\CPMS\Queues\QueueAdapters\Interfaces\Queues;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 class NotificationsClientFactory implements FactoryInterface
 {
@@ -15,10 +18,13 @@ class NotificationsClientFactory implements FactoryInterface
      * @param $requestedName
      * @param array|null $options
      * @return NotificationsClient the client to use for notifications from CPMS
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     *
+     * Required suppression due to un-typed parameter in parent class
+     * @psalm-suppress MissingParamType
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null): NotificationsClient
     {
         // shorthand
         $config = $container->get('config');
@@ -30,7 +36,7 @@ class NotificationsClientFactory implements FactoryInterface
         if (isset($config['cpms_api'], $config['cpms_api']['logger_alias'])) {
             $loggerAlias  = $config['cpms_api']['logger_alias'];
         }
-        if (empty($loggerAlias) || !$container->has($loggerAlias)) {
+        if ($loggerAlias === '' || $loggerAlias === '0' || $loggerAlias === null || !$container->has($loggerAlias)) {
             $loggerAlias = LoggerFactory::DEFAULT_LOGGER_ALIAS;
         }
         $logger = $container->get($loggerAlias);
@@ -40,12 +46,10 @@ class NotificationsClientFactory implements FactoryInterface
 
         // which queue adapter are we using?
         $adapterName = $config['cpms_api']['notifications_client']['adapter'];
+        /** @var Queues $adapter */
         $adapter = new $adapterName($queueOptions);
 
         // now, we can build ourselves the client
-        $notificationsClient = new NotificationsClient($adapter, $logger);
-
-        // all done
-        return $notificationsClient;
+        return new NotificationsClient($adapter, $logger);
     }
 }
