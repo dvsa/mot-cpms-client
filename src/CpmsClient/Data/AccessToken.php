@@ -6,6 +6,7 @@ use Traversable;
 
 /**
  * Class AccessToken
+ * @extends AbstractOptions<iterable>
  *
  * @package CpmsClient\Data
  */
