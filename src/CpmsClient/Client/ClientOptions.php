@@ -6,7 +6,7 @@ use Laminas\Stdlib\AbstractOptions;
 
 /**
  * Class ClientOptions
- * @extends AbstractOptions<array>
+ * @extends AbstractOptions<iterable>
  *
  * @package CpmsClient\Client
  */
