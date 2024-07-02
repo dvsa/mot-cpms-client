@@ -4,6 +4,7 @@ namespace CpmsClient\Client;
 
 use CpmsClient\Service\LoggerFactory;
 use DVSA\CPMS\Queues\QueueAdapters\Interfaces\Queues;
+use Laminas\Log\LoggerInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
@@ -27,6 +28,7 @@ class NotificationsClientFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null): NotificationsClient
     {
         // shorthand
+        /** @var array $config */
         $config = $container->get('config');
 
         // we need a logger
@@ -39,6 +41,8 @@ class NotificationsClientFactory implements FactoryInterface
         if ($loggerAlias === '' || $loggerAlias === '0' || $loggerAlias === null || !$container->has($loggerAlias)) {
             $loggerAlias = LoggerFactory::DEFAULT_LOGGER_ALIAS;
         }
+
+        /** @var LoggerInterface $logger */
         $logger = $container->get($loggerAlias);
 
         // what's the config for our queue adapter?

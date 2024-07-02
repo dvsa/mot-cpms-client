@@ -60,6 +60,7 @@ class RestClientTest extends TestCase
 
     public function testEmptyDomain(): void
     {
+        /** @var array $config */
         $config = $this->serviceManager->get('config');
         $host   = $config['cpms_api']['rest_client']['options']['domain'];
 

@@ -4,6 +4,7 @@ namespace CpmsClient\Service;
 use CpmsClient\Authenticate\IdentityProviderInterface;
 use CpmsClient\Client\HttpRestJsonClient;
 use CpmsClient\Client\NotificationsClient;
+use Laminas\Log\LoggerInterface;
 use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
@@ -27,6 +28,7 @@ class ApiServiceFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null): ApiService
     {
+        /** @var array $config */
         $config        = $container->get('config');
         $restClient    = $config['cpms_api']['rest_client']['alias'];
         $enableCache   = $config['cpms_api']['enable_cache'];
@@ -37,6 +39,7 @@ class ApiServiceFactory implements FactoryInterface
         if (empty($loggerAlias) || !$container->has($loggerAlias)) {
             $loggerAlias = LoggerFactory::DEFAULT_LOGGER_ALIAS;
         }
+        /** @var LoggerInterface $logger */
         $logger = $container->get($loggerAlias);
 
         /** @var \Laminas\Cache\Storage\Adapter\AbstractAdapter $cache */

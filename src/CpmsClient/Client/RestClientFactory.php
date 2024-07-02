@@ -2,6 +2,7 @@
 namespace CpmsClient\Client;
 
 use CpmsClient\Service\LoggerFactory;
+use Laminas\Log\LoggerInterface;
 use Psr\Container\ContainerInterface;
 use Laminas\Http\Client;
 use Laminas\Http\Client as HttpClient;
@@ -33,6 +34,7 @@ class RestClientFactory implements FactoryInterface
     {
         $clientOption = null;
         $domain                = $container->get('cpms\service\domain');
+        /** @var array $config */
         $config                = $container->get('config');
         $adapter               = $config['cpms_api']['rest_client']['adapter'];
         $restOptions           = $config['cpms_api']['rest_client']['options'];
@@ -42,6 +44,7 @@ class RestClientFactory implements FactoryInterface
         if (empty($loggerAlias) || !$container->has($loggerAlias)) {
             $loggerAlias = LoggerFactory::DEFAULT_LOGGER_ALIAS;
         }
+        /** @var LoggerInterface $logger */
         $logger = $container->get($loggerAlias);
 
         $options                 = new ClientOptions($restOptions);

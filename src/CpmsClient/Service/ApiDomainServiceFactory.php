@@ -25,7 +25,7 @@ class ApiDomainServiceFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): string
     {
-
+        /** @var array $config */
         $config = $container->get('config');
 
         if (empty($config['cpms_api']['rest_client']['options']['domain'])) {

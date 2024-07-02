@@ -1,6 +1,7 @@
 <?php
 namespace CpmsClientTest;
 
+use AllowDynamicProperties;
 use CpmsClient\Data\AccessToken;
 use CpmsClient\Service\ApiService;
 
@@ -9,7 +10,7 @@ use CpmsClient\Service\ApiService;
  *
  * @package CpmsClientTest
  */
-class MockApiService extends ApiService
+#[AllowDynamicProperties] class MockApiService extends ApiService
 {
     protected bool $done = false;
 
