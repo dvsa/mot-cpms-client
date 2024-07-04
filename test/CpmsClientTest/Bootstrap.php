@@ -98,7 +98,7 @@ class Bootstrap
             $classList = include static::$dir . "/autoload_classmap.php";
 
             spl_autoload_register(
-                function ($class) use ($classList, $basePath) {
+                function ($class) use ($classList) {
                     /** @psalm-suppress UnresolvableInclude */
                     if (isset($classList[$class])) {
                         /** @psalm-suppress UnresolvableInclude */

@@ -13,6 +13,7 @@ class MockLogger implements LoggerInterface
      *
      * @psalm-suppress MissingParamType
      * @psalm-suppress ImplementedReturnTypeMismatch
+     * @phpstan-ignore-next-line
      */
     public function emerg($message, $extra = []): void
     {
@@ -25,6 +26,7 @@ class MockLogger implements LoggerInterface
      *
      * @psalm-suppress MissingParamType
      * @psalm-suppress ImplementedReturnTypeMismatch
+     * @phpstan-ignore-next-line
      */
     public function alert($message, $extra = []): void
     {
@@ -37,6 +39,7 @@ class MockLogger implements LoggerInterface
      *
      * @psalm-suppress MissingParamType
      * @psalm-suppress ImplementedReturnTypeMismatch
+     * @phpstan-ignore-next-line
      */
     public function crit($message, $extra = [])
     {
@@ -49,6 +52,7 @@ class MockLogger implements LoggerInterface
      *
      * @psalm-suppress MissingParamType
      * @psalm-suppress ImplementedReturnTypeMismatch
+     * @phpstan-ignore-next-line
      */
     public function err($message, $extra = [])
     {
@@ -61,6 +65,7 @@ class MockLogger implements LoggerInterface
      *
      * @psalm-suppress MissingParamType
      * @psalm-suppress ImplementedReturnTypeMismatch
+     * @phpstan-ignore-next-line
      */
     public function warn($message, $extra = [])
     {
@@ -73,6 +78,7 @@ class MockLogger implements LoggerInterface
      *
      * @psalm-suppress MissingParamType
      * @psalm-suppress ImplementedReturnTypeMismatch
+     * @phpstan-ignore-next-line
      */
     public function notice($message, $extra = [])
     {
@@ -85,6 +91,7 @@ class MockLogger implements LoggerInterface
      *
      * @psalm-suppress MissingParamType
      * @psalm-suppress ImplementedReturnTypeMismatch
+     * @phpstan-ignore-next-line
      */
     public function info($message, $extra = [])
     {
@@ -97,6 +104,7 @@ class MockLogger implements LoggerInterface
      *
      * @psalm-suppress MissingParamType
      * @psalm-suppress ImplementedReturnTypeMismatch
+     * @phpstan-ignore-next-line
      */
     public function debug($message, $extra = [])
     {
