@@ -5,6 +5,7 @@ namespace CpmsClient\Service;
 use CpmsClient\Authenticate\IdentityProviderInterface;
 use CpmsClient\Client\HttpRestJsonClient;
 use CpmsClient\Client\NotificationsClient;
+use Laminas\Cache\Storage\Adapter\AbstractAdapter;
 use Laminas\Log\LoggerInterface;
 use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
@@ -42,19 +43,22 @@ class ApiServiceFactory implements FactoryInterface
         /** @var LoggerInterface $logger */
         $logger = $container->get($loggerAlias);
 
-        /** @var \Laminas\Cache\Storage\Adapter\AbstractAdapter $cache */
         /** @var HttpRestJsonClient $httpRestJsonClient */
         $httpRestJsonClient = $container->get($restClient);
+        /** @var AbstractAdapter $cache */
         $cache              = $container->get($config['cpms_api']['cache_storage']);
         $cacheNameSpace     = $cache->getOptions()->getNamespace();
 
         if (!empty($identityAlias) && $container->has($identityAlias)) {
+            /** @var IdentityProviderInterface $identity */
             $identity = $container->get($identityAlias);
             if ($identity instanceof IdentityProviderInterface) {
                 $httpRestJsonClient->getOptions()->setUserId($identity->getUserId());
                 $httpRestJsonClient->getOptions()->setClientId($identity->getClientId());
                 $httpRestJsonClient->getOptions()->setClientSecret($identity->getClientSecret());
-                $httpRestJsonClient->getOptions()->setCustomerReference($identity->getCustomerReference());
+                /** @var string $customerReference */
+                $customerReference = $identity->getCustomerReference();
+                $httpRestJsonClient->getOptions()->setCustomerReference($customerReference);
                 $cacheNameSpace .= $identity->getClientId();
             }
 

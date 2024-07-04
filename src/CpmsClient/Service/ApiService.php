@@ -8,6 +8,7 @@ use CpmsClient\Client\NotificationsClient;
 use CpmsClient\Data\AccessToken;
 use CpmsClient\Exceptions\CpmsNotificationAcknowledgementFailed;
 use CpmsClient\Utility\Util;
+use DVSA\CPMS\Notifications\Messages\Values\PaymentNotificationV1;
 use DVSA\CPMS\Queues\QueueAdapters\Interfaces\Queues;
 use DVSA\CPMS\Queues\QueueAdapters\Values\QueueMessage;
 use Exception;
@@ -87,7 +88,7 @@ class ApiService
      * @param        $scope (CARD, DIRECT_DEBIT)
      * @param string $method HTTP Method (GET, POST, DELETE, PUT)
      *
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     protected function processRequest(string $endPointAlias, string $scope, string $method, array | null $params = null): mixed
     {
@@ -105,6 +106,7 @@ class ApiService
 
                 $this->getOptions()->setHeaders($headers);
 
+                /** @var array $return */
                 $return = $this->getClient()->dispatchRequestAndDecodeResponse($url, $method, $params);
 
                 if (empty($return)) {
@@ -149,7 +151,7 @@ class ApiService
     }
 
     /**
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function get(string $endPointAlias, string $scope, array $data = array()): mixed
     {
@@ -157,7 +159,7 @@ class ApiService
     }
 
     /**
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function post(string $endPointAlias, string $scope, array $data): mixed
     {
@@ -165,7 +167,7 @@ class ApiService
     }
 
     /**
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function put(string $endPointAlias, string $scope, array $data): mixed
     {
@@ -173,15 +175,15 @@ class ApiService
     }
 
     /**
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
-    public function patch(string $endPointAlias, string $scope, array $data): array | string
+    public function patch(string $endPointAlias, string $scope, array $data): mixed
     {
         return $this->processRequest($endPointAlias, $scope, Request::METHOD_PATCH, $data);
     }
 
     /**
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function delete(string $endPointAlias, string $scope): mixed
     {
@@ -238,7 +240,7 @@ class ApiService
     }
 
     /**
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      * @throws Exception
      */
     public function getTokenForScope(string $scope, string | null $salesReference = ''): array | AccessToken | string | null
@@ -246,6 +248,7 @@ class ApiService
         $key = $this->generateCacheKey($scope, $salesReference);
 
         if ($this->getEnableCache() && $this->getCacheStorage()->hasItem($key)) {
+            /** @var array $cache */
             $cache = $this->getCacheStorage()->getItem($key);
             $token = new AccessToken($cache);
         } else {
@@ -253,6 +256,7 @@ class ApiService
         }
 
         if (empty($token) || $token->isExpired()) {
+            /** @var array $data */
             $data = $this->getPaymentServiceAccessToken($scope, $salesReference);
 
             if (isset($data['access_token'])) {
@@ -431,13 +435,14 @@ class ApiService
      * @throws CpmsNotificationAcknowledgementFailed|ExceptionInterface
      * @throws Exception
      */
-    public function acknowledgeNotification(QueueMessage $metadata, object $message): void
+    public function acknowledgeNotification(QueueMessage $metadata, PaymentNotificationV1 $message): void
     {
         // shorthand
         $queuesClient = $this->getNotificationsClient();
 
         // contact cpms/payment-service, tell it that we have successfully
         // processed this notification
+        /** @var array $response */
         $response = $this->put("/api/notifications/" . $message->getNotificationId() . '/acknowledged', 'NOTIFICATION', []);
         if (!isset($response['code']) || $response['code'] !== self::CPMS_CODE_SUCCESS) {
             $msg = "response from HttpClient does not contain expected 'code' field";

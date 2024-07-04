@@ -47,16 +47,20 @@ class CacheAwareApiService
      */
     public function __call(string $method, array $arg): mixed
     {
-        $cacheKey = 'cache_' . md5(json_encode(array($method, $arg, $this->serviceProxy->getOptions()->getClientId())));
+        /** @var string $json */
+        $json = json_encode(array($method, $arg, $this->serviceProxy->getOptions()->getClientId()));
+        $cacheKey = 'cache_' . md5($json);
 
         if ($this->useCache($method) && $this->getCacheStorage()->hasItem($cacheKey)) {
             return $this->getCacheStorage()->getItem($cacheKey);
         } else {
-            $result = call_user_func_array(array($this->serviceProxy, $method), $arg);
-            if ($this->useCache($method) && !empty($result['items'])) {
+            /** @var callable $func */
+            $func = array($this->serviceProxy, $method);
+
+            $result = call_user_func_array($func, $arg);
+            if ($this->useCache($method) && is_array($result) && !empty($result['items'])) {
                 $this->getCacheStorage()->addItem($cacheKey, $result);
             }
-
             return $result;
         }
     }

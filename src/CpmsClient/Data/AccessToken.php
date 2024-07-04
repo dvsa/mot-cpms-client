@@ -24,6 +24,9 @@ class AccessToken extends AbstractOptions
     public function __construct(?iterable $options = null)
     {
         $this->__strictMode__ = false;
+        /**
+         * @phpstan-ignore-next-line
+         */
         parent::__construct($options);
     }
 

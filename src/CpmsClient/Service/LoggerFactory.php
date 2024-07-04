@@ -32,6 +32,7 @@ class LoggerFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null): Logger
     {
+        /** @var array $config */
         $config   = $container->get('config');
         $filename = $this->getLogFilename($config);
         $writer   = new Stream($filename);

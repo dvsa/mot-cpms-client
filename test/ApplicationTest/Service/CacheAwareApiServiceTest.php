@@ -28,10 +28,13 @@ class CacheAwareApiServiceTest extends AbstractHttpControllerTestCase
         );
 
         $this->serviceManager = Bootstrap::getInstance()->getServiceManager();
-        $this->setApplicationConfig($this->serviceManager->get('ApplicationConfig'));
+        /** @var array $config */
+        $config = $this->serviceManager->get('ApplicationConfig');
+        $this->setApplicationConfig($config);
 
         /** @var CacheAwareApiService $service */
-        $this->service = $this->serviceManager->get('cpms\service\api\cacheAware');
+        $service = $this->serviceManager->get('cpms\service\api\cacheAware');
+        $this->service = $service;
         $this->serviceManager->setAllowOverride(true);
         parent::setUp();
     }
@@ -47,7 +50,9 @@ class CacheAwareApiServiceTest extends AbstractHttpControllerTestCase
     public function testCachedResult(): void
     {
         $param = array('limit' => time());
+        /** @phpstan-ignore method.notFound */
         $this->service->get('/api/transaction', ApiService::SCOPE_CARD, $param);
+        /** @phpstan-ignore method.notFound */
         $result = $this->service->get('/api/transaction', ApiService::SCOPE_CARD, $param);
         $this->assertTrue(is_array($result));
     }
@@ -72,7 +77,10 @@ class CacheAwareApiServiceTest extends AbstractHttpControllerTestCase
         $response = new Response();
         $response->setContent(json_encode($value));
 
-        /** @psalm-suppress UndefinedInterfaceMethod */
+        /**
+         * @psalm-suppress UndefinedInterfaceMethod
+         * @phpstan-ignore method.notFound
+         */
         $service->getServiceProxy()->getClient()->getHttpClient()->getAdapter()->setResponse($response);
         $data = $this->service->__call($method, $arg);
 

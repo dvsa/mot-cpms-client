@@ -88,6 +88,7 @@ class NotificationsClientTest extends TestCase
         $queuesClient = $unit->getQueuesClient();
 
         // we need to put a message onto this queue
+        /** @var string $expectedNotification */
         $expectedNotification = new PaymentNotificationV1(
             'unit-test',
             GenerateNotificationId::now(),
@@ -160,6 +161,7 @@ class NotificationsClientTest extends TestCase
         $queuesClient = $unit->getQueuesClient();
 
         // we need to put several messages onto this queue
+        /** @var array<string> $expectedNotifications */
         $expectedNotifications = [
             new PaymentNotificationV1(
                 'unit-test',
@@ -264,6 +266,7 @@ class NotificationsClientTest extends TestCase
         $queuesClient = $unit->getQueuesClient();
 
         // we need to put several messages onto this queue
+        /** @var array<string> $expectedNotifications */
         $expectedNotifications = [
             new PaymentNotificationV1(
                 'unit-test',
@@ -371,6 +374,7 @@ class NotificationsClientTest extends TestCase
         $queuesClient = $unit->getQueuesClient();
 
         // we need to put several messages onto this queue
+        /** @var array<string> $expectedNotifications */
         $expectedNotifications = [
             new PaymentNotificationV1(
                 'unit-test',

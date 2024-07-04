@@ -13,6 +13,7 @@ use Laminas\Cache\Storage\Adapter\Memory;
 use Laminas\Cache\Storage\StorageInterface;
 use Laminas\Http\Headers;
 use Laminas\ServiceManager\ServiceManager;
+use Laminas\Stdlib\ParametersInterface;
 use PHPUnit\Framework\TestCase;
 use Laminas\Http\PhpEnvironment\Request;
 
@@ -33,7 +34,7 @@ class RestClientTest extends TestCase
 
     public function testClientInstance(): void
     {
-        /** @var \CpmsClient\Service\ApiService $service */
+        /** @var ApiService $service */
         $service = $this->serviceManager->get('cpms\service\api');
         $service->addHeader('Custom', 'Header');
 
@@ -45,6 +46,7 @@ class RestClientTest extends TestCase
 
     public function testResetHeaders(): void
     {
+        /** @var ApiService $service */
         $service = $this->serviceManager->get('cpms\service\api');
 
         $headers                  = $service->getClient()->getOptions()->getHeaders();
@@ -70,6 +72,7 @@ class RestClientTest extends TestCase
 
         $factory      = new ApiDomainServiceFactory();
         $request      = new Request();
+        /** @var ParametersInterface $serverParams */
         $serverParams = $request->getServer();
         $serverParams->offsetSet('HTTP_HOST', $host);
         $request->setServer($serverParams);

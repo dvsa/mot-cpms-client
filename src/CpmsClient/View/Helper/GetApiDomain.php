@@ -16,7 +16,7 @@ class GetApiDomain extends AbstractHelper
 {
     protected ?ServiceLocatorInterface $pluginManager = null;
 
-    public function __invoke()
+    public function __invoke(): mixed
     {
         return $this->getServiceLocator()->get('cpms\service\domain');
     }

@@ -4,9 +4,11 @@ namespace CpmsClient\Service;
 
 use CpmsClient\Utility\Util;
 use Exception;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Laminas\Http\PhpEnvironment\Request;
 use Laminas\ServiceManager\Factory\FactoryInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 /**
  * Class ApiDomainServiceFactory
@@ -18,11 +20,14 @@ class ApiDomainServiceFactory implements FactoryInterface
     /**
      * Create service
      *
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
-     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+
      * Required suppression due to un-typed parameter in parent class
+     *
      * @psalm-suppress MissingParamType
+     * @psalm-suppress InvalidReturnType
+     * @phpstan-ignore-next-line
      */
     public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): string
     {

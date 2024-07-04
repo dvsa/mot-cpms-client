@@ -40,7 +40,9 @@ class NotificationsClientFactoryTest extends TestCase
         // we need to restore that config after each test
         //
         // if we do not do this, the legacy unit tests all break (grrrr)
-        $this->smConfig = $this->serviceManager->get('config');
+        /** @var array $config */
+        $config = $this->serviceManager->get('config');
+        $this->smConfig = $config;
     }
 
     /**
