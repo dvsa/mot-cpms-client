@@ -44,11 +44,11 @@ class Bootstrap
 
         $zf2ModulePaths = array(dirname(dirname($dir)));
         $path = static::findParentPath('vendor');
-        if ($path !== false && $path !== '') {
+        if ($path) {
             $zf2ModulePaths[] = $path;
         }
         $path = static::findParentPath('src');
-        if ($path !== false && $path !== '' && $path !== $zf2ModulePaths[0]) {
+        if ($path && $path !== $zf2ModulePaths[0]) {
             $zf2ModulePaths[] = $path;
         }
 
