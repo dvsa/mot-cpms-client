@@ -1,4 +1,6 @@
-<?php namespace CpmsClientTest;
+<?php
+
+namespace CpmsClientTest;
 
 use Laminas\Log\LoggerInterface;
 

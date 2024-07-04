@@ -1,4 +1,5 @@
 <?php
+
 namespace CpmsClient\Service;
 
 use Psr\Container\ContainerInterface;
@@ -13,7 +14,7 @@ use Laminas\ServiceManager\Factory\FactoryInterface;
  */
 class LoggerFactory implements FactoryInterface
 {
-    const DEFAULT_LOGGER_ALIAS = 'cpms\client\logger'; //default logger if none is set in the app
+    public const DEFAULT_LOGGER_ALIAS = 'cpms\client\logger'; //default logger if none is set in the app
 
     /**
      * Creates the logger

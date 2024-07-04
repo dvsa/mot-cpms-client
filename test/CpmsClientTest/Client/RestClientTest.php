@@ -1,4 +1,5 @@
 <?php
+
 namespace CpmsClientTest\Client;
 
 use CpmsClient\Client\ClientOptions;
@@ -66,7 +67,6 @@ class RestClientTest extends TestCase
 
         $config['cpms_api']['rest_client']['options']['domain'] = '';
         $this->serviceManager->setService('config', $config);
-
 
         $factory      = new ApiDomainServiceFactory();
         $request      = new Request();

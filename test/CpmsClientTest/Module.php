@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @package      CPMS Payment
@@ -15,7 +16,6 @@ namespace CpmsClientTest;
  */
 class Module
 {
-
     public function getConfig(): array
     {
         return include __DIR__ . '/../test.global.php';

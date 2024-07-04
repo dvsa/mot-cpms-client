@@ -14,7 +14,7 @@ class NotificationsClient
      * in our config, what is the name of the queue we need to read
      * new notifications from?
      */
-    const NOTIFICATIONS_QUEUENAME = "notifications";
+    protected const NOTIFICATIONS_QUEUENAME = "notifications";
 
     /**
      * our client for talking to our queues

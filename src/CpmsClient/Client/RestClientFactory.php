@@ -1,4 +1,5 @@
 <?php
+
 namespace CpmsClient\Client;
 
 use CpmsClient\Service\LoggerFactory;

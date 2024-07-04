@@ -66,8 +66,8 @@ class NotificationsClientTest extends TestCase
         //
         // we use ZF2's mock writer, so that the logger never attempts to
         // write either to disk nor to the screen
-        $logger = new Logger;
-        $mockWriter = new MockWriter;
+        $logger = new Logger();
+        $mockWriter = new MockWriter();
         $logger->addWriter($mockWriter);
 
         // finally!! we can build the client that we're unit testing here
@@ -326,7 +326,7 @@ class NotificationsClientTest extends TestCase
                 3.14
             ),
         ];
-        $mapper = new MapNotificationTypes;
+        $mapper = new MapNotificationTypes();
         foreach ($expectedNotifications as $expectedNotification) {
             /** @psalm-suppress InvalidArgument */
             $queuesClient->writeMessageToQueue('notifications', $expectedNotification);
@@ -433,7 +433,7 @@ class NotificationsClientTest extends TestCase
                 3.14
             ),
         ];
-        $mapper = new MapNotificationTypes;
+        $mapper = new MapNotificationTypes();
         foreach ($expectedNotifications as $expectedNotification) {
             /** @psalm-suppress InvalidArgument */
             $queuesClient->writeMessageToQueue('notifications', $expectedNotification);
@@ -477,5 +477,4 @@ class NotificationsClientTest extends TestCase
 
         $this->assertInstanceOf(Queues::class, $actualClient);
     }
-
 }

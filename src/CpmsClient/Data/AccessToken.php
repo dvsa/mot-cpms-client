@@ -1,4 +1,5 @@
 <?php
+
 namespace CpmsClient\Data;
 
 use Laminas\Stdlib\AbstractOptions;
@@ -12,7 +13,7 @@ use Traversable;
  */
 class AccessToken extends AbstractOptions
 {
-    const INVALID_ACCESS_TOKEN = 114;
+    public const INVALID_ACCESS_TOKEN = 114;
     protected ?int $expiresIn = null;
     protected ?string $tokenType = null;
     protected ?string $accessToken = null;

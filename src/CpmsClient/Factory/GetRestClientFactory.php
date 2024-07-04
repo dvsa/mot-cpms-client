@@ -2,7 +2,6 @@
 
 namespace CpmsClient\Factory;
 
-
 use CpmsClient\Controller\Plugin\GetRestClient;
 use Psr\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
@@ -12,7 +11,6 @@ use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class GetRestClientFactory implements FactoryInterface
 {
-
     /**
      * Create an object
      *

@@ -11,7 +11,6 @@ use Laminas\ServiceManager\ServiceManager;
  */
 class Bootstrap
 {
-
     protected static ServiceManager $serviceManager;
 
     /** This is the root directory where the test is run from which likely the test directory */
@@ -118,7 +117,7 @@ class Bootstrap
     /**
      * @param string $path
      *
-     * @return boolean|string false if the path cannot be found
+     * @return string false if the path cannot be found
      */
     protected function findParentPath($path)
     {
@@ -128,7 +127,7 @@ class Bootstrap
     }
 
     /**
-     * @return \Laminas\ServiceManager\ServiceManager
+     * @return ServiceManager
      */
     public function getServiceManager()
     {
@@ -147,7 +146,3 @@ class Bootstrap
     {
     }
 }
-
-$path = realpath(__DIR__ . '/../');
-chdir(dirname($path));
-Bootstrap::getInstance()->init($path, ['CpmsClientTest']);

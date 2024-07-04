@@ -21,7 +21,7 @@ use phpDocumentor\Reflection\Types\Object_;
  */
 class HttpRestJsonClient
 {
-    const CONTENT_TYPE_FORMAT = 'application/vnd.dvsa-gov-uk.v%d%s; charset=UTF-8';
+    protected const CONTENT_TYPE_FORMAT = 'application/vnd.dvsa-gov-uk.v%d%s; charset=UTF-8';
     protected HttpClient $httpClient;
 
     protected ClientOptions $options;

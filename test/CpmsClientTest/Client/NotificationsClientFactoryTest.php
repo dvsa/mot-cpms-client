@@ -68,7 +68,7 @@ class NotificationsClientFactoryTest extends TestCase
         // ----------------------------------------------------------------
         // perform the change
 
-        $unit = new NotificationsClientFactory;
+        $unit = new NotificationsClientFactory();
 
         // ----------------------------------------------------------------
         // test the results
@@ -87,7 +87,7 @@ class NotificationsClientFactoryTest extends TestCase
         // ----------------------------------------------------------------
         // perform the change
 
-        $unit = new NotificationsClientFactory;
+        $unit = new NotificationsClientFactory();
 
         // ----------------------------------------------------------------
         // test the results
@@ -169,5 +169,4 @@ class NotificationsClientFactoryTest extends TestCase
 
         $this->assertInstanceOf(NotificationsClient::class, $client);
     }
-
 }

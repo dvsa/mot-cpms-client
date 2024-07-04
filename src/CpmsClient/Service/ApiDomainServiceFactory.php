@@ -1,4 +1,5 @@
 <?php
+
 namespace CpmsClient\Service;
 
 use CpmsClient\Utility\Util;

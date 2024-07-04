@@ -1,4 +1,5 @@
 <?php
+
 namespace CpmsClient\Service;
 
 use CpmsClient\Authenticate\IdentityProviderInterface;
@@ -16,7 +17,6 @@ use Laminas\ServiceManager\Factory\FactoryInterface;
  */
 class ApiServiceFactory implements FactoryInterface
 {
-
     /**
      * Create API Service
      *

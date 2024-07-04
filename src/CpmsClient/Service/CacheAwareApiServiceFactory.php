@@ -1,8 +1,9 @@
 <?php
+
 namespace CpmsClient\Service;
+
 use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
-
 
 /**
  * Rest API service
@@ -12,7 +13,6 @@ use Laminas\ServiceManager\Factory\FactoryInterface;
  */
 class CacheAwareApiServiceFactory implements FactoryInterface
 {
-
     /**
      * Create Cache Aware API Service
      *

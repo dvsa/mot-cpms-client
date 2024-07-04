@@ -1,4 +1,5 @@
 <?php
+
 namespace ApplicationTest\Service;
 
 use CpmsClient\Service\ApiService;

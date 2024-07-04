@@ -1,4 +1,5 @@
 <?php
+
 namespace CpmsClient\Client;
 
 use Exception;

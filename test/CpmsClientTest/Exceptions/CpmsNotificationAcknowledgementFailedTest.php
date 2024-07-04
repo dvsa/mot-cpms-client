@@ -55,5 +55,4 @@ class CpmsNotificationAcknowledgementFailedTest extends TestCase
 
         $this->assertInstanceOf(Exception::class, $unit);
     }
-
 }

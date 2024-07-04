@@ -1,7 +1,9 @@
 <?php
+
 namespace CpmsClient\Service;
 
 use Exception;
+use Laminas\Cache\Exception\ExceptionInterface;
 use Laminas\Cache\Storage\StorageInterface;
 use Laminas\Log\LoggerAwareTrait;
 use Laminas\Log\LoggerInterface;
@@ -40,7 +42,7 @@ class CacheAwareApiService
     }
 
     /**
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      * @throws Exception
      */
     public function __call(string $method, array $arg): mixed

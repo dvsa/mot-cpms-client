@@ -1,4 +1,5 @@
 <?php
+
 namespace CpmsClient\View\Helper;
 
 use Exception;
@@ -17,7 +18,7 @@ class GetApiDomain extends AbstractHelper
 
     public function __invoke()
     {
-        return $this->getServiceLocator()->get('cpms\service\domain'); // TODO use ContainerInterface
+        return $this->getServiceLocator()->get('cpms\service\domain');
     }
 
     /**

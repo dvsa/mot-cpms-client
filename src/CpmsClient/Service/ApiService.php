@@ -1,4 +1,5 @@
 <?php
+
 namespace CpmsClient\Service;
 
 use CpmsClient\Client\ClientOptions;
@@ -14,6 +15,7 @@ use Laminas\Cache\Exception\ExceptionInterface;
 use Laminas\Cache\Storage\StorageInterface;
 use Laminas\Http\Request;
 use Laminas\Log\LoggerInterface;
+
 use function PHPUnit\Framework\arrayHasKey;
 
 /**
@@ -23,23 +25,23 @@ use function PHPUnit\Framework\arrayHasKey;
  */
 class ApiService
 {
-    const SCOPE_CARD         = 'CARD';
-    const SCOPE_CNP          = 'CNP';
-    const SCOPE_DIRECT_DEBIT = 'DIRECT_DEBIT';
-    const SCOPE_CHEQUE       = 'CHEQUE';
-    const SCOPE_REFUND       = 'REFUND';
-    const SCOPE_QUERY_TXN    = 'QUERY_TXN';
-    const SCOPE_STORED_CARD  = 'STORED_CARD';
-    const SCOPE_CHARGE_BACK  = 'CHARGE_BACK';
-    const SCOPE_CASH         = 'CASH';
-    const SCOPE_POSTAL_ORDER = 'POSTAL_ORDER';
-    const SCOPE_CHIP_PIN     = 'CHIP_PIN';
-    const SCOPE_ADJUSTMENT   = 'ADJUSTMENT';
-    const SCOPE_REPORT       = 'REPORT';
-    const CHEQUE_RD          = 'CHEQUE_RD'; // refer to drawer
-    const DIRECT_DEBIT_IC    = 'DIRECT_DEBIT_IC'; // indemnity claim
-    const REALLOCATE_PAYMENT = 'REALLOCATE'; // Reallocate payments by switch customer reference
-    const MAX_RETIRES        = 3;
+    public const SCOPE_CARD         = 'CARD';
+    public const SCOPE_CNP          = 'CNP';
+    public const SCOPE_DIRECT_DEBIT = 'DIRECT_DEBIT';
+    public const SCOPE_CHEQUE       = 'CHEQUE';
+    public const SCOPE_REFUND       = 'REFUND';
+    public const SCOPE_QUERY_TXN    = 'QUERY_TXN';
+    public const SCOPE_STORED_CARD  = 'STORED_CARD';
+    public const SCOPE_CHARGE_BACK  = 'CHARGE_BACK';
+    public const SCOPE_CASH         = 'CASH';
+    public const SCOPE_POSTAL_ORDER = 'POSTAL_ORDER';
+    public const SCOPE_CHIP_PIN     = 'CHIP_PIN';
+    public const SCOPE_ADJUSTMENT   = 'ADJUSTMENT';
+    public const SCOPE_REPORT       = 'REPORT';
+    public const CHEQUE_RD          = 'CHEQUE_RD'; // refer to drawer
+    public const DIRECT_DEBIT_IC    = 'DIRECT_DEBIT_IC'; // indemnity claim
+    public const REALLOCATE_PAYMENT = 'REALLOCATE'; // Reallocate payments by switch customer reference
+    public const MAX_RETIRES        = 3;
 
     protected LoggerInterface $logger;
 
@@ -57,14 +59,14 @@ class ApiService
 
     // we need to refactor the code to put these in a common package
     // that can be shared by both the client and the server :(
-    const CPMS_CODE_SUCCESS = '000';
+    public const CPMS_CODE_SUCCESS = '000';
 
     /**
      * Number of retries to get a valid token
      */
     private static int $retries = 0;
 
-    function __construct(
+    public function __construct(
         LoggerInterface $logger,
         HttpRestJsonClient $httpRestJsonClient,
         StorageInterface $cache,
@@ -114,7 +116,6 @@ class ApiService
                  * We delete the local cache and try to get a valid access for token in 3 attempts
                  */
                 if ($this->isCacheDeletedFromRemote($return)) {
-
                     self::$retries++;
 
                     $cacheKey = $this->generateCacheKey($scope, $salesReference);
@@ -131,7 +132,6 @@ class ApiService
                 return $token;
             }
         } catch (\Exception $exception) {
-
             return $this->returnErrorMessage(null, $exception);
         }
     }

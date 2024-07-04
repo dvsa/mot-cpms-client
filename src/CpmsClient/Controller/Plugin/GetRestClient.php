@@ -1,4 +1,5 @@
 <?php
+
 namespace CpmsClient\Controller\Plugin;
 
 use Psr\Container\ContainerInterface;
@@ -13,7 +14,7 @@ use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
  */
 class GetRestClient extends AbstractPlugin
 {
-    private $container;
+    private ContainerInterface $container;
 
     public function __construct(ContainerInterface $container)
     {
