@@ -17,7 +17,7 @@ class ClientOptions extends AbstractOptions
     protected ?string $clientId = null;
     protected ?string $clientSecret = null;
     protected ?string $userId = null;
-    protected array $endPoints = array();
+    protected array $endPoints = [];
     protected ?string $customerReference = null;
     protected ?string $grantType = null;
     protected int $timeout = 30;
@@ -25,7 +25,7 @@ class ClientOptions extends AbstractOptions
      * Payment Service domain
      */
     protected string $domain = '';
-    protected array $headers = array();
+    protected array $headers = [];
 
     public function getTimeout(): int
     {

@@ -99,7 +99,6 @@ class Bootstrap
 
             spl_autoload_register(
                 function ($class) use ($classList) {
-                    /** @psalm-suppress UnresolvableInclude */
                     if (isset($classList[$class])) {
                         /** @psalm-suppress UnresolvableInclude */
                         include $classList[$class];

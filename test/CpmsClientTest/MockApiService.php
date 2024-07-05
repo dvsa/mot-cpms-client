@@ -11,7 +11,7 @@ use CpmsClient\Service\ApiService;
  *
  * @package CpmsClientTest
  */
-#[AllowDynamicProperties] class MockApiService extends ApiService
+class MockApiService extends ApiService
 {
     protected bool $done = false;
 

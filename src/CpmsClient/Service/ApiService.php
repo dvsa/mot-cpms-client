@@ -44,19 +44,7 @@ class ApiService
     public const REALLOCATE_PAYMENT = 'REALLOCATE'; // Reallocate payments by switch customer reference
     public const MAX_RETIRES        = 3;
 
-    protected LoggerInterface $logger;
-
-    protected StorageInterface $cacheStorage;
-
-    protected HttpRestJsonClient $client;
-
-    protected array $tokens = [];
-
     protected ClientOptions $options;
-
-    protected bool $enableCache = true;
-
-    protected NotificationsClient $queuesClient;
 
     // we need to refactor the code to put these in a common package
     // that can be shared by both the client and the server :(
@@ -68,18 +56,14 @@ class ApiService
     private static int $retries = 0;
 
     public function __construct(
-        LoggerInterface $logger,
-        HttpRestJsonClient $httpRestJsonClient,
-        StorageInterface $cache,
-        bool $enableCache,
-        NotificationsClient $notificationsClient
+        protected LoggerInterface $logger,
+        protected HttpRestJsonClient $client,
+        protected StorageInterface $cacheStorage,
+        protected bool $enableCache,
+        protected NotificationsClient $queuesClient,
     ) {
-        $this->logger = $logger;
-        $this->client = $httpRestJsonClient;
-        $this->options = $httpRestJsonClient->getOptions();
-        $this->cacheStorage = $cache;
-        $this->enableCache = $enableCache;
-        $this->queuesClient = $notificationsClient;
+
+        $this->options = $client->getOptions();
     }
 
     /**

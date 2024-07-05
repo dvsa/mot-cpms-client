@@ -16,19 +16,17 @@ class LoggerFactory implements FactoryInterface
 {
     public const DEFAULT_LOGGER_ALIAS = 'cpms\client\logger'; //default logger if none is set in the app
 
-    /**
+    /**L
      * Creates the logger
      *
      * @param ContainerInterface $container
      *
-     * @param $requestedName
+     * @param mixed $requestedName
      * @param array|null $options
      * @return Logger
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      *
-     * Required suppression due to un-typed parameter in parent class
-     * @psalm-suppress MissingParamType
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null): Logger
     {

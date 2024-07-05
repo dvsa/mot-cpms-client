@@ -1,6 +1,6 @@
 <?php
 
-namespace ApplicationTest\Service;
+namespace CpmsClientTest\Service;
 
 use CpmsClient\Service\ApiService;
 use CpmsClient\Service\CacheAwareApiService;
