@@ -5,7 +5,7 @@
     "license": "proprietary",
     "require": {
         "php": "^8.2",
-        "dvsa/mot-cpms-notifications": "^1.0.0",
+        "dvsa/mot-cpms-notifications": "dev-feature-bl-17032-php-82-update",
         "laminas/laminas-mvc": "^3.3.0",
         "laminas/laminas-cache": "^3.10.1",
         "laminas/laminas-log": "^2.13",
