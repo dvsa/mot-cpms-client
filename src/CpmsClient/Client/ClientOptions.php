@@ -13,118 +13,191 @@ use Laminas\Stdlib\AbstractOptions;
  */
 class ClientOptions extends AbstractOptions
 {
-    protected int $version = 1;
-    protected ?string $clientId = null;
-    protected ?string $clientSecret = null;
-    protected ?string $userId = null;
-    protected array $endPoints = [];
-    protected ?string $customerReference = null;
-    protected ?string $grantType = null;
-    protected int $timeout = 30;
+    /** @var int $version */
+    protected $version = 1;
+    /** @var  string $clientId */
+    protected $clientId;
+    /** @var  string $clientSecret */
+    protected $clientSecret;
+    /** @var  string $userId */
+    protected $userId;
+    /** @var array $endPoints */
+    protected $endPoints = [];
+    /** @var  string $customerReference */
+    protected $customerReference;
+    /** @var  string $grantType */
+    protected $grantType;
+    /** @var int $timeout */
+    protected $timeout = 30;
+
     /**
      * Payment Service domain
+     *
+     * @var string $domain
      */
-    protected string $domain = '';
-    protected array $headers = [];
+    protected $domain;
 
+    /**
+     * @var array $headers
+     */
+    protected $headers = array();
+
+    /**
+     * @return int
+     */
     public function getTimeout(): int
     {
         return $this->timeout;
     }
 
-    public function setTimeout(int $timeout): void
+    /**
+     * @param int $timeout
+     */
+    public function setTimeout($timeout): void
     {
         $this->timeout = $timeout;
     }
 
+    /**
+     * @return int
+     */
     public function getVersion(): int
     {
         return $this->version;
     }
 
-    public function setVersion(int $version): void
+    /**
+     * @param int $version
+     */
+    public function setVersion($version): void
     {
         $this->version = $version;
     }
 
-    public function setCustomerReference(string $aeIdentity): void
+    /**
+     * @param string $aeIdentity
+     */
+    public function setCustomerReference($aeIdentity): void
     {
         $this->customerReference = $aeIdentity;
     }
 
-    public function getCustomerReference(): string | null
+    /**
+     * @return string
+     */
+    public function getCustomerReference(): string
     {
         return $this->customerReference;
     }
 
-    public function setEndPoints(array $endPoints): void
+    /**
+     * @param array $endPoints
+     */
+    public function setEndPoints($endPoints): void
     {
         $this->endPoints = $endPoints;
     }
 
+    /**
+     * @return array
+     */
     public function getEndPoints(): array
     {
         return $this->endPoints;
     }
 
-    public function setGrantType(string $grantType): void
+    /**
+     * @param string $grantType
+     */
+    public function setGrantType($grantType): void
     {
         $this->grantType = $grantType;
     }
 
-    public function getGrantType(): string | null
+    /**
+     * @return string
+     */
+    public function getGrantType(): string
     {
         return $this->grantType;
     }
 
-    public function setClientId(string $clientId): void
+    /**
+     * @param string $clientId
+     */
+    public function setClientId($clientId): void
     {
         $this->clientId = $clientId;
     }
 
     /**
-     * @throws Exception
+     * @return string
      */
-    public function getClientId(): string | null
+    public function getClientId(): string
     {
         return $this->clientId;
     }
 
-    public function setClientSecret(string | null $clientSecret): void
+    /**
+     * @param string $clientSecret
+     */
+    public function setClientSecret($clientSecret): void
     {
         $this->clientSecret = $clientSecret;
     }
 
-    public function getClientSecret(): string | null
+    /**
+     * @return string
+     */
+    public function getClientSecret(): string
     {
         return $this->clientSecret;
     }
 
-    public function setUserId(string | null $userId): void
+    /**
+     * @param string $userId
+     */
+    public function setUserId($userId): void
     {
         $this->userId = $userId;
     }
 
-    public function getUserId(): string | null
+    /**
+     * @return string
+     */
+    public function getUserId(): string
     {
         return $this->userId;
     }
 
-    public function setDomain(string $domain): void
+
+    /**
+     * @param string $domain
+     */
+    public function setDomain($domain): void
     {
         $this->domain = $domain;
     }
 
+    /**
+     * @return string
+     */
     public function getDomain(): string
     {
         return $this->domain;
     }
 
-    public function setHeaders(array $headers): void
+    /**
+     * @param array $headers
+     */
+    public function setHeaders($headers): void
     {
         $this->headers = $headers;
     }
 
+    /**
+     * @return array
+     */
     public function getHeaders(): array
     {
         return $this->headers;
