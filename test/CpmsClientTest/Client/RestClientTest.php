@@ -72,7 +72,7 @@ class RestClientTest extends TestCase
 
         $factory      = new ApiDomainServiceFactory();
         $request      = new Request();
-        /** @var ParametersInterface $serverParams */
+        /** @var ParametersInterface<mixed, mixed> $serverParams */
         $serverParams = $request->getServer();
         $serverParams->offsetSet('HTTP_HOST', $host);
         $request->setServer($serverParams);

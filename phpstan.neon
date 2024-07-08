@@ -1,7 +1,6 @@
 parameters:
     ignoreErrors:
         - identifier: missingType.iterableValue
-        - identifier: missingType.generics
     level: max
     paths:
         - src
