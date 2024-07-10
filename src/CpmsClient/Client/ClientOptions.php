@@ -86,7 +86,7 @@ class ClientOptions extends AbstractOptions
     }
 
     /**
-     * @throws Exception
+     * @return string|null
      */
     public function getClientId(): string|null
     {
