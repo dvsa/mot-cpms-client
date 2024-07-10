@@ -90,6 +90,9 @@ class ApiService
 
                 $this->getOptions()->setHeaders($headers);
 
+                $params['customer_reference'] = $params['customer_reference'] ?? $this->options->getCustomerReference();
+                $params['user_id'] = $params['user_id'] ?? $this->options->getUserId();
+
                 /** @var array $return */
                 $return = $this->getClient()->dispatchRequestAndDecodeResponse($url, $method, $params);
 
