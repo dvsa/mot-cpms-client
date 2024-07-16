@@ -1,4 +1,5 @@
 <?php
+
 namespace CpmsClient\Service;
 
 use CpmsClient\Client\ClientOptions;
@@ -7,11 +8,16 @@ use CpmsClient\Client\NotificationsClient;
 use CpmsClient\Data\AccessToken;
 use CpmsClient\Exceptions\CpmsNotificationAcknowledgementFailed;
 use CpmsClient\Utility\Util;
+use DVSA\CPMS\Notifications\Messages\Values\PaymentNotificationV1;
+use DVSA\CPMS\Queues\QueueAdapters\Interfaces\Queues;
 use DVSA\CPMS\Queues\QueueAdapters\Values\QueueMessage;
 use Exception;
+use Laminas\Cache\Exception\ExceptionInterface;
+use Laminas\Cache\Storage\StorageInterface;
 use Laminas\Http\Request;
-use Laminas\Log\Logger;
 use Laminas\Log\LoggerInterface;
+
+use function PHPUnit\Framework\arrayHasKey;
 
 /**
  * Class ApiService
@@ -20,77 +26,57 @@ use Laminas\Log\LoggerInterface;
  */
 class ApiService
 {
-    const SCOPE_CARD         = 'CARD';
-    const SCOPE_CNP          = 'CNP';
-    const SCOPE_DIRECT_DEBIT = 'DIRECT_DEBIT';
-    const SCOPE_CHEQUE       = 'CHEQUE';
-    const SCOPE_REFUND       = 'REFUND';
-    const SCOPE_QUERY_TXN    = 'QUERY_TXN';
-    const SCOPE_STORED_CARD  = 'STORED_CARD';
-    const SCOPE_CHARGE_BACK  = 'CHARGE_BACK';
-    const SCOPE_CASH         = 'CASH';
-    const SCOPE_POSTAL_ORDER = 'POSTAL_ORDER';
-    const SCOPE_CHIP_PIN     = 'CHIP_PIN';
-    const SCOPE_ADJUSTMENT   = 'ADJUSTMENT';
-    const SCOPE_REPORT       = 'REPORT';
-    const CHEQUE_RD          = 'CHEQUE_RD'; // refer to drawer
-    const DIRECT_DEBIT_IC    = 'DIRECT_DEBIT_IC'; // indemnity claim
-    const REALLOCATE_PAYMENT = 'REALLOCATE'; // Reallocate payments by switch customer reference
-    const MAX_RETIRES        = 3;
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger = null;
+    public const SCOPE_CARD         = 'CARD';
+    public const SCOPE_CNP          = 'CNP';
+    public const SCOPE_DIRECT_DEBIT = 'DIRECT_DEBIT';
+    public const SCOPE_CHEQUE       = 'CHEQUE';
+    public const SCOPE_REFUND       = 'REFUND';
+    public const SCOPE_QUERY_TXN    = 'QUERY_TXN';
+    public const SCOPE_STORED_CARD  = 'STORED_CARD';
+    public const SCOPE_CHARGE_BACK  = 'CHARGE_BACK';
+    public const SCOPE_CASH         = 'CASH';
+    public const SCOPE_POSTAL_ORDER = 'POSTAL_ORDER';
+    public const SCOPE_CHIP_PIN     = 'CHIP_PIN';
+    public const SCOPE_ADJUSTMENT   = 'ADJUSTMENT';
+    public const SCOPE_REPORT       = 'REPORT';
+    public const CHEQUE_RD          = 'CHEQUE_RD'; // refer to drawer
+    public const DIRECT_DEBIT_IC    = 'DIRECT_DEBIT_IC'; // indemnity claim
+    public const REALLOCATE_PAYMENT = 'REALLOCATE'; // Reallocate payments by switch customer reference
+    public const MAX_RETIRES        = 3;
 
-    /** @var  \Laminas\Cache\Storage\StorageInterface */
-    protected $cacheStorage;
-    /**
-     * @var \CpmsClient\Client\HttpRestJsonClient
-     */
-    protected $client;
-
-    /** @var  \Laminas\ServiceManager\ServiceManager */
-    protected $serviceManager;
-
-    /** @var array */
-    protected $tokens = array();
-
-    /** @var ClientOptions */
-    protected $options;
-
-    /** @var bool */
-    protected $enableCache = true;
-
-    /** @var \DVSA\CPMS\Queues\QueueAdapters\Queues */
-    protected $queuesClient;
+    protected ClientOptions $options;
 
     // we need to refactor the code to put these in a common package
     // that can be shared by both the client and the server :(
-    const CPMS_CODE_SUCCESS = '000';
+    public const CPMS_CODE_SUCCESS = '000';
 
     /**
      * Number of retries to get a valid token
-     *
-     * @var int
      */
-    private static $retries = 0;
+    private static int $retries = 0;
+
+    public function __construct(
+        protected LoggerInterface $logger,
+        protected HttpRestJsonClient $client,
+        protected StorageInterface $cacheStorage,
+        protected bool $enableCache,
+        protected NotificationsClient $queuesClient,
+    ) {
+
+        $this->options = $client->getOptions();
+    }
 
     /**
      * Process API request
      *
-     * @param        $endPointAlias
      * @param        $scope (CARD, DIRECT_DEBIT)
      * @param string $method HTTP Method (GET, POST, DELETE, PUT)
-     * @param null $params
      *
-     * @return array|mixed
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
-    protected function processRequest($endPointAlias, $scope, $method, $params = null)
+    protected function processRequest(string $endPointAlias, string $scope, string $method, array | null $params = null): mixed
     {
         try {
-            $method         = (string)$method;
-            $scope          = (string)$scope;
             $salesReference = $this->getSalesReferenceFromParams($params);
 
             //Get access token
@@ -104,14 +90,10 @@ class ApiService
 
                 $this->getOptions()->setHeaders($headers);
 
-                if (empty($data['customer_reference'])) {
-                    $data['customer_reference'] = $this->options->getCustomerReference();
-                }
+                $params['customer_reference'] = $params['customer_reference'] ?? $this->options->getCustomerReference();
+                $params['user_id'] = $params['user_id'] ?? $this->options->getUserId();
 
-                if (empty($data['user_id'])) {
-                    $data['user_id'] = $this->options->getUserId();
-                }
-
+                /** @var array $return */
                 $return = $this->getClient()->dispatchRequestAndDecodeResponse($url, $method, $params);
 
                 if (empty($return)) {
@@ -123,7 +105,6 @@ class ApiService
                  * We delete the local cache and try to get a valid access for token in 3 attempts
                  */
                 if ($this->isCacheDeletedFromRemote($return)) {
-
                     self::$retries++;
 
                     $cacheKey = $this->generateCacheKey($scope, $salesReference);
@@ -140,19 +121,14 @@ class ApiService
                 return $token;
             }
         } catch (\Exception $exception) {
-
             return $this->returnErrorMessage(null, $exception);
         }
     }
 
     /**
      * Is the cache invalid
-     *
-     * @param $return
-     *
-     * @return bool
      */
-    protected function isCacheDeletedFromRemote($return)
+    protected function isCacheDeletedFromRemote(array $return): bool
     {
         return (self::$retries <= self::MAX_RETIRES
             && $this->getEnableCache()
@@ -162,73 +138,50 @@ class ApiService
     }
 
     /**
-     * @param       $endPointAlias
-     * @param       $scope
-     * @param array $data
-     *
-     * @return array|mixed
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
-    public function get($endPointAlias, $scope, $data = array())
+    public function get(string $endPointAlias, string $scope, array $data = array()): mixed
     {
         return $this->processRequest($endPointAlias, $scope, Request::METHOD_GET, $data);
     }
 
     /**
-     * @param $endPointAlias
-     * @param $scope
-     * @param $data
-     *
-     * @return array|mixed
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
-    public function post($endPointAlias, $scope, $data)
+    public function post(string $endPointAlias, string $scope, array $data): mixed
     {
         return $this->processRequest($endPointAlias, $scope, Request::METHOD_POST, $data);
     }
 
     /**
-     * @param $endPointAlias
-     * @param $scope
-     * @param $data
-     *
-     * @return array|mixed
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
-    public function put($endPointAlias, $scope, $data)
+    public function put(string $endPointAlias, string $scope, array $data): mixed
     {
         return $this->processRequest($endPointAlias, $scope, Request::METHOD_PUT, $data);
     }
 
     /**
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
-    public function patch(string $endPointAlias, string $scope, array $data): array|string
+    public function patch(string $endPointAlias, string $scope, array $data): mixed
     {
         return $this->processRequest($endPointAlias, $scope, Request::METHOD_PATCH, $data);
     }
 
     /**
-     * @param $endPointAlias
-     * @param $scope
-     *
-     * @return array|mixed
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
-    public function delete($endPointAlias, $scope)
+    public function delete(string $endPointAlias, string $scope): mixed
     {
         return $this->processRequest($endPointAlias, $scope, Request::METHOD_DELETE);
     }
 
     /**
      * Add header to request
-     *
-     * @param string $key
-     * @param string $value
-     *
-     * @return $this
+     * @throws Exception
      */
-    public function addHeader($key, $value)
+    public function addHeader(string $key, string $value): ApiService
     {
         $headers       = $this->getOptions()->getHeaders();
         $headers[$key] = $value;
@@ -237,67 +190,52 @@ class ApiService
         return $this;
     }
 
-    /**
-     * @param \Laminas\Cache\Storage\StorageInterface $cacheStorage
-     */
-    public function setCacheStorage($cacheStorage)
+    public function setCacheStorage(StorageInterface $cacheStorage): void
     {
         $this->cacheStorage = $cacheStorage;
     }
 
-    /**
-     * @return \Laminas\Cache\Storage\StorageInterface
-     */
-    public function getCacheStorage()
+    public function getCacheStorage(): StorageInterface
     {
         return $this->cacheStorage;
     }
 
-    /**
-     * @param HttpRestJsonClient $client
-     */
-    public function setClient($client)
+    public function setClient(HttpRestJsonClient $client): void
     {
         $this->client = $client;
     }
 
     /**
-     * @return HttpRestJsonClient
+     * @throws Exception
      */
-    public function getClient()
+    public function getClient(): HttpRestJsonClient
     {
         return $this->client;
     }
 
-    /**
-     * @param ClientOptions $options
-     */
-    public function setOptions($options)
+    public function setOptions(ClientOptions $options): void
     {
         $this->options = $options;
     }
 
     /**
-     * @return ClientOptions
+     * @throws Exception
      */
-    public function getOptions()
+    public function getOptions(): ClientOptions
     {
         return $this->options;
     }
 
     /**
-     * @param $scope
-     * @param string $salesReference
-     *
-     * @return AccessToken
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
+     * @throws Exception
      */
-    public function getTokenForScope($scope, $salesReference = '')
+    public function getTokenForScope(string $scope, string | null $salesReference = ''): array | AccessToken | string | null
     {
-        /** @var \CpmsClient\Data\AccessToken $token */
         $key = $this->generateCacheKey($scope, $salesReference);
 
         if ($this->getEnableCache() && $this->getCacheStorage()->hasItem($key)) {
+            /** @var array $cache */
             $cache = $this->getCacheStorage()->getItem($key);
             $token = new AccessToken($cache);
         } else {
@@ -305,6 +243,7 @@ class ApiService
         }
 
         if (empty($token) || $token->isExpired()) {
+            /** @var array $data */
             $data = $this->getPaymentServiceAccessToken($scope, $salesReference);
 
             if (isset($data['access_token'])) {
@@ -325,40 +264,27 @@ class ApiService
     }
 
     /**
-     * @param $scope
-     * @param $salesRef
-     *
-     * @return string
+     * @throws Exception
      */
-    public function generateCacheKey($scope, $salesRef = null)
+    public function generateCacheKey(string $scope, string | null $salesRef = null): string
     {
         return 'token-' . md5($scope . $salesRef . $this->getOptions()->getClientId());
     }
 
     /**
-     * @param $key
-     *
      * @return string
      */
-    public function getEndpoint($key)
+    public function getEndpoint(string $key): string
     {
         $endPoints = $this->getOptions()->getEndPoints();
-        if (isset($endPoints[$key])) {
-            return $endPoints[$key];
-        } else {
-            return $key;
-        }
+        return $endPoints[$key] ?? $key;
     }
 
     /**
      * Make api request to get access token
-     *
-     * @param $scope
-     * @param $salesReference
-     *
-     * @return mixed
+     * @throws Exception
      */
-    protected function getPaymentServiceAccessToken($scope, $salesReference = null)
+    protected function getPaymentServiceAccessToken(string $scope, string | null $salesReference = null): mixed
     {
         $payload = [
             'client_id'     => $this->getOptions()->getClientId(),
@@ -368,7 +294,7 @@ class ApiService
             'scope'         => $scope,
         ];
 
-        if (!empty($salesReference)) {
+        if ($salesReference !== '' && $salesReference !== null) {
             $payload['sales_reference'] = $salesReference;
         }
 
@@ -384,31 +310,20 @@ class ApiService
         );
     }
 
-    /**
-     * @param boolean $enableCache
-     */
-    public function setEnableCache($enableCache)
+    public function setEnableCache(bool $enableCache): void
     {
         $this->enableCache = $enableCache;
     }
 
-    /**
-     * @return bool
-     */
-    public function getEnableCache()
+    public function getEnableCache(): bool
     {
         return $this->enableCache;
     }
 
-    /**
-     * @param Request   $request
-     * @param Exception $exception
-     *
-     * @return array
-     */
-    private function returnErrorMessage(Request $request = null, Exception $exception = null)
+    private function returnErrorMessage(Request $request = null, Exception $exception = null): array
     {
         $errorId   = $this->getErrorId();
+        $message = [];
         $message[] = $errorId;
 
         if ($request) {
@@ -419,9 +334,7 @@ class ApiService
             $message[] = Util::processException($exception);
         }
 
-        if ($logger = $this->getLogger()) {
-            $logger->err(implode(' ', $message));
-        }
+        $this->logger->err(implode(' ', $message));
 
         return array(
             'code'    => 105,
@@ -429,12 +342,7 @@ class ApiService
         );
     }
 
-    /**
-     * @param $params
-     *
-     * @return string|null
-     */
-    private function getSalesReferenceFromParams($params)
+    private function getSalesReferenceFromParams(array | null $params): string | null
     {
         if (!isset($params['payment_data'])) {
             return null;
@@ -451,12 +359,8 @@ class ApiService
 
     /**
      * Set logger object
-     *
-     * @param Logger $logger
-     *
-     * @return mixed
      */
-    public function setLogger(LoggerInterface $logger)
+    public function setLogger(LoggerInterface $logger): static
     {
         $this->logger = $logger;
 
@@ -465,20 +369,16 @@ class ApiService
 
     /**
      * Get logger object
-     *
-     * @return  Logger
      */
-    public function getLogger()
+    public function getLogger(): LoggerInterface
     {
         return $this->logger;
     }
 
     /**
      * Return a unique identifier for the error message for tracking in the the logs
-     *
-     * @return string
      */
-    private function getErrorId()
+    private function getErrorId(): string
     {
         return md5(uniqid('API'));
     }
@@ -489,18 +389,12 @@ class ApiService
     //
     // ------------------------------------------------------------------
 
-    /**
-     * @return NotificationsClient|null
-     */
-    public function getNotificationsClient()
+    public function getNotificationsClient(): NotificationsClient
     {
         return $this->queuesClient;
     }
 
-    /**
-     * @param NotificationsClient $client
-     */
-    public function setNotificationsClient(NotificationsClient $notificationsClient)
+    public function setNotificationsClient(NotificationsClient $notificationsClient): void
     {
         $this->queuesClient = $notificationsClient;
     }
@@ -515,16 +409,9 @@ class ApiService
      * returns an associative array of ['message', 'metadata'] pairs:
      * - 'message' is the notification from CPMS
      * - 'metadata' is information from the queueing system
-     *
-     * @return array
      */
-    public function getNotifications()
+    public function getNotifications(): array
     {
-        // if we have no queues client, there are no notifications to get
-        if ($this->queuesClient === null) {
-            return [];
-        }
-
         return $this->queuesClient->getNotifications();
     }
 
@@ -532,19 +419,17 @@ class ApiService
      * call this when a notification has been applied to the scheme's
      * own data
      *
-     * @param  QueueMessage $metadata
-     *         the metadata for the notification that has been applied
-     * @param  object $message
-     *         the notification that has been applied
-     * @return void
+     * @throws CpmsNotificationAcknowledgementFailed|ExceptionInterface
+     * @throws Exception
      */
-    public function acknowledgeNotification(QueueMessage $metadata, $message)
+    public function acknowledgeNotification(QueueMessage $metadata, PaymentNotificationV1 $message): void
     {
         // shorthand
         $queuesClient = $this->getNotificationsClient();
 
         // contact cpms/payment-service, tell it that we have successfully
         // processed this notification
+        /** @var array $response */
         $response = $this->put("/api/notifications/" . $message->getNotificationId() . '/acknowledged', 'NOTIFICATION', []);
         if (!isset($response['code']) || $response['code'] !== self::CPMS_CODE_SUCCESS) {
             $msg = "response from HttpClient does not contain expected 'code' field";

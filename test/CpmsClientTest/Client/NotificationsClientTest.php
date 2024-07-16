@@ -18,11 +18,13 @@ use Laminas\Log\Writer\Mock as MockWriter;
  */
 class NotificationsClientTest extends TestCase
 {
+    protected $backupStaticAttributes = null;
+    protected $runTestInSeparateProcess = null;
 
     /**
      * @covers ::__construct
      */
-    public function testCanInstantiate()
+    public function testCanInstantiate(): void
     {
         // ----------------------------------------------------------------
         // setup your test
@@ -38,7 +40,7 @@ class NotificationsClientTest extends TestCase
         $this->assertInstanceOf(NotificationsClient::class, $unit);
     }
 
-    protected function provideNotificationsClient($extraConfig = [])
+    protected function provideNotificationsClient(array $extraConfig = []): NotificationsClient
     {
         // our default config has a single, active queue
         $queuesConfig = [
@@ -47,7 +49,7 @@ class NotificationsClientTest extends TestCase
                     'active' => true,
                     'Middleware' => [
                         'MultipartMessage' => [
-                            "mapper" => MapNotificationTypes::class,
+                            'mapper' => MapNotificationTypes::class,
                         ]
                     ]
                 ]
@@ -64,8 +66,8 @@ class NotificationsClientTest extends TestCase
         //
         // we use ZF2's mock writer, so that the logger never attempts to
         // write either to disk nor to the screen
-        $logger = new Logger;
-        $mockWriter = new MockWriter;
+        $logger = new Logger();
+        $mockWriter = new MockWriter();
         $logger->addWriter($mockWriter);
 
         // finally!! we can build the client that we're unit testing here
@@ -77,7 +79,7 @@ class NotificationsClientTest extends TestCase
     /**
      * @covers ::getNotifications
      */
-    public function testCanGetNotificationsFromQueue()
+    public function testCanGetNotificationsFromQueue(): void
     {
         // ----------------------------------------------------------------
         // setup your test
@@ -86,19 +88,21 @@ class NotificationsClientTest extends TestCase
         $queuesClient = $unit->getQueuesClient();
 
         // we need to put a message onto this queue
+        /** @var string $expectedNotification */
         $expectedNotification = new PaymentNotificationV1(
-            "unit-test",
+            'unit-test',
             GenerateNotificationId::now(),
-            new DateTime("2015-01-01 00:30:00 +0000"),
-            "CPMS",
-            "unit-test",
-            "test",
-            "unit-test",
-            new DateTime("2015-01-01 00:00:00 +0000"),
-            "CPMS-123456-67890",
+            new DateTime('2015-01-01 00:30:00 +0000'),
+            'CPMS',
+            'unit-test',
+            'test',
+            'unit-test',
+            new DateTime('2015-01-01 00:00:00 +0000'),
+            'CPMS-123456-67890',
             3.14
         );
-        $queuesClient->writeMessageToQueue("notifications", $expectedNotification);
+        /** @psalm-suppress InvalidArgument */
+        $queuesClient->writeMessageToQueue('notifications', $expectedNotification);
 
         // ----------------------------------------------------------------
         // perform the change
@@ -109,7 +113,6 @@ class NotificationsClientTest extends TestCase
         // test the results
 
         // make sure that we have a result at all!
-        $this->assertTrue(is_array($actualNotifications));
         $this->assertCount(1, $actualNotifications);
 
         // make sure that the first entry in the list is what we expect
@@ -121,7 +124,7 @@ class NotificationsClientTest extends TestCase
     /**
      * @covers ::getNotifications
      */
-    public function testReturnsEmptyListWhenNoNotificationsAvailable()
+    public function testReturnsEmptyListWhenNoNotificationsAvailable(): void
     {
         // ----------------------------------------------------------------
         // setup your test
@@ -136,14 +139,13 @@ class NotificationsClientTest extends TestCase
         // ----------------------------------------------------------------
         // test the results
 
-        $this->assertTrue(is_array($actualNotifications));
         $this->assertCount(0, $actualNotifications);
     }
 
     /**
      * @covers ::getNotifications
      */
-    public function testCanReturnMultipleNotifications()
+    public function testCanReturnMultipleNotifications(): void
     {
         // ----------------------------------------------------------------
         // setup your test
@@ -151,7 +153,7 @@ class NotificationsClientTest extends TestCase
         $extraConfig = [
             'queues' => [
                 'notifications' => [
-                    "MaxNumberOfMessages" => 5,
+                    'MaxNumberOfMessages' => 5,
                 ]
             ]
         ];
@@ -159,70 +161,72 @@ class NotificationsClientTest extends TestCase
         $queuesClient = $unit->getQueuesClient();
 
         // we need to put several messages onto this queue
+        /** @var array<string> $expectedNotifications */
         $expectedNotifications = [
             new PaymentNotificationV1(
-                "unit-test",
-                1,
-                new DateTime("2015-01-01 00:30:00 +0000"),
-                "CPMS",
-                "unit-test",
-                "test",
-                "unit-test",
-                new DateTime("2015-01-01 00:00:00 +0000"),
-                "CPMS-123456-67890",
+                'unit-test',
+                '1',
+                new DateTime('2015-01-01 00:30:00 +0000'),
+                'CPMS',
+                'unit-test',
+                'test',
+                'unit-test',
+                new DateTime('2015-01-01 00:00:00 +0000'),
+                'CPMS-123456-67890',
                 3.14
             ),
             new PaymentNotificationV1(
-                "unit-test",
-                2,
-                new DateTime("2015-01-01 00:30:00 +0000"),
-                "CPMS",
-                "unit-test",
-                "test",
-                "unit-test",
-                new DateTime("2015-01-01 00:00:00 +0000"),
-                "CPMS-123456-67890",
+                'unit-test',
+                '2',
+                new DateTime('2015-01-01 00:30:00 +0000'),
+                'CPMS',
+                'unit-test',
+                'test',
+                'unit-test',
+                new DateTime('2015-01-01 00:00:00 +0000'),
+                'CPMS-123456-67890',
                 3.14
             ),
             new PaymentNotificationV1(
-                "unit-test",
-                3,
-                new DateTime("2015-01-01 00:30:00 +0000"),
-                "CPMS",
-                "unit-test",
-                "test",
-                "unit-test",
-                new DateTime("2015-01-01 00:00:00 +0000"),
-                "CPMS-123456-67890",
+                'unit-test',
+                '3',
+                new DateTime('2015-01-01 00:30:00 +0000'),
+                'CPMS',
+                'unit-test',
+                'test',
+                'unit-test',
+                new DateTime('2015-01-01 00:00:00 +0000'),
+                'CPMS-123456-67890',
                 3.14
             ),
             new PaymentNotificationV1(
-                "unit-test",
-                4,
-                new DateTime("2015-01-01 00:30:00 +0000"),
-                "CPMS",
-                "unit-test",
-                "test",
-                "unit-test",
-                new DateTime("2015-01-01 00:00:00 +0000"),
-                "CPMS-123456-67890",
+                'unit-test',
+                '4',
+                new DateTime('2015-01-01 00:30:00 +0000'),
+                'CPMS',
+                'unit-test',
+                'test',
+                'unit-test',
+                new DateTime('2015-01-01 00:00:00 +0000'),
+                'CPMS-123456-67890',
                 3.14
             ),
             new PaymentNotificationV1(
-                "unit-test",
-                5,
-                new DateTime("2015-01-01 00:30:00 +0000"),
-                "CPMS",
-                "unit-test",
-                "test",
-                "unit-test",
-                new DateTime("2015-01-01 00:00:00 +0000"),
-                "CPMS-123456-67890",
+                'unit-test',
+                '5',
+                new DateTime('2015-01-01 00:30:00 +0000'),
+                'CPMS',
+                'unit-test',
+                'test',
+                'unit-test',
+                new DateTime('2015-01-01 00:00:00 +0000'),
+                'CPMS-123456-67890',
                 3.14
             ),
         ];
         foreach ($expectedNotifications as $expectedNotification) {
-            $queuesClient->writeMessageToQueue("notifications", $expectedNotification);
+            /** @psalm-suppress InvalidArgument */
+            $queuesClient->writeMessageToQueue('notifications', $expectedNotification);
         }
 
         // ----------------------------------------------------------------
@@ -233,7 +237,6 @@ class NotificationsClientTest extends TestCase
         // ----------------------------------------------------------------
         // test the results
 
-        $this->assertTrue(is_array($actualNotifications));
         $this->assertCount(5, $actualNotifications);
 
         // InMemoryQueues guarantees ordering, which makes the following
@@ -247,7 +250,7 @@ class NotificationsClientTest extends TestCase
     /**
      * @covers ::getNotifications
      */
-    public function testWillOnlyReturnUpToMaxNumberOfNotifications()
+    public function testWillOnlyReturnUpToMaxNumberOfNotifications(): void
     {
         // ----------------------------------------------------------------
         // setup your test
@@ -255,7 +258,7 @@ class NotificationsClientTest extends TestCase
         $extraConfig = [
             'queues' => [
                 'notifications' => [
-                    "MaxNumberOfMessages" => 2,
+                    'MaxNumberOfMessages' => 2,
                 ]
             ]
         ];
@@ -263,71 +266,73 @@ class NotificationsClientTest extends TestCase
         $queuesClient = $unit->getQueuesClient();
 
         // we need to put several messages onto this queue
+        /** @var array<string> $expectedNotifications */
         $expectedNotifications = [
             new PaymentNotificationV1(
-                "unit-test",
-                1,
-                new DateTime("2015-01-01 00:30:00 +0000"),
-                "CPMS",
-                "unit-test",
-                "test",
-                "unit-test",
-                new DateTime("2015-01-01 00:00:00 +0000"),
-                "CPMS-123456-67890",
+                'unit-test',
+                '1',
+                new DateTime('2015-01-01 00:30:00 +0000'),
+                'CPMS',
+                'unit-test',
+                'test',
+                'unit-test',
+                new DateTime('2015-01-01 00:00:00 +0000'),
+                'CPMS-123456-67890',
                 3.14
             ),
             new PaymentNotificationV1(
-                "unit-test",
-                2,
-                new DateTime("2015-01-01 00:30:00 +0000"),
-                "CPMS",
-                "unit-test",
-                "test",
-                "unit-test",
-                new DateTime("2015-01-01 00:00:00 +0000"),
-                "CPMS-123456-67890",
+                'unit-test',
+                '2',
+                new DateTime('2015-01-01 00:30:00 +0000'),
+                'CPMS',
+                'unit-test',
+                'test',
+                'unit-test',
+                new DateTime('2015-01-01 00:00:00 +0000'),
+                'CPMS-123456-67890',
                 3.14
             ),
             new PaymentNotificationV1(
-                "unit-test",
-                3,
-                new DateTime("2015-01-01 00:30:00 +0000"),
-                "CPMS",
-                "unit-test",
-                "test",
-                "unit-test",
-                new DateTime("2015-01-01 00:00:00 +0000"),
-                "CPMS-123456-67890",
+                'unit-test',
+                '3',
+                new DateTime('2015-01-01 00:30:00 +0000'),
+                'CPMS',
+                'unit-test',
+                'test',
+                'unit-test',
+                new DateTime('2015-01-01 00:00:00 +0000'),
+                'CPMS-123456-67890',
                 3.14
             ),
             new PaymentNotificationV1(
-                "unit-test",
-                4,
-                new DateTime("2015-01-01 00:30:00 +0000"),
-                "CPMS",
-                "unit-test",
-                "test",
-                "unit-test",
-                new DateTime("2015-01-01 00:00:00 +0000"),
-                "CPMS-123456-67890",
+                'unit-test',
+                '4',
+                new DateTime('2015-01-01 00:30:00 +0000'),
+                'CPMS',
+                'unit-test',
+                'test',
+                'unit-test',
+                new DateTime('2015-01-01 00:00:00 +0000'),
+                'CPMS-123456-67890',
                 3.14
             ),
             new PaymentNotificationV1(
-                "unit-test",
-                5,
-                new DateTime("2015-01-01 00:30:00 +0000"),
-                "CPMS",
-                "unit-test",
-                "test",
-                "unit-test",
-                new DateTime("2015-01-01 00:00:00 +0000"),
-                "CPMS-123456-67890",
+                'unit-test',
+                '5',
+                new DateTime('2015-01-01 00:30:00 +0000'),
+                'CPMS',
+                'unit-test',
+                'test',
+                'unit-test',
+                new DateTime('2015-01-01 00:00:00 +0000'),
+                'CPMS-123456-67890',
                 3.14
             ),
         ];
-        $mapper = new MapNotificationTypes;
+        $mapper = new MapNotificationTypes();
         foreach ($expectedNotifications as $expectedNotification) {
-            $queuesClient->writeMessageToQueue("notifications", $expectedNotification);
+            /** @psalm-suppress InvalidArgument */
+            $queuesClient->writeMessageToQueue('notifications', $expectedNotification);
         }
 
         // ----------------------------------------------------------------
@@ -338,7 +343,6 @@ class NotificationsClientTest extends TestCase
         // ----------------------------------------------------------------
         // test the results
 
-        $this->assertTrue(is_array($actualNotifications));
         $this->assertCount(2, $actualNotifications);
 
         // InMemoryQueues guarantees ordering, which makes the following
@@ -352,7 +356,7 @@ class NotificationsClientTest extends TestCase
     /**
      * @covers ::getNotifications
      */
-    public function testDoesNotWaitIfThereAreLessThanMaxNumberOfNotifications()
+    public function testDoesNotWaitIfThereAreLessThanMaxNumberOfNotifications(): void
     {
         // ----------------------------------------------------------------
         // setup your test
@@ -362,7 +366,7 @@ class NotificationsClientTest extends TestCase
         $extraConfig = [
             'queues' => [
                 'notifications' => [
-                    "MaxNumberOfMessages" => 20,
+                    'MaxNumberOfMessages' => 20,
                 ]
             ]
         ];
@@ -370,71 +374,73 @@ class NotificationsClientTest extends TestCase
         $queuesClient = $unit->getQueuesClient();
 
         // we need to put several messages onto this queue
+        /** @var array<string> $expectedNotifications */
         $expectedNotifications = [
             new PaymentNotificationV1(
-                "unit-test",
-                1,
-                new DateTime("2015-01-01 00:30:00 +0000"),
-                "CPMS",
-                "unit-test",
-                "test",
-                "unit-test",
-                new DateTime("2015-01-01 00:00:00 +0000"),
-                "CPMS-123456-67890",
+                'unit-test',
+                '1',
+                new DateTime('2015-01-01 00:30:00 +0000'),
+                'CPMS',
+                'unit-test',
+                'test',
+                'unit-test',
+                new DateTime('2015-01-01 00:00:00 +0000'),
+                'CPMS-123456-67890',
                 3.14
             ),
             new PaymentNotificationV1(
-                "unit-test",
-                2,
-                new DateTime("2015-01-01 00:30:00 +0000"),
-                "CPMS",
-                "unit-test",
-                "test",
-                "unit-test",
-                new DateTime("2015-01-01 00:00:00 +0000"),
-                "CPMS-123456-67890",
+                'unit-test',
+                '2',
+                new DateTime('2015-01-01 00:30:00 +0000'),
+                'CPMS',
+                'unit-test',
+                'test',
+                'unit-test',
+                new DateTime('2015-01-01 00:00:00 +0000'),
+                'CPMS-123456-67890',
                 3.14
             ),
             new PaymentNotificationV1(
-                "unit-test",
-                3,
-                new DateTime("2015-01-01 00:30:00 +0000"),
-                "CPMS",
-                "unit-test",
-                "test",
-                "unit-test",
-                new DateTime("2015-01-01 00:00:00 +0000"),
-                "CPMS-123456-67890",
+                'unit-test',
+                '3',
+                new DateTime('2015-01-01 00:30:00 +0000'),
+                'CPMS',
+                'unit-test',
+                'test',
+                'unit-test',
+                new DateTime('2015-01-01 00:00:00 +0000'),
+                'CPMS-123456-67890',
                 3.14
             ),
             new PaymentNotificationV1(
-                "unit-test",
-                4,
-                new DateTime("2015-01-01 00:30:00 +0000"),
-                "CPMS",
-                "unit-test",
-                "test",
-                "unit-test",
-                new DateTime("2015-01-01 00:00:00 +0000"),
-                "CPMS-123456-67890",
+                'unit-test',
+                '4',
+                new DateTime('2015-01-01 00:30:00 +0000'),
+                'CPMS',
+                'unit-test',
+                'test',
+                'unit-test',
+                new DateTime('2015-01-01 00:00:00 +0000'),
+                'CPMS-123456-67890',
                 3.14
             ),
             new PaymentNotificationV1(
-                "unit-test",
-                5,
-                new DateTime("2015-01-01 00:30:00 +0000"),
-                "CPMS",
-                "unit-test",
-                "test",
-                "unit-test",
-                new DateTime("2015-01-01 00:00:00 +0000"),
-                "CPMS-123456-67890",
+                'unit-test',
+                '5',
+                new DateTime('2015-01-01 00:30:00 +0000'),
+                'CPMS',
+                'unit-test',
+                'test',
+                'unit-test',
+                new DateTime('2015-01-01 00:00:00 +0000'),
+                'CPMS-123456-67890',
                 3.14
             ),
         ];
-        $mapper = new MapNotificationTypes;
+        $mapper = new MapNotificationTypes();
         foreach ($expectedNotifications as $expectedNotification) {
-            $queuesClient->writeMessageToQueue("notifications", $expectedNotification);
+            /** @psalm-suppress InvalidArgument */
+            $queuesClient->writeMessageToQueue('notifications', $expectedNotification);
         }
 
         // ----------------------------------------------------------------
@@ -445,7 +451,6 @@ class NotificationsClientTest extends TestCase
         // ----------------------------------------------------------------
         // test the results
 
-        $this->assertTrue(is_array($actualNotifications));
         $this->assertCount(5, $actualNotifications);
 
         // InMemoryQueues guarantees ordering, which makes the following
@@ -459,7 +464,7 @@ class NotificationsClientTest extends TestCase
     /**
      * @covers ::getQueuesClient
      */
-    public function testCanGetTheQueuesClient()
+    public function testCanGetTheQueuesClient(): void
     {
         // ----------------------------------------------------------------
         // setup your test
@@ -476,5 +481,4 @@ class NotificationsClientTest extends TestCase
 
         $this->assertInstanceOf(Queues::class, $actualClient);
     }
-
 }

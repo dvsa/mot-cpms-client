@@ -1,8 +1,9 @@
 <?php
-namespace CpmsClient\Service;
-use Interop\Container\ContainerInterface;
-use Laminas\ServiceManager\Factory\FactoryInterface;
 
+namespace CpmsClient\Service;
+
+use Psr\Container\ContainerInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 /**
  * Rest API service
@@ -12,7 +13,6 @@ use Laminas\ServiceManager\Factory\FactoryInterface;
  */
 class CacheAwareApiServiceFactory implements FactoryInterface
 {
-
     /**
      * Create Cache Aware API Service
      *
@@ -23,16 +23,16 @@ class CacheAwareApiServiceFactory implements FactoryInterface
      * @return CacheAwareApiService
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
+     * @throws \Exception
+     *
+     * Required suppression due to un-typed parameter in parent class
+     * @psalm-suppress MissingParamType
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null): CacheAwareApiService
     {
         /** @var ApiService $service */
         $service = $container->get('cpms\service\api');
 
-        $wrapper = new CacheAwareApiService($service);
-        $wrapper->setCacheStorage($service->getCacheStorage());
-        $wrapper->setLogger($service->getLogger());
-
-        return $wrapper;
+        return new CacheAwareApiService($service, $service->getLogger(), $service->getCacheStorage());
     }
 }
