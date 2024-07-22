@@ -11,8 +11,13 @@ class Util
 {
     /**
      * Method to append any additional data to the clientUrl
+     *
+     * @param string $url
+     * @param ?array $requiredParams
+     *
+     * @return string
      */
-    public static function appendQueryString(string $url, array $requiredParams = null): string
+    public static function appendQueryString($url, array $requiredParams = null)
     {
         if (!empty($url) and stripos($url, 'http') !== 0) {
             $url = 'http://' . $url;
@@ -31,8 +36,10 @@ class Util
 
     /**
      * Format exception
+     *
+     * @return string
      */
-    public static function processException(\Exception $e): string
+    public static function processException(\Exception $e)
     {
         $trace = $e->getTraceAsString();
         $i     = 1;

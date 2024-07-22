@@ -8,14 +8,19 @@ namespace Laminas\Console;
 class Console
 {
     /**
-     * @return false
+     * @return bool
      */
-    public static function isConsole(): bool
+    public static function isConsole()
     {
         return false;
     }
 
-    public static function overrideIsConsole(mixed $param): void
+    /**
+     * @param mixed $param
+     *
+     * @return void
+     */
+    public static function overrideIsConsole($param)
     {
         return;
     }

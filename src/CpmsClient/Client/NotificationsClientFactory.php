@@ -25,7 +25,7 @@ class NotificationsClientFactory implements FactoryInterface
      * Required suppression due to un-typed parameter in parent class
      * @psalm-suppress MissingParamType
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null): NotificationsClient
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         // shorthand
         /** @var array $config */

@@ -2,9 +2,11 @@
 
 namespace CpmsClient\Controller\Plugin;
 
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
+use Psr\Container\NotFoundExceptionInterface;
 
 /**
  * Class GetRestClient
@@ -25,8 +27,8 @@ class GetRestClient extends AbstractPlugin
      * Work around to get the API domain based on naming convention
      *
      * @return mixed|string
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function __invoke()
     {

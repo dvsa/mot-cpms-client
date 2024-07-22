@@ -20,16 +20,18 @@ class ApiDomainServiceFactory implements FactoryInterface
     /**
      * Create service
      *
+     * @param Containerinterface $container
+     * @param string $requestedName
+     * @param array|null $options
+     * @return string
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
-
-     * Required suppression due to un-typed parameter in parent class
      *
-     * @psalm-suppress MissingParamType
-     * @psalm-suppress InvalidReturnType
+     * Required suppression due to mismatched return type in parent class
+     * @psalm-suppress ImplementedReturnTypeMismatch
      * @phpstan-ignore-next-line
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): string
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null)
     {
         /** @var array $config */
         $config = $container->get('config');
@@ -46,9 +48,14 @@ class ApiDomainServiceFactory implements FactoryInterface
 
     /**
      * Determine the CPMS API domain if not set in the config
+     *
+     * @param mixed $request
+     * @param array $config
+     *
+     * @return mixed
      * @throws Exception
      */
-    public function determineLocalDomain(mixed $request, array $config): mixed
+    public function determineLocalDomain($request, $config)
     {
         if ($request instanceof Request) {
             $currentDomain = $request->getServer('HTTP_HOST');

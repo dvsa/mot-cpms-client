@@ -30,23 +30,32 @@ class CacheAwareApiService
     }
 
     /**
+     * @return StorageInterface
      * @throws Exception
      */
-    public function getCacheStorage(): StorageInterface
+    public function getCacheStorage()
     {
         return $this->cacheStorage;
     }
 
-    public function setCacheStorage(StorageInterface $cacheStorage): void
+    /**
+     * @param StorageInterface $cacheStorage
+     * @return void
+     */
+    public function setCacheStorage($cacheStorage)
     {
         $this->cacheStorage = $cacheStorage;
     }
 
     /**
+     * @param string $method
+     * @param array $arg
+     *
+     * @return mixed
      * @throws ExceptionInterface
      * @throws Exception
      */
-    public function __call(string $method, array $arg): mixed
+    public function __call($method, $arg)
     {
         /** @var string $json */
         $json = json_encode(array($method, $arg, $this->serviceProxy->getOptions()->getClientId()));
@@ -66,12 +75,20 @@ class CacheAwareApiService
         }
     }
 
-    public function useCache(string $method): bool
+    /**
+     * @param string $method
+     *
+     * @return bool
+     */
+    public function useCache($method)
     {
         return ($method == strtolower($method));
     }
 
-    public function getServiceProxy(): ApiService
+    /**
+     * @return ApiService
+     */
+    public function getServiceProxy()
     {
         return $this->serviceProxy;
     }

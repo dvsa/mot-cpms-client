@@ -43,7 +43,7 @@
         "test": "vendor/bin/phpunit -c phpunit.xml",
         "phpcs": "./vendor/bin/phpcs .",
         "phpcs-fix": "./vendor/bin/phpcbf .",
-        "psalm": "./vendor/bin/psalm" ,
+        "psalm": "./vendor/bin/psalm",
         "phpstan": "vendor/bin/phpstan analyse"
     },
     "config": {

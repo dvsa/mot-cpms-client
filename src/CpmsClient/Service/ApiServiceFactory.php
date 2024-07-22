@@ -7,8 +7,10 @@ use CpmsClient\Client\HttpRestJsonClient;
 use CpmsClient\Client\NotificationsClient;
 use Laminas\Cache\Storage\Adapter\AbstractAdapter;
 use Laminas\Log\LoggerInterface;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 /**
  * Rest API service
@@ -21,13 +23,16 @@ class ApiServiceFactory implements FactoryInterface
     /**
      * Create API Service
      *
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
+     * @param ContainerInterface $container
+     * @param string $requestedName
+     * @param array|null $options
      *
-     * Required suppression due to un-typed parameter in parent class
-     * @psalm-suppress MissingParamType
+     * @return ApiService
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     *
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null): ApiService
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         /** @var array $config */
         $config        = $container->get('config');

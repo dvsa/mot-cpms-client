@@ -3,7 +3,6 @@
 namespace CpmsClient\Data;
 
 use Laminas\Stdlib\AbstractOptions;
-use Traversable;
 
 /**
  * Class AccessToken
@@ -14,12 +13,18 @@ use Traversable;
 class AccessToken extends AbstractOptions
 {
     public const INVALID_ACCESS_TOKEN = 114;
-    protected ?int $expiresIn = null;
-    protected ?string $tokenType = null;
-    protected ?string $accessToken = null;
-    protected ?string $scope = null;
-    protected ?int $issuedAt = null;
-    protected ?string $salesReference = null;
+    /** @var  ?int */
+    protected $expiresIn = null;
+    /** @var  ?string */
+    protected $tokenType = null;
+    /** @var  ?string */
+    protected $accessToken = null;
+    /** @var  ?string */
+    protected $scope = null;
+    /** @var  ?int */
+    protected $issuedAt = null;
+    /** @var  ?string */
+    protected $salesReference = null;
 
     public function __construct(?iterable $options = null)
     {
@@ -30,60 +35,102 @@ class AccessToken extends AbstractOptions
         parent::__construct($options);
     }
 
-    public function setIssuedAt(int $issuedAt): void
+    /**
+     * @param ?int $issuedAt
+     *
+     * @return void
+     */
+    public function setIssuedAt($issuedAt)
     {
         $this->issuedAt = $issuedAt;
     }
 
-    public function getIssuedAt(): int | null
+    /**
+     * @return ?int
+     */
+    public function getIssuedAt()
     {
         return $this->issuedAt;
     }
 
-    public function setAccessToken(string $accessToken): void
+    /**
+     * @param ?string $accessToken
+     *
+     * @return void
+     */
+    public function setAccessToken($accessToken)
     {
         $this->accessToken = $accessToken;
     }
 
-    public function getAccessToken(): string | null
+    /**
+     * @return ?string
+     */
+    public function getAccessToken()
     {
         return $this->accessToken;
     }
 
-    public function setExpiresIn(int $expiresIn): void
+    /**
+     * @param ?int $expiresIn
+     *
+     * @return void
+     */
+    public function setExpiresIn($expiresIn)
     {
         $this->expiresIn = $expiresIn;
     }
 
-    public function getExpiresIn(): int | null
+    /**
+     * @return ?int
+     */
+    public function getExpiresIn()
     {
         return $this->expiresIn;
     }
 
-    public function setScope(string $scope): void
+    /**
+     * @param ?string $scope
+     *
+     * @return void
+     */
+    public function setScope($scope)
     {
         $this->scope = $scope;
     }
 
-    public function getScope(): string | null
+    /**
+     * @return ?string
+     */
+    public function getScope()
     {
         return $this->scope;
     }
 
-    public function setTokenType(string $tokenType): void
+    /**
+     * @param ?string $tokenType
+     *
+     * @return void
+     */
+    public function setTokenType($tokenType)
     {
         $this->tokenType = $tokenType;
     }
 
-    public function getTokenType(): string | null
+    /**
+     * @return ?string
+     */
+    public function getTokenType()
     {
         return $this->tokenType;
     }
 
     /**
      * Is token expired
+     *
+     * @return bool
      */
-    public function isExpired(): bool
+    public function isExpired()
     {
         $expiryTime = (int)$this->getIssuedAt() + $this->getExpiresIn();
 
@@ -92,13 +139,20 @@ class AccessToken extends AbstractOptions
 
     /**
      * Get Auth Header
+     *
+     * @return string
      */
-    public function getAuthorisationHeader(): string
+    public function getAuthorisationHeader()
     {
         return 'Bearer ' . $this->getAccessToken();
     }
 
-    public function setSalesReference(?string $salesReference): void
+    /**
+     * @param ?string $salesReference
+     *
+     * @return void
+     */
+    public function setSalesReference($salesReference)
     {
         $this->salesReference = $salesReference;
     }

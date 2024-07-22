@@ -2,7 +2,6 @@
 
 namespace CpmsClient\Controller\Plugin;
 
-use CpmsClient\Service\ApiDomainServiceFactory;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Laminas\Mvc\Controller\AbstractRestfulController;
@@ -33,7 +32,7 @@ class GetApiDomain extends AbstractPlugin
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function __invoke(): mixed
+    public function __invoke()
     {
         return $this->container->get('cpms\service\domain');
     }

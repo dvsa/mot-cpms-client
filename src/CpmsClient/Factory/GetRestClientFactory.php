@@ -21,12 +21,8 @@ class GetRestClientFactory implements FactoryInterface
      * @throws ServiceNotFoundException if unable to resolve the service.
      * @throws ServiceNotCreatedException if an exception is raised when
      *     creating a service.
-     * @throws ContainerException if any other error occurs
-     *
-     * Required suppression due to un-typed parameter in parent class
-     * @psalm-suppress MissingParamType
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null): GetRestClient
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         return new GetRestClient($container);
     }
