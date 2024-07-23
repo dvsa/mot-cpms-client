@@ -61,7 +61,7 @@ class ApiServiceFactory implements FactoryInterface
                 $httpRestJsonClient->getOptions()->setUserId($identity->getUserId());
                 $httpRestJsonClient->getOptions()->setClientId($identity->getClientId());
                 $httpRestJsonClient->getOptions()->setClientSecret($identity->getClientSecret());
-                /** @var string $customerReference */
+                /** @var ?string $customerReference */
                 $customerReference = $identity->getCustomerReference();
                 $httpRestJsonClient->getOptions()->setCustomerReference($customerReference);
                 $cacheNameSpace .= $identity->getClientId();
@@ -79,7 +79,7 @@ class ApiServiceFactory implements FactoryInterface
             $notificationsClientName = $config['cpms_api']['notifications_client']['alias'];
         }
 
-        /** @var NotificationsClient */
+        /** @var NotificationsClient $notificationsClient */
         $notificationsClient = $container->get($notificationsClientName);
 
         $cache->getOptions()->setNamespace($cacheNameSpace);
