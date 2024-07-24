@@ -32,6 +32,10 @@ class CacheAwareApiServiceFactory implements FactoryInterface
         /** @var ApiService $service */
         $service = $container->get('cpms\service\api');
 
-        return new CacheAwareApiService($service, $service->getLogger(), $service->getCacheStorage());
+        $wrapper = new CacheAwareApiService($service);
+        $wrapper->setCacheStorage($service->getCacheStorage());
+        $wrapper->setLogger($service->getLogger());
+
+        return $wrapper;
     }
 }

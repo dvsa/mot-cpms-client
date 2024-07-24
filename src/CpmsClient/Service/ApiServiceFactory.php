@@ -82,10 +82,15 @@ class ApiServiceFactory implements FactoryInterface
         /** @var NotificationsClient $notificationsClient */
         $notificationsClient = $container->get($notificationsClientName);
 
-        $cache->getOptions()->setNamespace($cacheNameSpace);
-
         /** @var ApiService $service */
-        $service = new $serviceClass($logger, $httpRestJsonClient, $cache, $enableCache, $notificationsClient);
+        $service = new $serviceClass();
+        $cache->getOptions()->setNamespace($cacheNameSpace);
+        $service->setLogger($logger);
+        $service->setClient($httpRestJsonClient);
+        $service->setOptions($httpRestJsonClient->getOptions());
+        $service->setCacheStorage($cache);
+        $service->setEnableCache($enableCache);
+        $service->setNotificationsClient($notificationsClient);
 
         return $service;
     }

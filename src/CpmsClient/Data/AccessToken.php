@@ -26,7 +26,10 @@ class AccessToken extends AbstractOptions
     /** @var  ?string */
     protected $salesReference = null;
 
-    public function __construct(?iterable $options = null)
+    /**
+     * @param ?iterable $options
+     */
+    public function __construct($options = null)
     {
         $this->__strictMode__ = false;
         /**

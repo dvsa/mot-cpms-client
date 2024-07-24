@@ -23,7 +23,10 @@ class HttpRestJsonClient
     /** @var HttpClient */
     protected $httpClient;
 
-    /** @var ClientOptions */
+    /**
+     * @var ClientOptions
+     * @psalm-suppress PropertyNotSetInConstructor
+     */
     protected $options;
 
     /** @var Request */
@@ -37,7 +40,6 @@ class HttpRestJsonClient
         $this->setHttpClient($httpClient);
         $this->setRequest($request);
         $this->logger = $logger;
-        $this->options = new ClientOptions();
     }
 
     /**

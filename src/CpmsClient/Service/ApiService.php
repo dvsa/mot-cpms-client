@@ -15,11 +15,13 @@ use Laminas\Cache\Exception\ExceptionInterface;
 use Laminas\Cache\Storage\StorageInterface;
 use Laminas\Http\Request;
 use Laminas\Log\LoggerInterface;
+use Laminas\ServiceManager\ServiceManager;
 
 /**
  * Class ApiService
  *
  * @package CpmsClient\Service
+ * @psalm-suppress MissingConstructor
  */
 class ApiService
 {
@@ -41,8 +43,31 @@ class ApiService
     public const REALLOCATE_PAYMENT = 'REALLOCATE'; // Reallocate payments by switch customer reference
     public const MAX_RETIRES        = 3;
 
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /** @var StorageInterface */
+    protected $cacheStorage;
+
+    /** @var HttpRestJsonClient */
+    protected $client;
+
+    /** @var  ServiceManager */
+    protected $serviceManager;
+
+    /** @var array */
+    protected $tokens = [];
+
     /** @var ClientOptions */
     protected $options;
+
+    /** @var bool */
+    protected $enableCache = true;
+
+    /** @var NotificationsClient */
+    protected $queuesClient;
 
     // we need to refactor the code to put these in a common package
     // that can be shared by both the client and the server :(
@@ -54,17 +79,6 @@ class ApiService
      * @var int
      */
     private static $retries = 0;
-
-    public function __construct(
-        protected LoggerInterface $logger,
-        protected HttpRestJsonClient $client,
-        protected StorageInterface $cacheStorage,
-        protected bool $enableCache,
-        protected NotificationsClient $queuesClient,
-    ) {
-
-        $this->options = $client->getOptions();
-    }
 
     /**
      * Process API request
@@ -93,8 +107,17 @@ class ApiService
 
                 $this->getOptions()->setHeaders($headers);
 
-                $params['customer_reference'] = $params['customer_reference'] ?? $this->options->getCustomerReference();
-                $params['user_id'] = $params['user_id'] ?? $this->options->getUserId();
+                /**
+                 * @var array $data
+                 * @phpstan-ignore-next-line
+                 */
+                if (empty($data['customer_reference'])) {
+                    $data['customer_reference'] = $this->options->getCustomerReference();
+                }
+                /** @phpstan-ignore-next-line */
+                if (empty($data['user_id'])) {
+                    $data['user_id'] = $this->options->getUserId();
+                }
 
                 /** @var array $return */
                 $return = $this->getClient()->dispatchRequestAndDecodeResponse($url, $method, $params);
@@ -332,6 +355,7 @@ class ApiService
      * @param string $key
      *
      * @return string
+     * @throws Exception
      */
     public function getEndpoint($key)
     {
@@ -408,7 +432,13 @@ class ApiService
             $message[] = Util::processException($exception);
         }
 
-        $this->logger->err(implode(' ', $message));
+        /**
+         * @psalm-suppress RedundantConditionGivenDocblockType
+         * @phpstan-ignore-next-line
+         */
+        if ($logger = $this->getLogger()) {
+            $logger->err(implode(' ', $message));
+        }
 
         return array(
             'code'    => 105,

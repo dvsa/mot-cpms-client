@@ -17,16 +17,24 @@ class CacheAwareApiService
 {
     use LoggerAwareTrait;
 
+    /** @var ApiService */
+    protected $serviceProxy;
+
     /**
-     * @param ApiService $serviceProxy
-     * @param LoggerInterface $logger
-     * @param StorageInterface $cacheStorage
+     * @var StorageInterface
+     * @psalm-suppress PropertyNotSetInConstructor
      */
-    public function __construct(
-        protected ApiService $serviceProxy,
-        protected $logger,
-        protected StorageInterface $cacheStorage
-    ) {
+    protected $cacheStorage;
+
+    /**
+     * @var LoggerInterface
+     * @psalm-suppress PropertyNotSetInConstructor
+     */
+    protected $logger;
+
+    public function __construct(ApiService $service)
+    {
+        $this->serviceProxy = $service;
     }
 
     /**
