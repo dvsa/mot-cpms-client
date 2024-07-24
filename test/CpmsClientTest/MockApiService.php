@@ -19,7 +19,7 @@ class MockApiService extends ApiService
 
     protected int $expiresIn = 1;
 
-    public function getTokenForScope(string $scope, null | string $salesReference = null): array | AccessToken | string
+    public function getTokenForScope($scope, $salesReference = null)
     {
         $token = parent::getTokenForScope($scope, $salesReference);
 
@@ -32,7 +32,7 @@ class MockApiService extends ApiService
     /**
      * Make api request to get access token
      */
-    protected function getPaymentServiceAccessToken(string $scope, null | string $salesReference = null): mixed
+    protected function getPaymentServiceAccessToken($scope, $salesReference = null)
     {
         $data = parent::getPaymentServiceAccessToken($scope, $salesReference);
         if (!$this->done) {
@@ -54,7 +54,7 @@ class MockApiService extends ApiService
         return new AccessToken($data);
     }
 
-    public function isCacheDeletedFromRemote(array $return): bool
+    public function isCacheDeletedFromRemote($return): bool
     {
         if ($this->forceRetry) {
             $this->forceRetry = false;

@@ -2,7 +2,6 @@
 
 namespace CpmsClient\Client;
 
-use CaptainHook\App\Runner\Action\Cli;
 use CpmsClient\Utility\Util;
 use Exception;
 use Laminas\Http\AbstractMessage;
@@ -12,7 +11,6 @@ use Laminas\Http\Request;
 use Laminas\Http\Response;
 use Laminas\Log\LoggerInterface;
 use Laminas\Stdlib\Parameters;
-use phpDocumentor\Reflection\Types\Object_;
 
 /**
  * Class HttpRestJsonClient
@@ -22,27 +20,39 @@ use phpDocumentor\Reflection\Types\Object_;
 class HttpRestJsonClient
 {
     protected const CONTENT_TYPE_FORMAT = 'application/vnd.dvsa-gov-uk.v%d%s; charset=UTF-8';
-    protected HttpClient $httpClient;
+    /** @var HttpClient */
+    protected $httpClient;
 
-    protected ClientOptions $options;
+    /**
+     * @var ClientOptions
+     * @psalm-suppress PropertyNotSetInConstructor
+     */
+    protected $options;
 
-    protected Request $request;
+    /** @var Request */
+    protected $request;
 
-    protected LoggerInterface $logger;
+    /** @var LoggerInterface */
+    protected $logger;
 
     public function __construct(HttpClient $httpClient, LoggerInterface $logger, Request $request)
     {
         $this->setHttpClient($httpClient);
         $this->setRequest($request);
         $this->logger = $logger;
-        $this->options = new ClientOptions();
     }
 
     /**
      * Dispatch request and decode json response
+     *
+     * @param string $url
+     * @param string $method
+     * @param ?array $data
+     *
+     * @return mixed
      * @throws Exception
      */
-    public function dispatchRequestAndDecodeResponse(string $url, string $method, array | null $data = null): mixed
+    public function dispatchRequestAndDecodeResponse($url, $method, $data = null)
     {
         $request = clone $this->getRequest();
         $headers = $this->options->getHeaders();
@@ -61,10 +71,12 @@ class HttpRestJsonClient
 
         $endpoint = rtrim($this->options->getDomain(), '/') . '/' . ltrim($url, '/');
         $endpoint = Util::appendQueryString($endpoint);
-        $headers = $request->getHeaders();
-        if (is_object($headers) && get_class($headers) === Headers::class) {
-            $headers->addHeaders($headers);
-        }
+
+        /**
+         * @psalm-suppress PossiblyInvalidMethodCall, PossiblyUndefinedMethod
+         * @phpstan-ignore-next-line
+         */
+        $request->getHeaders()->addHeaders($headers);
         $request->setUri($endpoint);
         $request->setMethod($method);
 
@@ -93,37 +105,64 @@ class HttpRestJsonClient
         return $decodedData;
     }
 
-    public function setOptions(ClientOptions $options): void
+    /**
+     * @param ClientOptions $options
+     *
+     * @return void
+     */
+    public function setOptions($options)
     {
         $this->options = $options;
     }
 
-    public function getOptions(): ClientOptions
+    /**
+     * @return ClientOptions
+     */
+    public function getOptions()
     {
         return $this->options;
     }
 
-    public function setRequest(Request $request): void
+    /**
+     * @param Request $request
+     *
+     * @return void
+     */
+    public function setRequest(Request $request)
     {
         $this->request = $request;
     }
 
-    public function getRequest(): Request
+    /**
+     * @return Request
+     */
+    public function getRequest()
     {
         return $this->request;
     }
 
-    public function setHttpClient(HttpClient $httpClient): void
+    /**
+     * @param HttpClient $httpClient
+     *
+     * @return void
+     */
+    public function setHttpClient($httpClient)
     {
         $this->httpClient = $httpClient;
     }
 
-    public function getHttpClient(): HttpClient
+    /**
+     * @return HttpClient
+     */
+    public function getHttpClient()
     {
         return $this->httpClient;
     }
 
-    public function resetHeaders(): AbstractMessage
+    /**
+     * @return AbstractMessage
+     */
+    public function resetHeaders()
     {
         $headers = $this->getOptions()->getHeaders();
 

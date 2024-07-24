@@ -11,10 +11,8 @@ use Exception;
 class CpmsNotificationAcknowledgementFailed extends Exception
 {
     /**
-     * @param string $message
-     *        why the response was rejected
-     * @param mixed $response
-     *        the rejected response
+     * @param string $message why the response was rejected
+     * @param mixed $response the rejected response
      */
     public function __construct($message, $response)
     {

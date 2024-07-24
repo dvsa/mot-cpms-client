@@ -4,11 +4,13 @@ namespace CpmsClient\Client;
 
 use CpmsClient\Service\LoggerFactory;
 use Laminas\Log\LoggerInterface;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Laminas\Http\Client;
 use Laminas\Http\Client as HttpClient;
 use Laminas\Http\Request;
 use Laminas\ServiceManager\Factory\FactoryInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 /**
  * Class RestClientFactory
@@ -25,11 +27,11 @@ class RestClientFactory implements FactoryInterface
      * @param mixed $requestedName
      * @param array|null $options
      * @return HttpRestJsonClient
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      *
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null): HttpRestJsonClient
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $clientOption = null;
         $domain                = $container->get('cpms\service\domain');

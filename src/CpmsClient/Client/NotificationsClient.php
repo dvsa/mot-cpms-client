@@ -6,7 +6,6 @@ use DVSA\CPMS\Queues\QueueAdapters\Interfaces\Queues;
 use DVSA\CPMS\Queues\QueueAdapters\Values\QueueMessage;
 use Laminas\Log\LoggerInterface;
 use RuntimeException;
-use Laminas\Log\Logger;
 
 class NotificationsClient
 {
@@ -18,10 +17,11 @@ class NotificationsClient
 
     /**
      * our client for talking to our queues
+     * @var Queues
      */
-    protected Queues $queuesClient;
-
-    protected LoggerInterface | Logger $logger;
+    protected $queuesClient;
+    /** @var LoggerInterface */
+    protected $logger;
 
     public function __construct(Queues $queuesClient, LoggerInterface $logger)
     {
@@ -33,8 +33,10 @@ class NotificationsClient
      * get the next batch of messages from the notifications queue
      *
      * if there are no messages, this will return an empty list
+     *
+     * @return array
      */
-    public function getNotifications(): array
+    public function getNotifications()
     {
         // shorthand
         $queuesClient = $this->queuesClient;
@@ -67,8 +69,10 @@ class NotificationsClient
     /**
      * confirm that a message can be dropped from the queue that it
      * came from
+     *
+     * @return void
      */
-    public function confirmMessageHandled(QueueMessage $metadata): void
+    public function confirmMessageHandled(QueueMessage $metadata)
     {
         $this->queuesClient->confirmMessageHandled($metadata);
     }
@@ -83,8 +87,10 @@ class NotificationsClient
      * returns the client we are using to talk to our queues
      *
      * mainly here to help with unit testing
+     *
+     * @return Queues
      */
-    public function getQueuesClient(): Queues
+    public function getQueuesClient()
     {
         return $this->queuesClient;
     }
