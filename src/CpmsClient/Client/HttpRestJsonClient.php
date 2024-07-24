@@ -71,10 +71,12 @@ class HttpRestJsonClient
 
         $endpoint = rtrim($this->options->getDomain(), '/') . '/' . ltrim($url, '/');
         $endpoint = Util::appendQueryString($endpoint);
-        $headers = $request->getHeaders();
-        if (is_object($headers) && get_class($headers) === Headers::class) {
-            $headers->addHeaders($headers);
-        }
+
+        /**
+         * @psalm-suppress PossiblyInvalidMethodCall, PossiblyUndefinedMethod
+         * @phpstan-ignore-next-line
+         */
+        $request->getHeaders()->addHeaders($headers);
         $request->setUri($endpoint);
         $request->setMethod($method);
 

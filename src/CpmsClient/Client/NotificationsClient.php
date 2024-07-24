@@ -6,7 +6,6 @@ use DVSA\CPMS\Queues\QueueAdapters\Interfaces\Queues;
 use DVSA\CPMS\Queues\QueueAdapters\Values\QueueMessage;
 use Laminas\Log\LoggerInterface;
 use RuntimeException;
-use Laminas\Log\Logger;
 
 class NotificationsClient
 {

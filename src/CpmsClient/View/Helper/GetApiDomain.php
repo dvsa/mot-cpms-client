@@ -15,8 +15,11 @@ use Psr\Container\NotFoundExceptionInterface;
  */
 class GetApiDomain extends AbstractHelper
 {
-    /** @var ?ServiceLocatorInterface */
-    protected $pluginManager = null;
+    /**
+     * @var ServiceLocatorInterface
+     * @psalm-suppress PropertyNotSetInConstructor
+     */
+    protected $pluginManager;
 
     /**
      * @return mixed
@@ -41,13 +44,9 @@ class GetApiDomain extends AbstractHelper
 
     /**
      * @return ServiceLocatorInterface
-     * @throws Exception
      */
     public function getServiceLocator()
     {
-        if (!isset($this->pluginManager)) {
-            throw new Exception('Plugin Manager Not Set');
-        }
         return $this->pluginManager;
     }
 }
