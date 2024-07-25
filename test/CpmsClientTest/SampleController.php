@@ -1,8 +1,6 @@
 <?php
-
 namespace CpmsClientTest;
 
-use Laminas\Http\Response;
 use Laminas\Mvc\Controller\AbstractActionController;
 
 /**
@@ -12,9 +10,9 @@ use Laminas\Mvc\Controller\AbstractActionController;
  */
 class SampleController extends AbstractActionController
 {
-    public function sampleIndexAction(): Response
+    public function indexAction()
     {
-        /** @var Response $response */
+        /** @var \Laminas\Http\Response $response */
         $response = $this->getResponse();
         $response->setStatusCode(200);
         $response->setContent('foo');

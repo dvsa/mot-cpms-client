@@ -1,5 +1,4 @@
 <?php
-
 namespace CpmsClient\Authenticate;
 
 /**
@@ -10,71 +9,115 @@ namespace CpmsClient\Authenticate;
  */
 trait IdentityProviderTrait
 {
-    protected string $userId;
-    protected string $clientId;
-    protected string $clientSecret;
-    protected string $customerReference;
-    protected string $costCentre;
-    protected null | int $version = null;
+    /** @var  string */
+    protected $userId;
+    /** @var  string */
+    protected $clientId;
+    /** @var  string */
+    protected $clientSecret;
+    /** @var  string */
+    protected $customerReference;
+    /** @var  string */
+    protected $costCentre;
+    /** @var null | int */
+    protected $version = null;
 
-    public function getCostCentre(): string
+    /**
+     * @return string
+     */
+    public function getCostCentre()
     {
         return $this->costCentre;
     }
 
-    public function setCostCentre(string $costCentre): static
+    /**
+     * @param $costCentre
+     *
+     * @return $this
+     */
+    public function setCostCentre($costCentre)
     {
         $this->costCentre = $costCentre;
 
         return $this;
     }
 
-    public function getCustomerReference(): string
+    /**
+     * @return string
+     */
+    public function getCustomerReference()
     {
         return $this->customerReference;
     }
 
-    public function setCustomerReference(string $customerReference): void
+    /**
+     * @param string $customerReference
+     */
+    public function setCustomerReference($customerReference)
     {
         $this->customerReference = $customerReference;
     }
 
-    public function getClientId(): string
+    /**
+     * @return mixed
+     */
+    public function getClientId()
     {
         return $this->clientId;
     }
 
-    public function setClientId(string $clientId): void
+    /**
+     * @param mixed $clientId
+     */
+    public function setClientId($clientId)
     {
         $this->clientId = $clientId;
     }
 
-    public function getClientSecret(): string
+    /**
+     * @return mixed
+     */
+    public function getClientSecret()
     {
         return $this->clientSecret;
     }
 
-    public function setClientSecret(string $clientSecret): void
+    /**
+     * @param mixed $clientSecret
+     */
+    public function setClientSecret($clientSecret)
     {
         $this->clientSecret = $clientSecret;
     }
 
-    public function getUserId(): string
+    /**
+     * @return mixed
+     */
+    public function getUserId()
     {
         return $this->userId;
     }
 
-    public function setUserId(string $userId): void
+    /**
+     * @param mixed $userId
+     */
+    public function setUserId($userId)
     {
         $this->userId = $userId;
     }
 
-    public function getVersion(): int | null
+    /**
+     * @return int|null
+     */
+    public function getVersion()
     {
         return $this->version;
     }
 
-    public function setVersion(null | int $version): void
+    /**
+     * @param int|null $version
+     */
+    public function setVersion($version)
     {
         $this->version = $version;
     }

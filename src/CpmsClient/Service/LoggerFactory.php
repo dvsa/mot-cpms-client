@@ -1,8 +1,7 @@
 <?php
-
 namespace CpmsClient\Service;
 
-use Psr\Container\ContainerInterface;
+use Interop\Container\ContainerInterface;
 use Laminas\Log\Logger;
 use Laminas\Log\Writer\Stream;
 use Laminas\ServiceManager\Factory\FactoryInterface;
@@ -14,23 +13,21 @@ use Laminas\ServiceManager\Factory\FactoryInterface;
  */
 class LoggerFactory implements FactoryInterface
 {
-    public const DEFAULT_LOGGER_ALIAS = 'cpms\client\logger'; //default logger if none is set in the app
+    const DEFAULT_LOGGER_ALIAS = 'cpms\client\logger'; //default logger if none is set in the app
 
-    /**L
+    /**
      * Creates the logger
      *
      * @param ContainerInterface $container
      *
-     * @param mixed $requestedName
+     * @param $requestedName
      * @param array|null $options
      * @return Logger
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
-     *
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null): Logger
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        /** @var array $config */
         $config   = $container->get('config');
         $filename = $this->getLogFilename($config);
         $writer   = new Stream($filename);

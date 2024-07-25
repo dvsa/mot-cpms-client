@@ -1,8 +1,6 @@
 <?php
-
 namespace CpmsClientTest;
 
-use AllowDynamicProperties;
 use CpmsClient\Data\AccessToken;
 use CpmsClient\Service\ApiService;
 
@@ -13,17 +11,18 @@ use CpmsClient\Service\ApiService;
  */
 class MockApiService extends ApiService
 {
-    protected bool $done = false;
 
-    protected bool $forceRetry = false;
+    protected $done = false;
 
-    protected int $expiresIn = 1;
+    protected $forceRetry = false;
 
-    public function getTokenForScope(string $scope, null | string $salesReference = null): array | AccessToken | string
+    protected $expiresIn = 1;
+
+    public function getTokenForScope($scope, $salesReference = null)
     {
         $token = parent::getTokenForScope($scope, $salesReference);
 
-        if (isset($token) === false || $token === '' || $token === '0' || $token === []) {
+        if (empty($token)) {
             $token = $this->simulateToken($scope);
         }
         return $token;
@@ -31,8 +30,13 @@ class MockApiService extends ApiService
 
     /**
      * Make api request to get access token
+     *
+     * @param $scope
+     * @param $salesReference
+     *
+     * @return mixed
      */
-    protected function getPaymentServiceAccessToken(string $scope, null | string $salesReference = null): mixed
+    protected function getPaymentServiceAccessToken($scope, $salesReference = null)
     {
         $data = parent::getPaymentServiceAccessToken($scope, $salesReference);
         if (!$this->done) {
@@ -42,7 +46,12 @@ class MockApiService extends ApiService
         return $this->simulateToken($scope)->toArray();
     }
 
-    private function simulateToken(string $scope): AccessToken
+    /**
+     * @param $scope
+     *
+     * @return AccessToken
+     */
+    private function simulateToken($scope)
     {
         $data = array(
             'issued_at'    => time(),
@@ -54,7 +63,7 @@ class MockApiService extends ApiService
         return new AccessToken($data);
     }
 
-    public function isCacheDeletedFromRemote(array $return): bool
+    public function isCacheDeletedFromRemote($return)
     {
         if ($this->forceRetry) {
             $this->forceRetry = false;
@@ -64,12 +73,12 @@ class MockApiService extends ApiService
         }
     }
 
-    public function setExpiresIn(int $value): void
+    public function setExpiresIn($value)
     {
         $this->expiresIn = $value;
     }
 
-    public function setForceRetry(): void
+    public function setForceRetry()
     {
         $this->forceRetry = true;
     }

@@ -1,5 +1,4 @@
 <?php
-
 return array(
     'modules' => array(
         'Laminas\Filter',

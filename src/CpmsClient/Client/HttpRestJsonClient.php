@@ -2,17 +2,13 @@
 
 namespace CpmsClient\Client;
 
-use CaptainHook\App\Runner\Action\Cli;
 use CpmsClient\Utility\Util;
-use Exception;
-use Laminas\Http\AbstractMessage;
 use Laminas\Http\Client as HttpClient;
 use Laminas\Http\Headers;
 use Laminas\Http\Request;
-use Laminas\Http\Response;
-use Laminas\Log\LoggerInterface;
+use Laminas\Log\Logger;
 use Laminas\Stdlib\Parameters;
-use phpDocumentor\Reflection\Types\Object_;
+use Laminas\Log\LoggerInterface;
 
 /**
  * Class HttpRestJsonClient
@@ -21,34 +17,47 @@ use phpDocumentor\Reflection\Types\Object_;
  */
 class HttpRestJsonClient
 {
-    protected const CONTENT_TYPE_FORMAT = 'application/vnd.dvsa-gov-uk.v%d%s; charset=UTF-8';
-    protected HttpClient $httpClient;
+    const CONTENT_TYPE_FORMAT = 'application/vnd.dvsa-gov-uk.v%d%s; charset=UTF-8';
+    /** @var \Laminas\Http\Client */
+    protected $httpClient;
 
-    protected ClientOptions $options;
+    /** @var \CpmsClient\Client\ClientOptions */
+    protected $options;
 
-    protected Request $request;
+    /** @var \Laminas\Http\Request */
+    protected $request;
 
-    protected LoggerInterface $logger;
+    /** @var  \Laminas\Log\Logger */
+    protected $logger;
 
-    public function __construct(HttpClient $httpClient, LoggerInterface $logger, Request $request)
+    /**
+     * @param HttpClient $httpClient
+     * @param Logger     $logger
+     * @param Request    $request
+     */
+    public function __construct(HttpClient $httpClient, LoggerInterface $logger, Request $request = null)
     {
         $this->setHttpClient($httpClient);
         $this->setRequest($request);
         $this->logger = $logger;
-        $this->options = new ClientOptions();
     }
 
     /**
      * Dispatch request and decode json response
-     * @throws Exception
+     *
+     * @param      $url
+     * @param      $method
+     * @param null $data
+     *
+     * @return mixed
      */
-    public function dispatchRequestAndDecodeResponse(string $url, string $method, array | null $data = null): mixed
+    public function dispatchRequestAndDecodeResponse($url, $method, $data = null)
     {
         $request = clone $this->getRequest();
         $headers = $this->options->getHeaders();
         $method  = strtoupper($method);
 
-        if ($data !== null) {
+        if ($data) {
             if ($method == Request::METHOD_GET) {
                 $contentType = sprintf(self::CONTENT_TYPE_FORMAT, $this->getOptions()->getVersion(), '');
                 $request->setQuery(new Parameters($data));
@@ -61,28 +70,24 @@ class HttpRestJsonClient
 
         $endpoint = rtrim($this->options->getDomain(), '/') . '/' . ltrim($url, '/');
         $endpoint = Util::appendQueryString($endpoint);
-        $headers = $request->getHeaders();
-        if (is_object($headers) && get_class($headers) === Headers::class) {
-            $headers->addHeaders($headers);
-        }
+
+        $request->getHeaders()->addHeaders($headers);
         $request->setUri($endpoint);
         $request->setMethod($method);
 
         //Log request header
         $this->logger->debug($request->toString());
 
+        /** @var $response \Laminas\Http\Response */
         $response = $this->getHttpClient()->dispatch($request);
-        if (get_class($response) !== Response::class) {
-            throw new Exception('HttpClient returned object not of class Response');
-        }
 
         //log response code
-        $this->logger->debug((string)$response->getStatusCode());
+        $this->logger->debug($response->getStatusCode());
 
         /** End User (Schemes) should interrogate response status,
          * throwing appropriate exceptions for error codes as required
          */
-        $decodedData = json_decode($response->getBody(), true);
+        $decodedData = \json_decode($response->getBody(), true);
 
         if (empty($decodedData)) {
             $this->logger->warn($response->getBody());
@@ -93,37 +98,58 @@ class HttpRestJsonClient
         return $decodedData;
     }
 
-    public function setOptions(ClientOptions $options): void
+    /**
+     * @param $options
+     */
+    public function setOptions($options)
     {
         $this->options = $options;
     }
 
-    public function getOptions(): ClientOptions
+    /**
+     * @return ClientOptions
+     */
+    public function getOptions()
     {
         return $this->options;
     }
 
-    public function setRequest(Request $request): void
+    /**
+     * @param \Laminas\Http\Request $request
+     */
+    public function setRequest(Request $request)
     {
         $this->request = $request;
     }
 
-    public function getRequest(): Request
+    /**
+     * @return \Laminas\Http\Request
+     */
+    public function getRequest()
     {
         return $this->request;
     }
 
-    public function setHttpClient(HttpClient $httpClient): void
+    /**
+     * @param $httpClient
+     */
+    public function setHttpClient($httpClient)
     {
         $this->httpClient = $httpClient;
     }
 
-    public function getHttpClient(): HttpClient
+    /**
+     * @return HttpClient
+     */
+    public function getHttpClient()
     {
         return $this->httpClient;
     }
 
-    public function resetHeaders(): AbstractMessage
+    /**
+     * @return \Laminas\Http\AbstractMessage
+     */
+    public function resetHeaders()
     {
         $headers = $this->getOptions()->getHeaders();
 

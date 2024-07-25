@@ -1,8 +1,7 @@
 <?php
-
 namespace CpmsClient\Controller\Plugin;
 
-use Psr\Container\ContainerInterface;
+use Interop\Container\ContainerInterface;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 
@@ -14,7 +13,7 @@ use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
  */
 class GetRestClient extends AbstractPlugin
 {
-    private ContainerInterface $container;
+    private $container;
 
     public function __construct(ContainerInterface $container)
     {
@@ -30,6 +29,8 @@ class GetRestClient extends AbstractPlugin
      */
     public function __invoke()
     {
-        return $this->container->get('cpms\service\api');
+        $client = $this->container->get('cpms\service\api');
+
+        return $client;
     }
 }
