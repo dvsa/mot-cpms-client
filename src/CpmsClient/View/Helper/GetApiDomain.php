@@ -1,11 +1,8 @@
 <?php
-
 namespace CpmsClient\View\Helper;
 
-use Exception;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\View\Helper\AbstractHelper;
-use Laminas\View\HelperPluginManager;
 
 /**
  * Get the API domain name
@@ -14,29 +11,29 @@ use Laminas\View\HelperPluginManager;
  */
 class GetApiDomain extends AbstractHelper
 {
-    protected ?ServiceLocatorInterface $pluginManager = null;
+    /** @var \Laminas\View\HelperPluginManager */
+    protected $pluginManager;
 
-    public function __invoke(): mixed
+    public function __invoke()
     {
-        return $this->getServiceLocator()->get('cpms\service\domain');
+        return $this->getServiceLocator()->get('cpms\service\domain'); // TODO use ContainerInterface
     }
 
     /**
      * Set service locator
+     *
+     * @param ServiceLocatorInterface $serviceLocator
      */
-    public function setServiceLocator(ServiceLocatorInterface $serviceLocator): void
+    public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
     {
         $this->pluginManager = $serviceLocator;
     }
 
     /**
-     * @throws Exception
+     * @return ServiceLocatorInterface|\Laminas\View\HelperPluginManager
      */
-    public function getServiceLocator(): ServiceLocatorInterface
+    public function getServiceLocator()
     {
-        if (!isset($this->pluginManager)) {
-            throw new Exception('Plugin Manager Not Set');
-        }
         return $this->pluginManager;
     }
 }

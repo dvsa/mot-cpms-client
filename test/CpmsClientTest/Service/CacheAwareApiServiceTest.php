@@ -1,14 +1,10 @@
 <?php
-
-namespace CpmsClientTest\Service;
+namespace ApplicationTest\Service;
 
 use CpmsClient\Service\ApiService;
 use CpmsClient\Service\CacheAwareApiService;
 use CpmsClientTest\Bootstrap;
-use Laminas\Cache\Exception\ExceptionInterface;
-use Laminas\Cache\Storage\StorageInterface;
 use Laminas\Http\Response;
-use Laminas\ServiceManager\ServiceManager;
 use Laminas\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
 
 /**
@@ -18,8 +14,11 @@ use Laminas\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
  */
 class CacheAwareApiServiceTest extends AbstractHttpControllerTestCase
 {
-    protected CacheAwareApiService $service;
-    protected ServiceManager $serviceManager;
+    /** @var CacheAwareApiService */
+    protected $service;
+
+    /** @var  \Laminas\ServiceManager\ServiceManager */
+    protected $serviceManager;
 
     public function setUp(): void
     {
@@ -28,13 +27,10 @@ class CacheAwareApiServiceTest extends AbstractHttpControllerTestCase
         );
 
         $this->serviceManager = Bootstrap::getInstance()->getServiceManager();
-        /** @var array $config */
-        $config = $this->serviceManager->get('ApplicationConfig');
-        $this->setApplicationConfig($config);
+        $this->setApplicationConfig($this->serviceManager->get('ApplicationConfig'));
 
-        /** @var CacheAwareApiService $service */
-        $service = $this->serviceManager->get('cpms\service\api\cacheAware');
-        $this->service = $service;
+        /** @var \CpmsClient\Service\CacheAwareApiService $service */
+        $this->service = $this->serviceManager->get('cpms\service\api\cacheAware');
         $this->serviceManager->setAllowOverride(true);
         parent::setUp();
     }
@@ -42,33 +38,25 @@ class CacheAwareApiServiceTest extends AbstractHttpControllerTestCase
     /**
      * @medium
      */
-    public function testApiInstance(): void
+    public function testApiInstance()
     {
-        $this->assertInstanceOf(CacheAwareApiService::class, $this->service);
+        $this->assertInstanceOf('CpmsClient\Service\CacheAwareApiService', $this->service);
     }
 
-    public function testCachedResult(): void
+    public function testCachedResult()
     {
         $param = array('limit' => time());
-        /** @phpstan-ignore method.notFound */
         $this->service->get('/api/transaction', ApiService::SCOPE_CARD, $param);
-        /** @phpstan-ignore method.notFound */
         $result = $this->service->get('/api/transaction', ApiService::SCOPE_CARD, $param);
         $this->assertTrue(is_array($result));
     }
 
-    /**
-     * @throws \Exception
-     */
-    public function testStorage(): void
+    public function testStorage()
     {
-        $this->assertInstanceOf(StorageInterface::class, $this->service->getCacheStorage());
+        $this->assertInstanceOf('Laminas\Cache\Storage\StorageInterface', $this->service->getCacheStorage());
     }
 
-    /**
-     * @throws ExceptionInterface
-     */
-    public function testSaveResultInCache(): array
+    public function testSaveResultInCache()
     {
         $method   = 'get';
         $arg      = ['access_token', 'CARD'];
@@ -76,11 +64,6 @@ class CacheAwareApiServiceTest extends AbstractHttpControllerTestCase
         $service  = clone $this->service;
         $response = new Response();
         $response->setContent(json_encode($value));
-
-        /**
-         * @psalm-suppress UndefinedInterfaceMethod
-         * @phpstan-ignore method.notFound
-         */
         $service->getServiceProxy()->getClient()->getHttpClient()->getAdapter()->setResponse($response);
         $data = $this->service->__call($method, $arg);
 
@@ -92,7 +75,7 @@ class CacheAwareApiServiceTest extends AbstractHttpControllerTestCase
     /**
      * @depends testSaveResultInCache
      */
-    public function testCallMagicMethod(mixed $value): void
+    public function testCallMagicMethod($value)
     {
         $method = 'get';
         $arg    = ['access_token', 'CARD'];

@@ -1,13 +1,9 @@
 <?php
-
 namespace CpmsClient\Controller\Plugin;
 
-use CpmsClient\Service\ApiDomainServiceFactory;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\ContainerInterface;
+use Interop\Container\ContainerInterface;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
-use Psr\Container\NotFoundExceptionInterface;
 
 /**
  * Class SendResponse
@@ -19,7 +15,7 @@ use Psr\Container\NotFoundExceptionInterface;
  */
 class GetApiDomain extends AbstractPlugin
 {
-    private ContainerInterface $container;
+    private $container;
 
     public function __construct(ContainerInterface $container)
     {
@@ -30,11 +26,13 @@ class GetApiDomain extends AbstractPlugin
      * Work around to get the API domain based on naming convention
      *
      * @return mixed|string
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
-    public function __invoke(): mixed
+    public function __invoke()
     {
-        return $this->container->get('cpms\service\domain');
+        $apiDomain = $this->container->get('cpms\service\domain');
+
+        return $apiDomain;
     }
 }

@@ -14,27 +14,30 @@ class NotificationsClient
      * in our config, what is the name of the queue we need to read
      * new notifications from?
      */
-    protected const NOTIFICATIONS_QUEUENAME = "notifications";
+    const NOTIFICATIONS_QUEUENAME = "notifications";
 
     /**
-     * our client for talking to our queues
+     * our constructor
+     *
+     * @param Queues $queuesClient
+     *        how we will talk to our queues
+     * @param Logger $logger
+     *        how we will report on what happens
      */
-    protected Queues $queuesClient;
-
-    protected LoggerInterface | Logger $logger;
-
-    public function __construct(Queues $queuesClient, LoggerInterface $logger)
-    {
-        $this->queuesClient = $queuesClient;
-        $this->logger = $logger;
+    public function __construct(
+        protected Queues $queuesClient,
+        public LoggerInterface $logger
+    ) {
     }
 
     /**
      * get the next batch of messages from the notifications queue
      *
      * if there are no messages, this will return an empty list
+     *
+     * @return array
      */
-    public function getNotifications(): array
+    public function getNotifications()
     {
         // shorthand
         $queuesClient = $this->queuesClient;
@@ -67,8 +70,12 @@ class NotificationsClient
     /**
      * confirm that a message can be dropped from the queue that it
      * came from
+     *
+     * @param  QueueMessage $metadata
+     *         the metadata message that we're done with
+     * @return void
      */
-    public function confirmMessageHandled(QueueMessage $metadata): void
+    public function confirmMessageHandled(QueueMessage $metadata)
     {
         $this->queuesClient->confirmMessageHandled($metadata);
     }
@@ -83,8 +90,10 @@ class NotificationsClient
      * returns the client we are using to talk to our queues
      *
      * mainly here to help with unit testing
+     *
+     * @return Queues
      */
-    public function getQueuesClient(): Queues
+    public function getQueuesClient()
     {
         return $this->queuesClient;
     }

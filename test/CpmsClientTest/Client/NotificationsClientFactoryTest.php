@@ -16,15 +16,28 @@ use Laminas\ServiceManager\ServiceManager;
  */
 class NotificationsClientFactoryTest extends TestCase
 {
-    protected ServiceManager $serviceManager;
-    protected array $smConfig;
+    /**
+     * ZF2's ServiceManager
+     *
+     * @var ServiceManager
+     */
+    protected $serviceManager;
 
     /**
-     * automatically called by PHPUnit before every test
+     * the config from ZF2's ServiceManager
      *
-     * it provides a working Zend ServiceManager. we'll use this to make sure
-     * that our factory is compatible with ZF2
+     * @var array
      */
+    protected $smConfig;
+
+    /**
+ * automatically called by PHPUnit before every test
+ *
+ * it provides a working Zend ServiceManager. we'll use this to make sure
+ * that our factory is compatible with ZF2
+ *
+ *
+ */
     public function setUp(): void
     {
         // our Zend ServiceManager
@@ -40,9 +53,7 @@ class NotificationsClientFactoryTest extends TestCase
         // we need to restore that config after each test
         //
         // if we do not do this, the legacy unit tests all break (grrrr)
-        /** @var array $config */
-        $config = $this->serviceManager->get('config');
-        $this->smConfig = $config;
+        $this->smConfig = $this->serviceManager->get('config');
     }
 
     /**
@@ -62,7 +73,7 @@ class NotificationsClientFactoryTest extends TestCase
     /**
      * @coversNothing
      */
-    public function testCanInstantiate(): void
+    public function testCanInstantiate()
     {
         // ----------------------------------------------------------------
         // setup your test
@@ -70,7 +81,7 @@ class NotificationsClientFactoryTest extends TestCase
         // ----------------------------------------------------------------
         // perform the change
 
-        $unit = new NotificationsClientFactory();
+        $unit = new NotificationsClientFactory;
 
         // ----------------------------------------------------------------
         // test the results
@@ -81,7 +92,7 @@ class NotificationsClientFactoryTest extends TestCase
     /**
      * @coversNothing
      */
-    public function testIsServiceManagerFactory(): void
+    public function testIsServiceManagerFactory()
     {
         // ----------------------------------------------------------------
         // setup your test
@@ -89,7 +100,7 @@ class NotificationsClientFactoryTest extends TestCase
         // ----------------------------------------------------------------
         // perform the change
 
-        $unit = new NotificationsClientFactory();
+        $unit = new NotificationsClientFactory;
 
         // ----------------------------------------------------------------
         // test the results
@@ -97,7 +108,7 @@ class NotificationsClientFactoryTest extends TestCase
         $this->assertInstanceOf(FactoryInterface::class, $unit);
     }
 
-    public function testCanCreateNotificationsClient(): void
+    public function testCanCreateNotificationsClient()
     {
         // ----------------------------------------------------------------
         // setup your test
@@ -133,7 +144,7 @@ class NotificationsClientFactoryTest extends TestCase
         $this->assertInstanceOf(NotificationsClient::class, $client);
     }
 
-    public function testUsesTheDefaultLoggerIfOneIsNotConfigured(): void
+    public function testUsesTheDefaultLoggerIfOneIsNotConfigured()
     {
         // ----------------------------------------------------------------
         // setup your test
@@ -171,4 +182,5 @@ class NotificationsClientFactoryTest extends TestCase
 
         $this->assertInstanceOf(NotificationsClient::class, $client);
     }
+
 }

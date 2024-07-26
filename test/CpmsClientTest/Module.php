@@ -1,5 +1,4 @@
 <?php
-
 /**
  *
  * @package      CPMS Payment
@@ -16,12 +15,13 @@ namespace CpmsClientTest;
  */
 class Module
 {
-    public function getConfig(): array
+
+    public function getConfig()
     {
         return include __DIR__ . '/../test.global.php';
     }
 
-    public function getAutoloaderConfig(): array
+    public function getAutoloaderConfig()
     {
         return array(
             'Laminas\Loader\StandardAutoloader' => array(

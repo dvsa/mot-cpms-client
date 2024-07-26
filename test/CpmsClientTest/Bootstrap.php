@@ -3,7 +3,6 @@
 namespace CpmsClientTest;
 
 use Laminas\Mvc\Application;
-use Laminas\ServiceManager\ServiceManager;
 
 /**
  * Test bootstrap, for setting up auto loading
@@ -11,14 +10,16 @@ use Laminas\ServiceManager\ServiceManager;
  */
 class Bootstrap
 {
-    protected static ServiceManager $serviceManager;
 
-    /** This is the root directory where the test is run from which likely the test directory */
-    protected static string $dir;
+    /** @var  \Laminas\ServiceManager\ServiceManager */
+    protected static $serviceManager;
 
-    protected static Application $application;
+    /** @var  string This is the root directory where the test is run from which likely the test directory */
+    protected static $dir;
 
-    protected static ?self $instance;
+    protected static $application;
+
+    protected static $instance;
 
     protected function __construct()
     {
@@ -29,43 +30,43 @@ class Bootstrap
      */
     public static function getInstance()
     {
-        if (!isset(static::$instance)) {
+        if (!static::$instance) {
             static::$instance = new self();
         }
 
         return static::$instance;
     }
 
-    public function init(string $dir, array $testModule = null): void
+    /**
+     * @param        $dir
+     * @param string $testModule
+     */
+    public function init($dir, $testModule = null)
     {
         static::$dir = $dir;
 
         $this->setPaths();
 
         $zf2ModulePaths = array(dirname(dirname($dir)));
-        $path = static::findParentPath('vendor');
-        if ($path) {
+        if (($path = static::findParentPath('vendor'))) {
             $zf2ModulePaths[] = $path;
         }
-        $path = static::findParentPath('src');
-        if ($path && $path !== $zf2ModulePaths[0]) {
+        if (($path = static::findParentPath('src')) !== $zf2ModulePaths[0]) {
             $zf2ModulePaths[] = $path;
         }
 
         $zf2ModulePaths[] = './';
 
-        /** @psalm-suppress UnresolvableInclude */
         $config = include $dir . '/../config/application.config.php';
 
-        if ($testModule !== null && count($testModule) >= 1) {
-            foreach ($testModule as $mod) {
+        if (!empty($testModule)) {
+            foreach ((array)$testModule as $mod) {
                 if (!in_array($mod, $config['modules'])) {
                     $config['modules'][] = $mod;
                 }
             }
         }
 
-        /** @psalm-suppress UnresolvableInclude */
         include $dir . '/../init_autoloader.php';
 
         $application    = Application::init($config);
@@ -78,7 +79,7 @@ class Bootstrap
     /**
      * set paths
      */
-    protected function setPaths(): void
+    protected function setPaths()
     {
         $basePath = realpath(static::$dir) . '/';
 
@@ -94,13 +95,11 @@ class Bootstrap
         );
 
         if (file_exists(static::$dir . "/autoload_classmap.php")) {
-            /** @psalm-suppress UnresolvableInclude */
             $classList = include static::$dir . "/autoload_classmap.php";
 
             spl_autoload_register(
-                function ($class) use ($classList) {
+                function ($class) use ($classList, $basePath) {
                     if (isset($classList[$class])) {
-                        /** @psalm-suppress UnresolvableInclude */
                         include $classList[$class];
                     } else {
                         $filename = str_replace('\\\\', '/', $class) . '.php';
@@ -116,7 +115,7 @@ class Bootstrap
     /**
      * @param string $path
      *
-     * @return string false if the path cannot be found
+     * @return boolean|string false if the path cannot be found
      */
     protected function findParentPath($path)
     {
@@ -126,7 +125,7 @@ class Bootstrap
     }
 
     /**
-     * @return ServiceManager
+     * @return \Laminas\ServiceManager\ServiceManager
      */
     public function getServiceManager()
     {
@@ -145,3 +144,7 @@ class Bootstrap
     {
     }
 }
+
+$path = realpath(__DIR__ . '/../');
+chdir(dirname($path));
+Bootstrap::getInstance()->init($path, array('CpmsClientTest'));
