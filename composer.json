@@ -5,7 +5,7 @@
     "license": "proprietary",
     "require": {
         "php": "^8.2",
-        "dvsa/mot-cpms-notifications": "^3.0.0",
+        "dvsa/mot-cpms-notifications": "dev-feature-bl-15040-code-linting",
         "laminas/laminas-mvc": "^3.3.0",
         "laminas/laminas-cache": "^3.12.0",
         "laminas/laminas-log": "^2.13",

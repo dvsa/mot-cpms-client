@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3117d62e3d83de4b370c70b13218814e",
+    "content-hash": "4540f8971f7d36869b47948ec3d447ff",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -261,16 +261,16 @@
         },
         {
             "name": "dvsa/mot-cpms-notifications",
-            "version": "v3.0.0",
+            "version": "dev-feature-bl-15040-code-linting",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dvsa/mot-cpms-notifications.git",
-                "reference": "314f0015ec2aa35fc8fcae71888b406a4bff419a"
+                "reference": "00cc1f902ed6d60ea69eaec3f87c1a4c93e91b88"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dvsa/mot-cpms-notifications/zipball/314f0015ec2aa35fc8fcae71888b406a4bff419a",
-                "reference": "314f0015ec2aa35fc8fcae71888b406a4bff419a",
+                "url": "https://api.github.com/repos/dvsa/mot-cpms-notifications/zipball/00cc1f902ed6d60ea69eaec3f87c1a4c93e91b88",
+                "reference": "00cc1f902ed6d60ea69eaec3f87c1a4c93e91b88",
                 "shasum": ""
             },
             "require": {
@@ -281,7 +281,10 @@
             "require-dev": {
                 "captainhook/captainhook": "^5.16",
                 "captainhook/plugin-composer": "^5.3",
-                "phpunit/phpunit": "^9.5"
+                "dvsa/coding-standards": "^2.0",
+                "phpstan/phpstan": "^1.12",
+                "phpunit/phpunit": "^9.5",
+                "squizlabs/php_codesniffer": "*"
             },
             "type": "library",
             "autoload": {
@@ -295,9 +298,9 @@
             ],
             "support": {
                 "issues": "https://github.com/dvsa/mot-cpms-notifications/issues",
-                "source": "https://github.com/dvsa/mot-cpms-notifications/tree/v3.0.0"
+                "source": "https://github.com/dvsa/mot-cpms-notifications/tree/feature-bl-15040-code-linting"
             },
-            "time": "2024-07-25T13:07:43+00:00"
+            "time": "2024-10-24T14:39:04+00:00"
         },
         {
             "name": "dvsa/mot-cpms-queues",
@@ -7099,7 +7102,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "dvsa/mot-cpms-notifications": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
