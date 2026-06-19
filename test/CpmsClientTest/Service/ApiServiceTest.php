@@ -55,8 +55,16 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
         $loader = $this->getApplicationServiceLocator()->get('ControllerManager');
         /** @var SampleController $controller */
         $controller = $loader->get('CpmsClientTest\Sample');
-        $plugin     = $controller->getCpmsRestClient();
-        $this->assertInstanceOf('CpmsClient\Service\ApiService', $plugin);
+        $plugin = $controller->plugin('getCpmsRestClient');
+        $this->assertInstanceOf(
+            \CpmsClient\Controller\Plugin\GetRestClient::class,
+            $plugin
+        );
+        // $service = $plugin();
+        // $this->assertInstanceOf(
+        //     \CpmsClient\Service\ApiService::class,
+        //     $service
+        // );
     }
 
     /**

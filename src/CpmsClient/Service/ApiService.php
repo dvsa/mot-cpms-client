@@ -421,7 +421,7 @@ class ApiService
         if ($logger = $this->getLogger()) {
             $logger->error(implode(' ', $message));
         }
-
+   
         return array(
             'code'    => 105,
             'message' => sprintf("An CPMS client error occurred, ID %s\n%s", $errorId, implode('\n', $message)),
