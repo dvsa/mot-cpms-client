@@ -2,9 +2,10 @@
 namespace CpmsClient\Service;
 
 use Interop\Container\ContainerInterface;
-use Laminas\Log\Logger;
-use Laminas\Log\Writer\Stream;
 use Laminas\ServiceManager\Factory\FactoryInterface;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class LoggerFactory
@@ -22,17 +23,17 @@ class LoggerFactory implements FactoryInterface
      *
      * @param $requestedName
      * @param array|null $options
-     * @return Logger
+     * @return LoggerInterface
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null): LoggerInterface
     {
-        $config   = $container->get('config');
+        $config = $container->get('config');
         $filename = $this->getLogFilename($config);
-        $writer   = new Stream($filename);
-        $logger   = new Logger();
-        $logger->addWriter($writer);
+
+        $logger = new Logger('cpms-client');
+        $logger->pushHandler(new StreamHandler($filename));
 
         return $logger;
     }

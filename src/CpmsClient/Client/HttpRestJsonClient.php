@@ -6,7 +6,6 @@ use CpmsClient\Utility\Util;
 use Laminas\Http\Client as HttpClient;
 use Laminas\Http\Headers;
 use Laminas\Http\Request;
-use Laminas\Log\Logger;
 use Laminas\Stdlib\Parameters;
 use Psr\Log\LoggerInterface;
 
@@ -32,7 +31,7 @@ class HttpRestJsonClient
 
     /**
      * @param HttpClient $httpClient
-     * @param Logger     $logger
+     * @param LoggerInterface $logger
      * @param Request    $request
      */
     public function __construct(HttpClient $httpClient, LoggerInterface $logger, Request $request = null)

@@ -11,7 +11,6 @@ use DVSA\CPMS\Queues\QueueAdapters\InMemory\InMemoryQueues;
 use DVSA\CPMS\Queues\QueueAdapters\Interfaces\Queues;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Laminas\Log\Writer\Mock as MockWriter;
 
 /**
  * @coversDefaultClass CpmsClient\Client\NotificationsClient
