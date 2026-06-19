@@ -10,8 +10,7 @@ use CpmsClient\Utility\Util;
 use DVSA\CPMS\Queues\QueueAdapters\Values\QueueMessage;
 use Exception;
 use Laminas\Http\Request;
-use Laminas\Log\Logger;
-use Laminas\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class ApiService
@@ -315,7 +314,7 @@ class ApiService
                 }
                 $token = new AccessToken($data);
             } else {
-                $this->getLogger()->warn('Unable to create access token with data: ' . print_r($data, true));
+                $this->getLogger()->warning('Unable to create access token with data: ' . print_r($data, true));
 
                 return $data;
             }
@@ -420,7 +419,7 @@ class ApiService
         }
 
         if ($logger = $this->getLogger()) {
-            $logger->err(implode(' ', $message));
+            $logger->error(implode(' ', $message));
         }
 
         return array(
@@ -452,7 +451,7 @@ class ApiService
     /**
      * Set logger object
      *
-     * @param Logger $logger
+     * @param LoggerInterface $logger
      *
      * @return mixed
      */
@@ -466,7 +465,7 @@ class ApiService
     /**
      * Get logger object
      *
-     * @return  Logger
+     * @return  LoggerInterface
      */
     public function getLogger()
     {
@@ -548,7 +547,7 @@ class ApiService
         $response = $this->put("/api/notifications/" . $message->getNotificationId() . '/acknowledged', 'NOTIFICATION', []);
         if (!isset($response['code']) || $response['code'] !== self::CPMS_CODE_SUCCESS) {
             $msg = "response from HttpClient does not contain expected 'code' field";
-            $this->logger->warn($msg, $response);
+            $this->logger->warning($msg, $response);
             throw new CpmsNotificationAcknowledgementFailed($msg, $response);
         }
 

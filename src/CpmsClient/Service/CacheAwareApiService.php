@@ -2,7 +2,8 @@
 namespace CpmsClient\Service;
 
 use Laminas\Cache\Storage\StorageInterface;
-use Laminas\Log\LoggerAwareTrait;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 
 /**
  * Class ApiService
@@ -13,9 +14,9 @@ use Laminas\Log\LoggerAwareTrait;
  *
  * @package CpmsClient\Service
  */
-class CacheAwareApiService
+class CacheAwareApiService implements LoggerAwareInterface
 {
-    use LoggerAwareTrait;
+     use LoggerAwareTrait;
     /**
      * @var ApiService
      */

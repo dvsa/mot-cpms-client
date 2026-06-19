@@ -4,7 +4,7 @@ namespace CpmsClient\Client;
 
 use DVSA\CPMS\Queues\QueueAdapters\Interfaces\Queues;
 use DVSA\CPMS\Queues\QueueAdapters\Values\QueueMessage;
-use Laminas\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Laminas\Log\Logger;
 
@@ -21,7 +21,7 @@ class NotificationsClient
      *
      * @param Queues $queuesClient
      *        how we will talk to our queues
-     * @param Logger $logger
+     * @param LoggerInterface $logger
      *        how we will report on what happens
      */
     public function __construct(

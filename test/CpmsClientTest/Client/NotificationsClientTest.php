@@ -10,7 +10,7 @@ use DVSA\CPMS\Notifications\Messages\Values\PaymentNotificationV1;
 use DVSA\CPMS\Queues\QueueAdapters\InMemory\InMemoryQueues;
 use DVSA\CPMS\Queues\QueueAdapters\Interfaces\Queues;
 use PHPUnit\Framework\TestCase;
-use Laminas\Log\Logger;
+use Psr\Log\LoggerInterface;
 use Laminas\Log\Writer\Mock as MockWriter;
 
 /**
@@ -64,9 +64,7 @@ class NotificationsClientTest extends TestCase
         //
         // we use ZF2's mock writer, so that the logger never attempts to
         // write either to disk nor to the screen
-        $logger = new Logger;
-        $mockWriter = new MockWriter;
-        $logger->addWriter($mockWriter);
+        $logger = $this->createMock(LoggerInterface::class);
 
         // finally!! we can build the client that we're unit testing here
         $unit = new NotificationsClient($queues, $logger);

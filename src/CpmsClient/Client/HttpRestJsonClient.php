@@ -8,7 +8,7 @@ use Laminas\Http\Headers;
 use Laminas\Http\Request;
 use Laminas\Log\Logger;
 use Laminas\Stdlib\Parameters;
-use Laminas\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class HttpRestJsonClient
@@ -27,7 +27,7 @@ class HttpRestJsonClient
     /** @var \Laminas\Http\Request */
     protected $request;
 
-    /** @var  \Laminas\Log\Logger */
+    /** @var  \Psr\Log\LoggerInterface */
     protected $logger;
 
     /**
@@ -90,7 +90,7 @@ class HttpRestJsonClient
         $decodedData = \json_decode($response->getBody(), true);
 
         if (empty($decodedData)) {
-            $this->logger->warn($response->getBody());
+            $this->logger->warning($response->getBody());
 
             return $response->getBody();
         }

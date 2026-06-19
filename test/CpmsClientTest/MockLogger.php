@@ -1,38 +1,59 @@
-<?php namespace CpmsClientTest;
+<?php
 
-use Laminas\Log\LoggerInterface;
+namespace CpmsClientTest;
+
+use Psr\Log\LoggerInterface;
 
 class MockLogger implements LoggerInterface
 {
-    public function emerg($message, $extra = [])
+    public array $logs = [];
+
+    public function emergency(string|\Stringable $message, array $context = []): void
     {
+        $this->log('emergency', $message, $context);
     }
 
-    public function alert($message, $extra = [])
+    public function alert(string|\Stringable $message, array $context = []): void
     {
+        $this->log('alert', $message, $context);
     }
 
-    public function crit($message, $extra = [])
+    public function critical(string|\Stringable $message, array $context = []): void
     {
+        $this->log('critical', $message, $context);
     }
 
-    public function err($message, $extra = [])
+    public function error(string|\Stringable $message, array $context = []): void
     {
+        $this->log('error', $message, $context);
     }
 
-    public function warn($message, $extra = [])
+    public function warning(string|\Stringable $message, array $context = []): void
     {
+        $this->log('warning', $message, $context);
     }
 
-    public function notice($message, $extra = [])
+    public function notice(string|\Stringable $message, array $context = []): void
     {
+        $this->log('notice', $message, $context);
     }
 
-    public function info($message, $extra = [])
+    public function info(string|\Stringable $message, array $context = []): void
     {
+        $this->log('info', $message, $context);
     }
 
-    public function debug($message, $extra = [])
+    public function debug(string|\Stringable $message, array $context = []): void
     {
+        $this->log('debug', $message, $context);
+    }
+
+    public function log($level, string|\Stringable $message, array $context = []): void
+    {
+        $this->logs[] = [
+            'level' => $level,
+            'message' => (string) $message,
+            'context' => $context,
+        ];
     }
 }
