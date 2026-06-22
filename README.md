@@ -37,7 +37,7 @@ composer require dvsa/mot-cpms-client
              );
    
    * ```version```          : This is the version of CPMS API to target, currently on version 1
-   * ```logger_alias```     : Zend Service Manager alias for retrieving a  instance
+   * ```logger_alias```     : Zend Service Manager alias for retrieving a Monolog Logger instance
    * ```identity_provider``` : This is the service manager alias that should return an object which implements ```CpmsClient\Authenticate\IdentityProviderInterface```. 
    This is mandatory. The following information is retrieved from the class
    
