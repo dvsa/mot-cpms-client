@@ -3,13 +3,17 @@
 namespace CpmsClientTest\Client;
 
 use CpmsClient\Client\NotificationsClient;
+use CpmsClient\Service\LoggerFactory;
 use DateTime;
 use DVSA\CPMS\Notifications\Ids\ValueBuilders\GenerateNotificationId;
 use DVSA\CPMS\Notifications\Messages\Maps\MapNotificationTypes;
 use DVSA\CPMS\Notifications\Messages\Values\PaymentNotificationV1;
 use DVSA\CPMS\Queues\QueueAdapters\InMemory\InMemoryQueues;
 use DVSA\CPMS\Queues\QueueAdapters\Interfaces\Queues;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -69,6 +73,108 @@ class NotificationsClientTest extends TestCase
         $unit = new NotificationsClient($queues, $logger);
 
         return $unit;
+    }
+
+    public function testLoggerWritesToConfiguredFilePath(): void
+    {
+        $logDir = sys_get_temp_dir() . '/mot_logger_' . uniqid('', true);
+        mkdir($logDir);
+
+        $logFile = $logDir . '/test.log';
+
+        $config = [
+            'logger' => [
+                'location' => $logDir,
+                'filename' => 'test.log',
+            ],
+        ];
+
+        $container = $this->createMock(ContainerInterface::class);
+        $container
+            ->expects($this->once())
+            ->method('get')
+            ->with('config')
+            ->willReturn($config);
+
+        $factory = new LoggerFactory();
+
+        $logger = $factory($container, LoggerFactory::DEFAULT_LOGGER_ALIAS);
+
+        $this->assertInstanceOf(LoggerInterface::class, $logger);
+        $this->assertInstanceOf(Logger::class, $logger);
+
+        $logger->info('Test log message');
+
+        $this->assertFileExists($logFile);
+
+        $contents = file_get_contents($logFile);
+
+        $this->assertIsString($contents);
+        $this->assertStringContainsString('Test log message', $contents);
+        $this->assertStringContainsString('cpms-client', $contents);
+
+        @unlink($logFile);
+        @rmdir($logDir);
+    }
+
+    public function testFactoryConfiguresStreamHandler(): void
+    {
+        $logDir = sys_get_temp_dir() . '/mot_logger_' . uniqid('', true);
+        mkdir($logDir);
+
+        $config = [
+            'logger' => [
+                'location' => $logDir,
+                'filename' => 'test.log',
+            ],
+        ];
+
+        $container = $this->createMock(ContainerInterface::class);
+        $container
+            ->method('get')
+            ->with('config')
+            ->willReturn($config);
+
+        $factory = new LoggerFactory();
+
+        $logger = $factory($container, LoggerFactory::DEFAULT_LOGGER_ALIAS);
+
+        $this->assertInstanceOf(Logger::class, $logger);
+
+        $handlers = $logger->getHandlers();
+
+        $this->assertNotEmpty($handlers);
+        $this->assertInstanceOf(StreamHandler::class, $handlers[0]);
+
+        @rmdir($logDir);
+    }
+
+    public function testLoggerChannelIsConfigured(): void
+    {
+        $logDir = sys_get_temp_dir() . '/mot_logger_' . uniqid('', true);
+        mkdir($logDir);
+
+        $config = [
+            'logger' => [
+                'location' => $logDir,
+                'filename' => 'test.log',
+            ],
+        ];
+
+        $container = $this->createMock(ContainerInterface::class);
+        $container
+            ->method('get')
+            ->with('config')
+            ->willReturn($config);
+
+        $factory = new LoggerFactory();
+
+        $logger = $factory($container, LoggerFactory::DEFAULT_LOGGER_ALIAS);
+
+        $this->assertInstanceOf(Logger::class, $logger);
+        $this->assertSame('cpms-client', $logger->getName());
+
+        @rmdir($logDir);
     }
 
     /**
