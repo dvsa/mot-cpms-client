@@ -4,7 +4,7 @@ namespace CpmsClient\Factory;
 
 
 use CpmsClient\Controller\Plugin\GetRestClient;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
 use Laminas\ServiceManager\Exception\ServiceNotCreatedException;
 use Laminas\ServiceManager\Exception\ServiceNotFoundException;

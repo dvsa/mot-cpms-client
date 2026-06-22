@@ -4,7 +4,7 @@ namespace CpmsClient\Service;
 use CpmsClient\Authenticate\IdentityProviderInterface;
 use CpmsClient\Client\HttpRestJsonClient;
 use CpmsClient\Client\NotificationsClient;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 /**

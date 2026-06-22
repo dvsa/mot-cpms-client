@@ -1,7 +1,7 @@
 <?php
 namespace CpmsClient\Service;
 
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
