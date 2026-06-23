@@ -18,3 +18,4 @@ dummy.php
 .tags*
 review/
 .phpunit.result.cache
+/data
