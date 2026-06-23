@@ -17,28 +17,15 @@ use Psr\Log\LoggerInterface;
 class HttpRestJsonClient
 {
     const CONTENT_TYPE_FORMAT = 'application/vnd.dvsa-gov-uk.v%d%s; charset=UTF-8';
-    /** @var \Laminas\Http\Client */
-    protected $httpClient;
 
     /** @var \CpmsClient\Client\ClientOptions */
     protected $options;
 
-    /** @var \Laminas\Http\Request */
-    protected $request;
-
-    /** @var  \Psr\Log\LoggerInterface */
-    protected $logger;
-
-    /**
-     * @param HttpClient $httpClient
-     * @param LoggerInterface $logger
-     * @param Request    $request
-     */
-    public function __construct(HttpClient $httpClient, LoggerInterface $logger, Request $request = null)
-    {
-        $this->setHttpClient($httpClient);
-        $this->setRequest($request);
-        $this->logger = $logger;
+    public function __construct(
+        protected HttpClient $httpClient,
+        protected LoggerInterface $logger,
+        protected ?Request $request = null
+    ) {
     }
 
     /**
@@ -77,7 +64,7 @@ class HttpRestJsonClient
         //Log request header
         $this->logger->debug($request->toString());
 
-        /** @var $response \Laminas\Http\Response */
+        /** @var \Laminas\Http\Response $response */
         $response = $this->getHttpClient()->dispatch($request);
 
         //log response code

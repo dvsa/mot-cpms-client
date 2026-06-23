@@ -21,13 +21,13 @@ class LoggerFactory implements FactoryInterface
      *
      * @param ContainerInterface $container
      *
-     * @param $requestedName
+     * @param mixed $requestedName
      * @param array|null $options
      * @return LoggerInterface
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null): LoggerInterface
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): LoggerInterface
     {
         $config = $container->get('config');
 
