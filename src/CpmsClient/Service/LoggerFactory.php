@@ -30,9 +30,15 @@ class LoggerFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null): LoggerInterface
     {
         $config = $container->get('config');
-        $filename = $this->getLogFilename($config);
 
-        $logger = new Logger('cpms-client');
+        $loggerConfig = $config['cpms_client']['logger'] ?? [];
+
+        $filename = rtrim($loggerConfig['location'] ?? 'data/logs', '/') . '/'
+            . trim($loggerConfig['filename'] ?? 'cpms-client.log', '/');
+
+        $channel = $loggerConfig['channel'] ?? 'cpms-client';
+
+        $logger = new Logger($channel);
         $logger->pushHandler(new StreamHandler($filename));
 
         return $logger;
@@ -50,7 +56,7 @@ class LoggerFactory implements FactoryInterface
         if (isset($config['logPath']) and is_file($config['logPath'])) {
             $filename = $config['logPath'];
         } else {
-            $filename = rtrim($config['logger']['location'], '/') . '/' . trim($config['logger']['filename'], '/');
+            $filename = rtrim($config['cpms_client']['logger']['location'], '/') . '/' . trim($config['cpms_client']['logger']['filename'], '/');
         }
 
         return $filename;

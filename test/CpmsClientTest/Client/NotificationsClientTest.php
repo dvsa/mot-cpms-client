@@ -80,12 +80,15 @@ class NotificationsClientTest extends TestCase
         $logDir = sys_get_temp_dir() . '/mot_logger_' . uniqid('', true);
         mkdir($logDir);
 
-        $logFile = $logDir . '/test.log';
+        $logFile = $logDir . '/cpms-client.log';
 
         $config = [
-            'logger' => [
+            'cpms_client'=> [
+                'logger' => [
                 'location' => $logDir,
-                'filename' => 'test.log',
+                'filename' => 'cpms-client.log',
+                'channel' => 'cpms-client',
+                ],
             ],
         ];
 
@@ -97,6 +100,8 @@ class NotificationsClientTest extends TestCase
             ->willReturn($config);
 
         $factory = new LoggerFactory();
+        
+        $this->assertSame($logFile, $factory->getLogFilename($config));
 
         $logger = $factory($container, LoggerFactory::DEFAULT_LOGGER_ALIAS);
 
@@ -123,9 +128,12 @@ class NotificationsClientTest extends TestCase
         mkdir($logDir);
 
         $config = [
-            'logger' => [
+               'cpms_client'=> [
+                'logger' => [
                 'location' => $logDir,
-                'filename' => 'test.log',
+                'filename' => 'cpms-client.log',
+                'channel' => 'cpms-client',
+                ],
             ],
         ];
 
@@ -158,6 +166,7 @@ class NotificationsClientTest extends TestCase
             'logger' => [
                 'location' => $logDir,
                 'filename' => 'test.log',
+                'channel' => 'cpms-client',
             ],
         ];
 
