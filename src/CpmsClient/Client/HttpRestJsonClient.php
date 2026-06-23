@@ -16,15 +16,15 @@ use Psr\Log\LoggerInterface;
  */
 class HttpRestJsonClient
 {
-    const CONTENT_TYPE_FORMAT = 'application/vnd.dvsa-gov-uk.v%d%s; charset=UTF-8';
+    private const CONTENT_TYPE_FORMAT = 'application/vnd.dvsa-gov-uk.v%d%s; charset=UTF-8';
 
     /** @var \CpmsClient\Client\ClientOptions */
-    protected $options;
+    private ?ClientOptions $options = null;
 
     public function __construct(
-        protected HttpClient $httpClient,
-        protected LoggerInterface $logger,
-        protected ?Request $request = null
+        private readonly HttpClient $httpClient,
+        private readonly LoggerInterface $logger,
+        private readonly ?Request $request = null
     ) {
     }
 
