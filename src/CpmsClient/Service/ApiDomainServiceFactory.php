@@ -2,7 +2,7 @@
 namespace CpmsClient\Service;
 
 use CpmsClient\Utility\Util;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Laminas\Http\Request;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 

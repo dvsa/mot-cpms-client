@@ -2,7 +2,7 @@
 namespace CpmsClient\Client;
 
 use CpmsClient\Service\LoggerFactory;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Laminas\Http\Client;
 use Laminas\Http\Client as HttpClient;
 use Laminas\Http\Request;

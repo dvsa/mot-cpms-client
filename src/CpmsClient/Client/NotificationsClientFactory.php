@@ -3,7 +3,7 @@
 namespace CpmsClient\Client;
 
 use CpmsClient\Service\LoggerFactory;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class NotificationsClientFactory implements FactoryInterface

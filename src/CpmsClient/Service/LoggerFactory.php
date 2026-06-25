@@ -1,10 +1,11 @@
 <?php
 namespace CpmsClient\Service;
 
-use Interop\Container\ContainerInterface;
-use Laminas\Log\Logger;
-use Laminas\Log\Writer\Stream;
+use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class LoggerFactory
@@ -20,19 +21,25 @@ class LoggerFactory implements FactoryInterface
      *
      * @param ContainerInterface $container
      *
-     * @param $requestedName
+     * @param mixed $requestedName
      * @param array|null $options
-     * @return Logger
+     * @return LoggerInterface
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): LoggerInterface
     {
-        $config   = $container->get('config');
-        $filename = $this->getLogFilename($config);
-        $writer   = new Stream($filename);
-        $logger   = new Logger();
-        $logger->addWriter($writer);
+        $config = $container->get('config');
+
+        $loggerConfig = $config['cpms_client']['logger'] ?? [];
+
+        $filename = rtrim($loggerConfig['location'] ?? 'data/logs', '/') . '/'
+            . trim($loggerConfig['filename'] ?? 'cpms-client.log', '/');
+
+        $channel = $loggerConfig['channel'] ?? 'cpms-client';
+
+        $logger = new Logger($channel);
+        $logger->pushHandler(new StreamHandler($filename));
 
         return $logger;
     }
@@ -49,7 +56,7 @@ class LoggerFactory implements FactoryInterface
         if (isset($config['logPath']) and is_file($config['logPath'])) {
             $filename = $config['logPath'];
         } else {
-            $filename = rtrim($config['logger']['location'], '/') . '/' . trim($config['logger']['filename'], '/');
+            $filename = rtrim($config['cpms_client']['logger']['location'], '/') . '/' . trim($config['cpms_client']['logger']['filename'], '/');
         }
 
         return $filename;

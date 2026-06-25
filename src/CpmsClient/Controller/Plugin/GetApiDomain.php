@@ -1,7 +1,7 @@
 <?php
 namespace CpmsClient\Controller\Plugin;
 
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 

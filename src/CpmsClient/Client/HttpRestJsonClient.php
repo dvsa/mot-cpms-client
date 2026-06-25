@@ -6,9 +6,8 @@ use CpmsClient\Utility\Util;
 use Laminas\Http\Client as HttpClient;
 use Laminas\Http\Headers;
 use Laminas\Http\Request;
-use Laminas\Log\Logger;
 use Laminas\Stdlib\Parameters;
-use Laminas\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class HttpRestJsonClient
@@ -17,29 +16,16 @@ use Laminas\Log\LoggerInterface;
  */
 class HttpRestJsonClient
 {
-    const CONTENT_TYPE_FORMAT = 'application/vnd.dvsa-gov-uk.v%d%s; charset=UTF-8';
-    /** @var \Laminas\Http\Client */
-    protected $httpClient;
+    private const CONTENT_TYPE_FORMAT = 'application/vnd.dvsa-gov-uk.v%d%s; charset=UTF-8';
 
     /** @var \CpmsClient\Client\ClientOptions */
-    protected $options;
+    private ?ClientOptions $options = null;
 
-    /** @var \Laminas\Http\Request */
-    protected $request;
-
-    /** @var  \Laminas\Log\Logger */
-    protected $logger;
-
-    /**
-     * @param HttpClient $httpClient
-     * @param Logger     $logger
-     * @param Request    $request
-     */
-    public function __construct(HttpClient $httpClient, LoggerInterface $logger, Request $request = null)
-    {
-        $this->setHttpClient($httpClient);
-        $this->setRequest($request);
-        $this->logger = $logger;
+    public function __construct(
+        private readonly HttpClient $httpClient,
+        private readonly LoggerInterface $logger,
+        private readonly ?Request $request = null
+    ) {
     }
 
     /**
@@ -78,7 +64,7 @@ class HttpRestJsonClient
         //Log request header
         $this->logger->debug($request->toString());
 
-        /** @var $response \Laminas\Http\Response */
+        /** @var \Laminas\Http\Response $response */
         $response = $this->getHttpClient()->dispatch($request);
 
         //log response code
@@ -90,7 +76,7 @@ class HttpRestJsonClient
         $decodedData = \json_decode($response->getBody(), true);
 
         if (empty($decodedData)) {
-            $this->logger->warn($response->getBody());
+            $this->logger->warning($response->getBody());
 
             return $response->getBody();
         }
