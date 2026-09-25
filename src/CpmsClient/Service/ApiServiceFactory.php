@@ -4,6 +4,7 @@ namespace CpmsClient\Service;
 use CpmsClient\Authenticate\IdentityProviderInterface;
 use CpmsClient\Client\HttpRestJsonClient;
 use CpmsClient\Client\NotificationsClient;
+use DvsaLogger\Logger\MotLogger;
 use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
@@ -33,13 +34,9 @@ class ApiServiceFactory implements FactoryInterface
         $restClient    = $config['cpms_api']['rest_client']['alias'];
         $enableCache   = $config['cpms_api']['enable_cache'];
         $serviceClass  = $config['cpms_api']['service_class'];
-        $loggerAlias   = $config['cpms_api']['logger_alias'];
         $identityAlias = $config['cpms_api']['identity_provider'];
 
-        if (empty($loggerAlias) || !$container->has($loggerAlias)) {
-            $loggerAlias = LoggerFactory::DEFAULT_LOGGER_ALIAS;
-        }
-        $logger = $container->get($loggerAlias);
+        $logger = $container->get(MotLogger::class);
 
         /** @var \Laminas\Cache\Storage\Adapter\AbstractAdapter $cache */
         /** @var HttpRestJsonClient $httpRestJsonClient */

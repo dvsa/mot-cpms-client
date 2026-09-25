@@ -3,8 +3,11 @@
 namespace CpmsClient\Client;
 
 use CpmsClient\Service\LoggerFactory;
+use DvsaLogger\Logger\MotLogger;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 class NotificationsClientFactory implements FactoryInterface
 {
@@ -15,25 +18,15 @@ class NotificationsClientFactory implements FactoryInterface
      * @param $requestedName
      * @param array|null $options
      * @return NotificationsClient the client to use for notifications from CPMS
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null): NotificationsClient
     {
         // shorthand
         $config = $container->get('config');
 
-        // we need a logger
-        //
-        // best not assume that we have one, just in case
-        $loggerAlias = null;
-        if (isset($config['cpms_api'], $config['cpms_api']['logger_alias'])) {
-            $loggerAlias  = $config['cpms_api']['logger_alias'];
-        }
-        if (empty($loggerAlias) || !$container->has($loggerAlias)) {
-            $loggerAlias = LoggerFactory::DEFAULT_LOGGER_ALIAS;
-        }
-        $logger = $container->get($loggerAlias);
+        $logger = $container->get(MotLogger::class);
 
         // what's the config for our queue adapter?
         $queueOptions = $config['cpms_api']['notifications_client']['options'];

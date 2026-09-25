@@ -2,9 +2,9 @@
 
 namespace CpmsClientTest;
 
-use Psr\Log\LoggerInterface;
+use DvsaLogger\Logger\MotLogger;
 
-class MockLogger implements LoggerInterface
+class MockLogger extends MotLogger
 {
     public array $logs = [];
 

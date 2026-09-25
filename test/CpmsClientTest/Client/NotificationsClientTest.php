@@ -10,6 +10,7 @@ use DVSA\CPMS\Notifications\Messages\Maps\MapNotificationTypes;
 use DVSA\CPMS\Notifications\Messages\Values\PaymentNotificationV1;
 use DVSA\CPMS\Queues\QueueAdapters\InMemory\InMemoryQueues;
 use DVSA\CPMS\Queues\QueueAdapters\Interfaces\Queues;
+use DvsaLogger\Logger\MotLogger;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
@@ -67,7 +68,7 @@ class NotificationsClientTest extends TestCase
         //
         // we use ZF2's mock writer, so that the logger never attempts to
         // write either to disk nor to the screen
-        $logger = $this->createMock(LoggerInterface::class);
+        $logger = $this->createMock(MotLogger::class);
 
         // finally!! we can build the client that we're unit testing here
         $unit = new NotificationsClient($queues, $logger);
