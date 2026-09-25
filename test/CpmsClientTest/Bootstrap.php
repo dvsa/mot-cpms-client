@@ -72,6 +72,24 @@ class Bootstrap
         $application    = Application::init($config);
         $serviceManager = $application->getServiceManager();
 
+        $serviceManager->setAllowOverride(true);
+
+        $appConfig = $serviceManager->get('config');
+
+        $appConfig['mot_logger'] = [
+            'channel' => 'cpms-api-client-test',
+            'writers' => [
+                [
+                    'type' => 'stream',
+                    'path' => 'php://stderr',
+                    'formatter' => 'pipe',
+                    'level' => 'error',
+                    'enabled' => true,
+                ],
+            ],
+        ];
+
+        $serviceManager->setService('config', $appConfig);
         static::$serviceManager = $serviceManager;
         static::$application    = $application;
     }

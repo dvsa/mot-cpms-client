@@ -88,7 +88,7 @@ class ApiService
      */
 protected function processRequest($endPointAlias, $scope, $method, $params = null)
     {
-        $this->logger->info("Starrting processing request for endpoint: $endPointAlias, scope: $scope, method: $method");
+        $this->logger->info("Starting processing request for endpoint: $endPointAlias, scope: $scope, method: $method");
 
         try {
             $method         = (string)$method;

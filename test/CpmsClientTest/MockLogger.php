@@ -3,57 +3,67 @@
 namespace CpmsClientTest;
 
 use DvsaLogger\Logger\MotLogger;
+use Monolog\Level;
 
 class MockLogger extends MotLogger
 {
     public array $logs = [];
 
-    public function emergency(string|\Stringable $message, array $context = []): void
+    public function emerg(string $message, array $context = []): MotLogger
     {
-        $this->log('emergency', $message, $context);
+        $this->log(Level::Emergency, $message, $context);
+        return $this;
     }
 
-    public function alert(string|\Stringable $message, array $context = []): void
+    public function alert(string $message, array $context = []): MotLogger
     {
-        $this->log('alert', $message, $context);
+        $this->log(Level::Alert, $message, $context);
+        return $this;
     }
 
-    public function critical(string|\Stringable $message, array $context = []): void
+    public function crit(string $message, array $context = []): MotLogger
     {
-        $this->log('critical', $message, $context);
+        $this->log(Level::Critical, $message, $context);
+        return $this;
     }
 
-    public function error(string|\Stringable $message, array $context = []): void
+    public function error(string $message, array $context = []): MotLogger
     {
-        $this->log('error', $message, $context);
+        $this->log(Level::Error, $message, $context);
+        return $this;
     }
 
-    public function warning(string|\Stringable $message, array $context = []): void
+    public function warn(string $message, array $context = []): MotLogger
     {
-        $this->log('warning', $message, $context);
+        $this->log(Level::Warning, $message, $context);
+        return $this;
     }
 
-    public function notice(string|\Stringable $message, array $context = []): void
+    public function notice(string $message, array $context = []): MotLogger
     {
-        $this->log('notice', $message, $context);
+        $this->log(Level::Notice, $message, $context);
+        return $this;
     }
 
-    public function info(string|\Stringable $message, array $context = []): void
+    public function info(string $message, array $context = []): MotLogger
     {
-        $this->log('info', $message, $context);
+        $this->log(Level::Info, $message, $context);
+        return $this;
     }
 
-    public function debug(string|\Stringable $message, array $context = []): void
+    public function debug(string $message, array $context = []): MotLogger
     {
-        $this->log('debug', $message, $context);
+        $this->log(Level::Debug, $message, $context);
+        return $this;
     }
 
-    public function log($level, string|\Stringable $message, array $context = []): void
+    public function log($level, string $message, array $context = []): MotLogger
     {
         $this->logs[] = [
             'level' => $level,
             'message' => (string) $message,
             'context' => $context,
         ];
+        return $this;
     }
 }

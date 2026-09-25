@@ -24,9 +24,9 @@ class HttpRestJsonClient
     private ?ClientOptions $options = null;
 
     public function __construct(
-        private readonly HttpClient $httpClient,
+        private HttpClient $httpClient,
         private readonly MotLogger $logger,
-        private readonly ?Request $request = null
+        private ?Request $request = null
     ) {
     }
 
