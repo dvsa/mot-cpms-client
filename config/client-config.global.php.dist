@@ -3,26 +3,51 @@
 use DVSA\CPMS\Queues\QueueAdapters\AmazonSqs\AmazonSqsQueues;
 use DVSA\CPMS\Notifications\Messages\Maps\MapNotificationTypes;
 
-return array(
-    'cpms_api'                => array(
-        'logger_alias'      => '', //Zend logger service manager alias
+return [
+    'mot_logger' => [
+        'channel' => 'cpms-api-client',
+        'environment_levels' => [
+            'dev' => 'debug',
+            'int' => 'debug',
+            'prv' => 'warning',
+            'pre-prod' => 'error',
+            'prod' => 'error',
+        ],
+        'writers' => [
+            [
+                'type' => 'stream',
+                'path' => 'php://stderr',
+                'formatter' => 'pipe',
+                'level' => 'error',
+                'enabled' => true,
+            ],
+            [
+                'type' => 'stream',
+                'path' => '/var/log/dvsa/cpms-api-client.log',
+                'formatter' => 'json',
+                'level' => 'error',
+                'enabled' => true,
+            ]
+        ],
+    ],
+    'cpms_api' => [
         'identity_provider' => '', //Should implement CpmsClient\Authenticate\IdentityProviderInterface
-        'enable_cache'      => true,
-        'cache_storage'     => 'filesystem',
-        'rest_client'   => array(
-            'options' => array(
-                'version'           => 1, //CPMS API version to use
-                'domain'            => '', //CPMS API domain
-            ),
-        ),
-        'notifications_client' => array (
+        'enable_cache' => true,
+        'cache_storage' => 'filesystem',
+        'rest_client' => [
+            'options' => [
+                'version' => 1, //CPMS API version to use
+                'domain' => '', //CPMS API domain
+            ],
+        ],
+        'notifications_client' => [
             // Should implement DVSA\CPMS\Queues\Interfaces\Queues
             'adapter' => AmazonSqsQueues::class,
-            'options' => array (
+            'options' => [
                 // replace this with the AWS region that your environment is built in
                 'region' => 'us-west-2',
-                'queues' => array (
-                    'notifications' => array (
+                'queues' => [
+                    'notifications' => [
                         // replace this with the correct notifications queue
                         // for your scheme
                         'QueueUrl' => 'https://sqs.us-west-2.amazonaws.com/600499240829/SH_Test01',
@@ -31,9 +56,9 @@ return array(
                                 "mapper" => MapNotificationTypes::class,
                             ],
                         ],
-                    ),
-                ),
-            ),
-        ),
-    ),
-);
+                    ],
+                ],
+            ],
+        ],
+    ],
+];

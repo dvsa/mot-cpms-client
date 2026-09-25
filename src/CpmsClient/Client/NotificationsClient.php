@@ -4,7 +4,7 @@ namespace CpmsClient\Client;
 
 use DVSA\CPMS\Queues\QueueAdapters\Interfaces\Queues;
 use DVSA\CPMS\Queues\QueueAdapters\Values\QueueMessage;
-use Psr\Log\LoggerInterface;
+use DvsaLogger\Logger\MotLogger;
 use RuntimeException;
 
 class NotificationsClient
@@ -13,17 +13,17 @@ class NotificationsClient
      * In our config, what is the name of the queue we need to read
      * new notifications from?
      */
-    const NOTIFICATIONS_QUEUENAME = "notifications";
+    const NOTIFICATIONS_QUEUE_NAME = "notifications";
 
     /**
      * @param Queues $queuesClient
      *        how we will talk to our queues
-     * @param LoggerInterface $logger
+     * @param MotLogger $logger
      *        how we will report on what happens
      */
     public function __construct(
         private readonly Queues $queuesClient,
-        private readonly LoggerInterface $logger
+        private readonly MotLogger $logger
     ) {
     }
 
@@ -35,21 +35,26 @@ class NotificationsClient
     {
 
         $queuesClient = $this->queuesClient;
-        $this->logger->debug("reading messages from queue: " . self::NOTIFICATIONS_QUEUENAME);
-        $qMessages = $queuesClient->receiveMessagesFromQueue(self::NOTIFICATIONS_QUEUENAME);
+        $this->logger->debug("[" . NotificationsClient::class . "]: Reading messages from queue: " . self::NOTIFICATIONS_QUEUE_NAME);
+
+        $qMessages = $queuesClient->receiveMessagesFromQueue(self::NOTIFICATIONS_QUEUE_NAME);
+
         $notificationsArray = [];
         foreach ($qMessages as $qMessage) {
             $notification = $qMessage->getPayload();
+
             if (!is_object($notification)) {
+                $this->logger->warn("[" . NotificationsClient::class . "]: Non-object received from notifications queue");
                 throw new RuntimeException("non-object received from notifications queue");
             }
+
             $notificationsArray[] = [
                 "metadata" => $qMessage,
                 "message" => $notification,
             ];
         }
 
-        $this->logger->debug("read " . count($notificationsArray) . " message(s) from queue: " . self::NOTIFICATIONS_QUEUENAME);
+        $this->logger->debug("[" . NotificationsClient::class . "]: Read " . count($notificationsArray) . " message(s) from queue: " . self::NOTIFICATIONS_QUEUE_NAME);
         return $notificationsArray;
     }
 

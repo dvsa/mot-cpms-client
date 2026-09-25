@@ -1,9 +1,10 @@
 <?php
+
+declare(strict_types=1);
+
 namespace CpmsClient\Service;
 
 use Laminas\Cache\Storage\StorageInterface;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
 
 /**
  * Class ApiService
@@ -14,9 +15,8 @@ use Psr\Log\LoggerAwareTrait;
  *
  * @package CpmsClient\Service
  */
-class CacheAwareApiService implements LoggerAwareInterface
+class CacheAwareApiService
 {
-     use LoggerAwareTrait;
     /**
      * @var ApiService
      */

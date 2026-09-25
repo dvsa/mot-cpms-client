@@ -5,7 +5,7 @@ Introduction
 This a module designed to make restful API calls to CPMS backend API. It handles 
 
 * The generation of the required access token based on the scope 
-* Logging when a logger alias is provided
+* Logging application and API calls to CPMS.
 * Caching of access tokens when caching is setup and enabled.
  
 
@@ -23,8 +23,7 @@ composer require dvsa/mot-cpms-client
          ```
              return array(
                  'cpms_api'                => array(
-                     'version'           => 1,  
-                     'logger_alias'      => '',  
+                     'version'           => 1,
                      'identity_provider' => '',
                      'enable_cache'      => true, //Enable of caching of access tokens for reuse
                      'cache_storage'     => 'filesystem',
@@ -37,7 +36,6 @@ composer require dvsa/mot-cpms-client
              );
    
    * ```version```          : This is the version of CPMS API to target, currently on version 1
-   * ```logger_alias```     : Zend Service Manager alias for retrieving a Monolog Logger instance
    * ```identity_provider``` : This is the service manager alias that should return an object which implements ```CpmsClient\Authenticate\IdentityProviderInterface```. 
    This is mandatory. The following information is retrieved from the class
    

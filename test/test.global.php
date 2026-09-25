@@ -2,61 +2,82 @@
 
 use CpmsClientTest\MockLogger;
 use CpmsClientTest\MockUser;
+use DvsaLogger\Logger\MotLogger;
 
-return array(
+return [
     'application_env'   => 'testing',
     'display_exception' => false,
-    'router'            => array(
-        'routes' => array(
-            'cpms-test' => array(
+    'router'            => [
+        'routes' => [
+            'cpms-test' => [
                 'type'    => 'literal',
-                'options' => array(
+                'options' => [
                     'route'    => '/test-index',
-                    'defaults' => array(
+                    'defaults' => [
                         'controller' => 'CpmsClientTest\Sample',
                         'action'     => 'index'
-                    )
-                ),
-            ),
-        ),
-    ),
-    'view_manager'      => array(
+                    ]
+                ],
+            ],
+        ],
+    ],
+    'mot_logger' => [
+        'channel' => 'cpms-api-client-test',
+        'writers' => [
+            [
+                'type' => 'stream',
+                'path' => 'php://stderr',
+                'formatter' => 'pipe',
+                'level' => 'error',
+                'enabled' => true,
+            ],
+            [
+                'type' => 'stream',
+                'path' => '/var/log/dvsa/cpms-api-client.log',
+                'formatter' => 'json',
+                'level' => 'error',
+                'enabled' => false,
+            ]
+        ],
+    ],
+
+    'view_manager'      => [
         'not_found_template'  => 'error/404',
         'exception_template'  => 'error/index',
-        'template_map'        => array(
+        'template_map'        => [
             'layout/layout' => __DIR__ . '/view/layout/layout.phtml',
             'error/404'     => __DIR__ . '/view/error/404.phtml',
             'error/index'   => __DIR__ . '/view/error/index.phtml',
             'sample/index'  => __DIR__ . '/view/cpms-common/index/index.phtml',
-        ),
-        'template_path_stack' => array(
+        ],
+        'template_path_stack' => [
             __DIR__ . '/view',
-        ),
-    ),
-    'controllers'       => array(
-        'invokables' => array(
+        ],
+    ],
+    'controllers'       => [
+        'invokables' => [
             'CpmsClientTest\Sample' => 'CpmsClientTest\SampleController',
-        ),
-    ),
-    'cpms_api'          => array(
+        ],
+    ],
+    'cpms_api'          => [
         'identity_provider' => 'mock_user',
         'home_domain'       => 'http://payment-app.psqa-ap01.ps.npm',
         'service_class'     => 'CpmsClientTest\MockApiService',
-        'rest_client'       => array(
-            'options' => array(
+        'rest_client'       => [
+            'options' => [
                 'version' => 2,
                 'domain'  => 'http://payment-service.psqa-ap01.ps.npm',
-            ),
+            ],
             'adapter' => 'Laminas\Http\Client\Adapter\Test',
-        )
-    ),
-    'service_manager'   => array(
-        'shared'    => array(
+        ],
+    ],
+    'service_manager'   => [
+        'shared'    => [
             'cpms\service\api'    => false,
             'cpms\client\rest'    => false,
             'cpms\service\domain' => false,
-        ),
-        'factories' => array(
+        ],
+        'factories' => [
             'mock_user' => function () {
                 $user = new MockUser();
                 $user->setClientId('MOT');
@@ -67,28 +88,25 @@ return array(
 
                 return $user;
             },
-            'cpms\client\logger' => function () {
-                return new MockLogger();
-            },
-        ),
-    ),
-    'caches'            => array(
-        'filesystem' => array(
+        ],
+    ],
+    'caches'            => [
+        'filesystem' => [
             'adapter' => 'filesystem',
-             'options' => array(
+             'options' => [
                     'cache_dir' => 'data/cache/cpms',
-                ),
+                ],
             'plugins' => null,
-        ),
-        'array' => array(
+        ],
+        'array' => [
             'adapter' => 'memory',
-        ),
-        'apc' => array(
+        ],
+        'apc' => [
             'adapter' => 'apcu',
             'plugins' => null,
-        ),
-    ),
-    'logger'            => array(
+        ],
+    ],
+    'logger'            => [
         'location' => 'data/logs/',
-    ),
-);
+    ],
+];
