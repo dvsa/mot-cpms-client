@@ -5,10 +5,10 @@ return [
         'channel' => 'cpms-api-client',
         'environment_levels' => [
             'dev' => 'debug',
-            'int' => 'info',
+            'int' => 'debug',
             'prv' => 'warning',
             'pre-prod' => 'error',
-            'prod' => 'critical',
+            'prod' => 'error',
         ],
         'writers' => [
             [
@@ -26,6 +26,10 @@ return [
                 'enabled' => true,
             ]
         ],
+    ],
+    'cpms_api' => [
+        // CPMS API configuration values are set in the module config.
+        // You can override them here if you want to change to custom values.
     ],
 ];
 

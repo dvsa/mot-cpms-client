@@ -41,7 +41,7 @@ class HttpRestJsonClient
      */
     public function dispatchRequestAndDecodeResponse($url, $method, $data = null): mixed
     {
-        $this->logger->debug("Starting request dispatch");
+        $this->logger->debug("[" . HttpRestJsonClient::class . "]: Starting request dispatch");
         $request = clone $this->getRequest();
 
         $headers = $this->options->getHeaders();
@@ -65,12 +65,12 @@ class HttpRestJsonClient
         $request->setUri($endpoint);
         $request->setMethod($method);
 
-        $this->logger->debug("Dispatching request: " . $request->toString());
+        $this->logger->debug("[" . HttpRestJsonClient::class . "]: Dispatching request: " . $request->toString());
 
         /** @var Response $response */
         $response = $this->getHttpClient()->dispatch($request);
 
-        $this->logger->debug("Response status code: " . $response->getStatusCode());
+        $this->logger->debug("[" . HttpRestJsonClient::class . "]: Response status code: " . $response->getStatusCode());
 
         /** End User (Schemes) should interrogate response status,
          * throwing appropriate exceptions for error codes as required
@@ -78,12 +78,12 @@ class HttpRestJsonClient
         $decodedData = \json_decode($response->getBody(), true);
 
         if (empty($decodedData)) {
-            $this->logger->warn("Response body is empty or not valid JSON. Returning raw response body.");
+            $this->logger->warn("[" . HttpRestJsonClient::class . "]: Response body is empty or not valid JSON. Returning raw response body.");
 
             return $response->getBody();
         }
 
-        $this->logger->debug("Response body decoded successfully.");
+        $this->logger->debug("[" . HttpRestJsonClient::class . "]: Response body decoded successfully.");
         return $decodedData;
     }
 

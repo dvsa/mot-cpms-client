@@ -114,9 +114,9 @@ protected function processRequest($endPointAlias, $scope, $method, $params = nul
                     $data['user_id'] = $this->options->getUserId();
                 }
 
-                $return = $this->getClient()->dispatchRequestAndDecodeResponse($url, $method, $params);
+                $decodedResponse = $this->getClient()->dispatchRequestAndDecodeResponse($url, $method, $params);
 
-                if (empty($return)) {
+                if (empty($decodedResponse)) {
                     return $this->returnErrorMessage($this->getClient()->getRequest());
                 }
 
@@ -124,7 +124,7 @@ protected function processRequest($endPointAlias, $scope, $method, $params = nul
                  * Cache appears to have been deleted from the remote server but we have it cached locally
                  * We delete the local cache and try to get a valid access for token in 3 attempts
                  */
-                if ($this->isCacheDeletedFromRemote($return)) {
+                if ($this->isCacheDeletedFromRemote($decodedResponse)) {
 
                     self::$retries++;
 
@@ -138,7 +138,7 @@ protected function processRequest($endPointAlias, $scope, $method, $params = nul
                 }
 
                 $this->logger->info("Request processed successfully for endpoint: $endPointAlias, scope: $scope, method: $method");
-                return $return;
+                return $decodedResponse;
             } else {
                 return $token;
             }

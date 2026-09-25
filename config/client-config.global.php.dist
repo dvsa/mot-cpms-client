@@ -8,10 +8,10 @@ return [
         'channel' => 'cpms-api-client',
         'environment_levels' => [
             'dev' => 'debug',
-            'int' => 'info',
+            'int' => 'debug',
             'prv' => 'warning',
             'pre-prod' => 'error',
-            'prod' => 'critical',
+            'prod' => 'error',
         ],
         'writers' => [
             [

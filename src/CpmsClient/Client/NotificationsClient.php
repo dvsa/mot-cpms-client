@@ -35,7 +35,7 @@ class NotificationsClient
     {
 
         $queuesClient = $this->queuesClient;
-        $this->logger->debug("[NotificationClient]: Reading messages from queue: " . self::NOTIFICATIONS_QUEUE_NAME);
+        $this->logger->debug("[" . NotificationsClient::class . "]: Reading messages from queue: " . self::NOTIFICATIONS_QUEUE_NAME);
 
         $qMessages = $queuesClient->receiveMessagesFromQueue(self::NOTIFICATIONS_QUEUE_NAME);
 
@@ -44,7 +44,7 @@ class NotificationsClient
             $notification = $qMessage->getPayload();
 
             if (!is_object($notification)) {
-                $this->logger->warn("[NotificationClient]: Non-object received from notifications queue");
+                $this->logger->warn("[" . NotificationsClient::class . "]: Non-object received from notifications queue");
                 throw new RuntimeException("non-object received from notifications queue");
             }
 
@@ -54,7 +54,7 @@ class NotificationsClient
             ];
         }
 
-        $this->logger->debug("[NotificationClient]: Read " . count($notificationsArray) . " message(s) from queue: " . self::NOTIFICATIONS_QUEUE_NAME);
+        $this->logger->debug("[" . NotificationsClient::class . "]: Read " . count($notificationsArray) . " message(s) from queue: " . self::NOTIFICATIONS_QUEUE_NAME);
         return $notificationsArray;
     }
 
