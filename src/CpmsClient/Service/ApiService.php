@@ -117,7 +117,6 @@ protected function processRequest($endPointAlias, $scope, $method, $params = nul
                 $return = $this->getClient()->dispatchRequestAndDecodeResponse($url, $method, $params);
 
                 if (empty($return)) {
-                    $this->logger->warn("Response is empty. Returning error message.");
                     return $this->returnErrorMessage($this->getClient()->getRequest());
                 }
 
@@ -405,8 +404,8 @@ protected function processRequest($endPointAlias, $scope, $method, $params = nul
     }
 
     /**
-     * @param Request   $request
-     * @param Exception $exception
+     * @param Request|null $request
+     * @param Exception|null $exception
      *
      * @return array
      */
@@ -423,9 +422,7 @@ protected function processRequest($endPointAlias, $scope, $method, $params = nul
             $message[] = Util::processException($exception);
         }
 
-        if ($logger = $this->getLogger()) {
-            $logger->error(implode(' ', $message));
-        }
+        $this->logger->error("An CPMS client error occurred, ID $errorId\n" . implode('\n', $message));
    
         return array(
             'code'    => 105,

@@ -41,9 +41,8 @@ class HttpRestJsonClient
      */
     public function dispatchRequestAndDecodeResponse($url, $method, $data = null): mixed
     {
+        $this->logger->debug("Starting request dispatch");
         $request = clone $this->getRequest();
-
-        $this->logger->debug("Dispatching request: " . $request->toString());
 
         $headers = $this->options->getHeaders();
         $method  = strtoupper($method);
@@ -66,6 +65,8 @@ class HttpRestJsonClient
         $request->setUri($endpoint);
         $request->setMethod($method);
 
+        $this->logger->debug("Dispatching request: " . $request->toString());
+
         /** @var Response $response */
         $response = $this->getHttpClient()->dispatch($request);
 
@@ -82,7 +83,7 @@ class HttpRestJsonClient
             return $response->getBody();
         }
 
-        $this->logger->debug("Decoded response data: " . print_r($decodedData, true));
+        $this->logger->debug("Response body decoded successfully.");
         return $decodedData;
     }
 

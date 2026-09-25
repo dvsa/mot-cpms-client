@@ -77,7 +77,6 @@ return [
     ],
 
     'cpms_api'           => [
-        'logger_alias'      => MotLogger::class,
         'enable_cache'      => true,
         'service_class'     => ApiService::class,
         'home_domain'       => '', //Used when running in console mode
