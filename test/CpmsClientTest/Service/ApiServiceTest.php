@@ -4,8 +4,6 @@ namespace ApplicationTest\Service;
 use CpmsClient\Data\AccessToken;
 use CpmsClient\Exceptions\CpmsNotificationAcknowledgementFailed;
 use CpmsClient\Service\ApiService;
-use CpmsClient\Service\LoggerFactory;
-use CpmsClient\View\Helper\GetApiDomain;
 use CpmsClientTest\Bootstrap;
 use CpmsClientTest\MockUser;
 use CpmsClientTest\SampleController;
@@ -16,7 +14,6 @@ use DVSA\CPMS\Notifications\Messages\Values\PaymentNotificationV1;
 use Laminas\Filter\Word\UnderscoreToCamelCase;
 use Laminas\Http\Response;
 use Laminas\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
-use Laminas\View\HelperPluginManager;
 
 /**
  * Class ApiDomainTest

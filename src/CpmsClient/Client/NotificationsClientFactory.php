@@ -2,7 +2,6 @@
 
 namespace CpmsClient\Client;
 
-use CpmsClient\Service\LoggerFactory;
 use DvsaLogger\Logger\MotLogger;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
