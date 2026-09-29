@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace CpmsClient\Service;
 use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
@@ -24,14 +27,13 @@ class CacheAwareApiServiceFactory implements FactoryInterface
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null): CacheAwareApiService
     {
         /** @var ApiService $service */
         $service = $container->get('cpms\service\api');
 
         $wrapper = new CacheAwareApiService($service);
         $wrapper->setCacheStorage($service->getCacheStorage());
-        $wrapper->setLogger($service->getLogger());
 
         return $wrapper;
     }

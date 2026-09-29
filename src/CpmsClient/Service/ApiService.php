@@ -8,7 +8,10 @@ use CpmsClient\Data\AccessToken;
 use CpmsClient\Exceptions\CpmsNotificationAcknowledgementFailed;
 use CpmsClient\Utility\Util;
 use DVSA\CPMS\Queues\QueueAdapters\Values\QueueMessage;
+use DvsaLogger\Logger\MotLogger;
 use Exception;
+use Laminas\Cache\Exception\ExceptionInterface;
+use Laminas\Cache\Storage\StorageInterface;
 use Laminas\Http\Request;
 use Psr\Log\LoggerInterface;
 
@@ -36,12 +39,10 @@ class ApiService
     const DIRECT_DEBIT_IC    = 'DIRECT_DEBIT_IC'; // indemnity claim
     const REALLOCATE_PAYMENT = 'REALLOCATE'; // Reallocate payments by switch customer reference
     const MAX_RETIRES        = 3;
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger = null;
 
-    /** @var  \Laminas\Cache\Storage\StorageInterface */
+    protected ?MotLogger $logger = null;
+
+    /** @var  StorageInterface */
     protected $cacheStorage;
     /**
      * @var \CpmsClient\Client\HttpRestJsonClient
@@ -83,10 +84,12 @@ class ApiService
      * @param null $params
      *
      * @return array|mixed
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
-    protected function processRequest($endPointAlias, $scope, $method, $params = null)
+protected function processRequest($endPointAlias, $scope, $method, $params = null)
     {
+        $this->logger->info("Starting processing request for endpoint: $endPointAlias, scope: $scope, method: $method");
+
         try {
             $method         = (string)$method;
             $scope          = (string)$scope;
@@ -111,9 +114,9 @@ class ApiService
                     $data['user_id'] = $this->options->getUserId();
                 }
 
-                $return = $this->getClient()->dispatchRequestAndDecodeResponse($url, $method, $params);
+                $decodedResponse = $this->getClient()->dispatchRequestAndDecodeResponse($url, $method, $params);
 
-                if (empty($return)) {
+                if (empty($decodedResponse)) {
                     return $this->returnErrorMessage($this->getClient()->getRequest());
                 }
 
@@ -121,7 +124,7 @@ class ApiService
                  * Cache appears to have been deleted from the remote server but we have it cached locally
                  * We delete the local cache and try to get a valid access for token in 3 attempts
                  */
-                if ($this->isCacheDeletedFromRemote($return)) {
+                if ($this->isCacheDeletedFromRemote($decodedResponse)) {
 
                     self::$retries++;
 
@@ -134,12 +137,13 @@ class ApiService
                     return $this->processRequest($endPointAlias, $scope, $method, $params);
                 }
 
-                return $return;
+                $this->logger->info("Request processed successfully for endpoint: $endPointAlias, scope: $scope, method: $method");
+                return $decodedResponse;
             } else {
                 return $token;
             }
         } catch (\Exception $exception) {
-
+            $this->logger->error("Exception occurred while processing request for endpoint: $endPointAlias, scope: $scope, method: $method. Exception: " . $exception->getMessage());
             return $this->returnErrorMessage(null, $exception);
         }
     }
@@ -166,7 +170,7 @@ class ApiService
      * @param array $data
      *
      * @return array|mixed
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function get($endPointAlias, $scope, $data = array())
     {
@@ -179,7 +183,7 @@ class ApiService
      * @param $data
      *
      * @return array|mixed
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function post($endPointAlias, $scope, $data)
     {
@@ -192,7 +196,7 @@ class ApiService
      * @param $data
      *
      * @return array|mixed
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function put($endPointAlias, $scope, $data)
     {
@@ -200,7 +204,7 @@ class ApiService
     }
 
     /**
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function patch(string $endPointAlias, string $scope, array $data): array|string
     {
@@ -212,7 +216,7 @@ class ApiService
      * @param $scope
      *
      * @return array|mixed
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function delete($endPointAlias, $scope)
     {
@@ -237,7 +241,7 @@ class ApiService
     }
 
     /**
-     * @param \Laminas\Cache\Storage\StorageInterface $cacheStorage
+     * @param StorageInterface $cacheStorage
      */
     public function setCacheStorage($cacheStorage)
     {
@@ -245,7 +249,7 @@ class ApiService
     }
 
     /**
-     * @return \Laminas\Cache\Storage\StorageInterface
+     * @return StorageInterface
      */
     public function getCacheStorage()
     {
@@ -289,7 +293,7 @@ class ApiService
      * @param string $salesReference
      *
      * @return AccessToken
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function getTokenForScope($scope, $salesReference = '')
     {
@@ -314,7 +318,7 @@ class ApiService
                 }
                 $token = new AccessToken($data);
             } else {
-                $this->getLogger()->warning('Unable to create access token with data: ' . print_r($data, true));
+                $this->getLogger()->warn('Unable to create access token with data: ' . print_r($data, true));
 
                 return $data;
             }
@@ -400,8 +404,8 @@ class ApiService
     }
 
     /**
-     * @param Request   $request
-     * @param Exception $exception
+     * @param Request|null $request
+     * @param Exception|null $exception
      *
      * @return array
      */
@@ -418,9 +422,7 @@ class ApiService
             $message[] = Util::processException($exception);
         }
 
-        if ($logger = $this->getLogger()) {
-            $logger->error(implode(' ', $message));
-        }
+        $this->logger->error("An CPMS client error occurred, ID $errorId\n" . implode('\n', $message));
    
         return array(
             'code'    => 105,
@@ -451,11 +453,11 @@ class ApiService
     /**
      * Set logger object
      *
-     * @param LoggerInterface $logger
+     * @param MotLogger $logger
      *
      * @return mixed
      */
-    public function setLogger(LoggerInterface $logger)
+    public function setLogger(MotLogger $logger)
     {
         $this->logger = $logger;
 
@@ -465,9 +467,9 @@ class ApiService
     /**
      * Get logger object
      *
-     * @return  LoggerInterface
+     * @return MotLogger|null
      */
-    public function getLogger()
+    public function getLogger(): ?MotLogger
     {
         return $this->logger;
     }
@@ -547,7 +549,7 @@ class ApiService
         $response = $this->put("/api/notifications/" . $message->getNotificationId() . '/acknowledged', 'NOTIFICATION', []);
         if (!isset($response['code']) || $response['code'] !== self::CPMS_CODE_SUCCESS) {
             $msg = "response from HttpClient does not contain expected 'code' field";
-            $this->logger->warning($msg, $response);
+            $this->logger->warn($msg, $response);
             throw new CpmsNotificationAcknowledgementFailed($msg, $response);
         }
 

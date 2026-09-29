@@ -1,12 +1,17 @@
 <?php
+
+declare(strict_types=1);
+
 namespace CpmsClient\Client;
 
-use CpmsClient\Service\LoggerFactory;
+use DvsaLogger\Logger\MotLogger;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Laminas\Http\Client;
 use Laminas\Http\Client as HttpClient;
 use Laminas\Http\Request;
 use Laminas\ServiceManager\Factory\FactoryInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 /**
  * Class RestClientFactory
@@ -23,22 +28,18 @@ class RestClientFactory implements FactoryInterface
      * @param $requestedName
      * @param array|null $options
      * @return HttpRestJsonClient
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null): HttpRestJsonClient
     {
         $domain                = $container->get('cpms\service\domain');
         $config                = $container->get('config');
         $adapter               = $config['cpms_api']['rest_client']['adapter'];
         $restOptions           = $config['cpms_api']['rest_client']['options'];
         $restOptions['domain'] = $domain;
-        $loggerAlias           = $config['cpms_api']['logger_alias'];
 
-        if (empty($loggerAlias) || !$container->has($loggerAlias)) {
-            $loggerAlias = LoggerFactory::DEFAULT_LOGGER_ALIAS;
-        }
-        $logger = $container->get($loggerAlias);
+        $logger = $container->get(MotLogger::class);
 
         $options                 = new ClientOptions($restOptions);
         $clientOption['timeout'] = $options->getTimeout();

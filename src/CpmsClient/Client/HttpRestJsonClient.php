@@ -3,11 +3,13 @@
 namespace CpmsClient\Client;
 
 use CpmsClient\Utility\Util;
+use DvsaLogger\Logger\MotLogger;
+use Laminas\Http\AbstractMessage;
 use Laminas\Http\Client as HttpClient;
 use Laminas\Http\Headers;
 use Laminas\Http\Request;
+use Laminas\Http\Response;
 use Laminas\Stdlib\Parameters;
-use Psr\Log\LoggerInterface;
 
 /**
  * Class HttpRestJsonClient
@@ -22,9 +24,9 @@ class HttpRestJsonClient
     private ?ClientOptions $options = null;
 
     public function __construct(
-        private readonly HttpClient $httpClient,
-        private readonly LoggerInterface $logger,
-        private readonly ?Request $request = null
+        private HttpClient $httpClient,
+        private readonly MotLogger $logger,
+        private ?Request $request = null
     ) {
     }
 
@@ -37,9 +39,11 @@ class HttpRestJsonClient
      *
      * @return mixed
      */
-    public function dispatchRequestAndDecodeResponse($url, $method, $data = null)
+    public function dispatchRequestAndDecodeResponse($url, $method, $data = null): mixed
     {
+        $this->logger->debug("[" . HttpRestJsonClient::class . "]: Starting request dispatch");
         $request = clone $this->getRequest();
+
         $headers = $this->options->getHeaders();
         $method  = strtoupper($method);
 
@@ -61,14 +65,12 @@ class HttpRestJsonClient
         $request->setUri($endpoint);
         $request->setMethod($method);
 
-        //Log request header
-        $this->logger->debug($request->toString());
+        $this->logger->debug("[" . HttpRestJsonClient::class . "]: Dispatching request: " . $request->toString());
 
-        /** @var \Laminas\Http\Response $response */
+        /** @var Response $response */
         $response = $this->getHttpClient()->dispatch($request);
 
-        //log response code
-        $this->logger->debug($response->getStatusCode());
+        $this->logger->debug("[" . HttpRestJsonClient::class . "]: Response status code: " . $response->getStatusCode());
 
         /** End User (Schemes) should interrogate response status,
          * throwing appropriate exceptions for error codes as required
@@ -76,18 +78,19 @@ class HttpRestJsonClient
         $decodedData = \json_decode($response->getBody(), true);
 
         if (empty($decodedData)) {
-            $this->logger->warning($response->getBody());
+            $this->logger->warn("[" . HttpRestJsonClient::class . "]: Response body is empty or not valid JSON. Returning raw response body.");
 
             return $response->getBody();
         }
 
+        $this->logger->debug("[" . HttpRestJsonClient::class . "]: Response body decoded successfully.");
         return $decodedData;
     }
 
     /**
      * @param $options
      */
-    public function setOptions($options)
+    public function setOptions($options): void
     {
         $this->options = $options;
     }
@@ -95,7 +98,7 @@ class HttpRestJsonClient
     /**
      * @return ClientOptions
      */
-    public function getOptions()
+    public function getOptions(): ?ClientOptions
     {
         return $this->options;
     }
@@ -103,7 +106,7 @@ class HttpRestJsonClient
     /**
      * @param \Laminas\Http\Request $request
      */
-    public function setRequest(Request $request)
+    public function setRequest(Request $request): void
     {
         $this->request = $request;
     }
@@ -111,7 +114,7 @@ class HttpRestJsonClient
     /**
      * @return \Laminas\Http\Request
      */
-    public function getRequest()
+    public function getRequest(): ?Request
     {
         return $this->request;
     }
@@ -119,7 +122,7 @@ class HttpRestJsonClient
     /**
      * @param $httpClient
      */
-    public function setHttpClient($httpClient)
+    public function setHttpClient($httpClient): void
     {
         $this->httpClient = $httpClient;
     }
@@ -127,15 +130,15 @@ class HttpRestJsonClient
     /**
      * @return HttpClient
      */
-    public function getHttpClient()
+    public function getHttpClient(): HttpClient
     {
         return $this->httpClient;
     }
 
     /**
-     * @return \Laminas\Http\AbstractMessage
+     * @return AbstractMessage
      */
-    public function resetHeaders()
+    public function resetHeaders(): AbstractMessage
     {
         $headers = $this->getOptions()->getHeaders();
 

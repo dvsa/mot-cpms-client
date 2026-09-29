@@ -5,6 +5,7 @@ use CpmsClient\Service\ApiService;
 use CpmsClient\Service\CacheAwareApiService;
 use CpmsClientTest\Bootstrap;
 use Laminas\Http\Response;
+use Laminas\ServiceManager\ServiceManager;
 use Laminas\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
 
 /**
@@ -17,7 +18,7 @@ class CacheAwareApiServiceTest extends AbstractHttpControllerTestCase
     /** @var CacheAwareApiService */
     protected $service;
 
-    /** @var  \Laminas\ServiceManager\ServiceManager */
+    /** @var  ServiceManager */
     protected $serviceManager;
 
     public function setUp(): void
@@ -29,7 +30,7 @@ class CacheAwareApiServiceTest extends AbstractHttpControllerTestCase
         $this->serviceManager = Bootstrap::getInstance()->getServiceManager();
         $this->setApplicationConfig($this->serviceManager->get('ApplicationConfig'));
 
-        /** @var \CpmsClient\Service\CacheAwareApiService $service */
+        /** @var CacheAwareApiService $service */
         $this->service = $this->serviceManager->get('cpms\service\api\cacheAware');
         $this->serviceManager->setAllowOverride(true);
         parent::setUp();
