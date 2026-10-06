@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c5907672fcae50c49e9ec5db283b1c54",
+    "content-hash": "fdb437a65509493cbd087da7e7dc79ef",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -505,16 +505,16 @@
         },
         {
             "name": "dvsa/mot-logger",
-            "version": "v3.3.0",
+            "version": "dev-feature-bl-22896-add-multi-logger-support",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dvsa/mot-logger.git",
-                "reference": "c028a81ac6722c5e78871655ccadb160b375c17a"
+                "reference": "1a49743c6f2c27304692edd14289e5ca494f2ced"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dvsa/mot-logger/zipball/c028a81ac6722c5e78871655ccadb160b375c17a",
-                "reference": "c028a81ac6722c5e78871655ccadb160b375c17a",
+                "url": "https://api.github.com/repos/dvsa/mot-logger/zipball/1a49743c6f2c27304692edd14289e5ca494f2ced",
+                "reference": "1a49743c6f2c27304692edd14289e5ca494f2ced",
                 "shasum": ""
             },
             "require": {
@@ -558,9 +558,9 @@
             ],
             "support": {
                 "issues": "https://github.com/dvsa/mot-logger/issues",
-                "source": "https://github.com/dvsa/mot-logger/tree/v3.3.0"
+                "source": "https://github.com/dvsa/mot-logger/tree/feature-bl-22896-add-multi-logger-support"
             },
-            "time": "2026-04-14T10:03:49+00:00"
+            "time": "2026-10-06T10:32:14+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -8327,7 +8327,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "dvsa/mot-logger": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

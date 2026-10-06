@@ -6,8 +6,8 @@ use CpmsClient\Service\ApiDomainServiceFactory;
 use CpmsClient\Service\ApiService;
 use CpmsClient\Service\ApiServiceFactory;
 use CpmsClient\Service\CacheAwareApiServiceFactory;
-use DVSA\CPMS\Queues\QueueAdapters\AmazonSqs\AmazonSqsQueues;
 use DVSA\CPMS\Notifications\Messages\Maps\MapNotificationTypes;
+use DVSA\CPMS\Queues\QueueAdapters\AmazonSqs\AmazonSqsQueues;
 use DvsaLogger\Factory\MotLoggerFactory;
 use DvsaLogger\Logger\MotLogger;
 
