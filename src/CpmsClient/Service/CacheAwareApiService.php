@@ -4,36 +4,30 @@ declare(strict_types=1);
 
 namespace CpmsClient\Service;
 
+use Laminas\Cache\Exception\ExceptionInterface;
 use Laminas\Cache\Storage\StorageInterface;
 
 /**
  * Class ApiService
- * @method get
- * @method post
- * @method put
- * @method delete
+ * @method mixed get(string $endPointAlias, string $scope, array<string, mixed> $data = [])
+ * @method mixed post(string $endPointAlias, string $scope, array<string, mixed> $data)
+ * @method mixed put(string $endPointAlias, string $scope, array<string, mixed> $data)
+ * @method mixed delete(string $endPointAlias, string $scope)
  *
  * @package CpmsClient\Service
  */
 class CacheAwareApiService
 {
-    /**
-     * @var ApiService
-     */
-    protected $serviceProxy;
+    protected StorageInterface $cacheStorage;
 
-    /** @var  StorageInterface */
-    protected $cacheStorage;
-
-    public function __construct(ApiService $service)
+    public function __construct(private readonly ApiService $serviceProxy)
     {
-        $this->serviceProxy = $service;
     }
 
     /**
      * @return StorageInterface
      */
-    public function getCacheStorage()
+    public function getCacheStorage(): StorageInterface
     {
         return $this->cacheStorage;
     }
@@ -41,27 +35,29 @@ class CacheAwareApiService
     /**
      * @param StorageInterface $cacheStorage
      */
-    public function setCacheStorage($cacheStorage)
+    public function setCacheStorage(StorageInterface $cacheStorage): void
     {
         $this->cacheStorage = $cacheStorage;
     }
 
     /**
-     * @param $method
-     * @param $arg
+     * @param string $method
+     * @param array<int, mixed> $arg
      *
      * @return mixed
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function __call($method, $arg)
     {
-        $cacheKey = 'cache_' . md5(json_encode(array($method, $arg, $this->serviceProxy->getOptions()->getClientId())));
+        $cacheKey = 'cache_' . md5((string) json_encode(array($method, $arg, $this->serviceProxy->getOptions()->getClientId())));
 
         if ($this->useCache($method) && $this->getCacheStorage()->hasItem($cacheKey)) {
             return $this->getCacheStorage()->getItem($cacheKey);
         } else {
-            $result = call_user_func_array(array($this->serviceProxy, $method), $arg);
-            if ($this->useCache($method) && !empty($result['items'])) {
+            /** @var callable $callback */
+            $callback = array($this->serviceProxy, $method);
+            $result = call_user_func_array($callback, $arg);
+            if ($this->useCache($method) && is_array($result) && !empty($result['items'])) {
                 $this->getCacheStorage()->addItem($cacheKey, $result);
             }
 
@@ -70,11 +66,11 @@ class CacheAwareApiService
     }
 
     /**
-     * @param $method
+     * @param string $method
      *
      * @return bool
      */
-    public function useCache($method)
+    public function useCache($method): bool
     {
         return ($method == strtolower($method));
     }
@@ -82,7 +78,7 @@ class CacheAwareApiService
     /**
      * @return ApiService
      */
-    public function getServiceProxy()
+    public function getServiceProxy(): ApiService
     {
         return $this->serviceProxy;
     }

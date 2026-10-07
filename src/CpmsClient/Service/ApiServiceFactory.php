@@ -1,61 +1,90 @@
 <?php
+
 namespace CpmsClient\Service;
 
 use CpmsClient\Authenticate\IdentityProviderInterface;
+use CpmsClient\Client\ClientOptions;
 use CpmsClient\Client\HttpRestJsonClient;
 use CpmsClient\Client\NotificationsClient;
 use DvsaLogger\Logger\MotLogger;
+use Laminas\Cache\Storage\Adapter\AbstractAdapter;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 /**
  * Rest API service
  * Class ApiService
  *
  * @package CpmsClient\Service
+ * @psalm-api
  */
 class ApiServiceFactory implements FactoryInterface
 {
-
     /**
      * Create API Service
      *
      * @param ContainerInterface $container
      *
      * @param $requestedName
-     * @param array|null $options
-     * @return ApiService|mixed
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
+     * @param array<array-key, mixed>|null $options
+     * @return ApiService
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    #[\Override]
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null): ApiService
     {
+        /** @var array{
+         *     cpms_api: array{
+         *         rest_client: array{alias: string},
+         *         enable_cache: bool,
+         *         service_class: class-string<ApiService>,
+         *         cache_storage: string,
+         *         identity_provider: string,
+         *         notifications_client?: array{alias?: string}
+         *     }
+         * } $config
+         */
         $config        = $container->get('config');
         $restClient    = $config['cpms_api']['rest_client']['alias'];
         $enableCache   = $config['cpms_api']['enable_cache'];
         $serviceClass  = $config['cpms_api']['service_class'];
         $identityAlias = $config['cpms_api']['identity_provider'];
 
+        /** @var MotLogger $logger */
         $logger = $container->get(MotLogger::class);
 
-        /** @var \Laminas\Cache\Storage\Adapter\AbstractAdapter $cache */
         /** @var HttpRestJsonClient $httpRestJsonClient */
         $httpRestJsonClient = $container->get($restClient);
+        /** @var AbstractAdapter $cache */
         $cache              = $container->get($config['cpms_api']['cache_storage']);
         $cacheNameSpace     = $cache->getOptions()->getNamespace();
+
+        $clientOptions = $httpRestJsonClient->getOptions();
+        if (!$clientOptions instanceof ClientOptions) {
+            throw new \UnexpectedValueException('The REST client has no ClientOptions configured.');
+        }
 
         if (!empty($identityAlias) && $container->has($identityAlias)) {
             $identity = $container->get($identityAlias);
             if ($identity instanceof IdentityProviderInterface) {
-                $httpRestJsonClient->getOptions()->setUserId($identity->getUserId());
-                $httpRestJsonClient->getOptions()->setClientId($identity->getClientId());
-                $httpRestJsonClient->getOptions()->setClientSecret($identity->getClientSecret());
-                $httpRestJsonClient->getOptions()->setCustomerReference($identity->getCustomerReference());
+                $clientOptions->setUserId($identity->getUserId());
+                $clientOptions->setClientId($identity->getClientId());
+                $clientOptions->setClientSecret($identity->getClientSecret());
+                $customerReference = $identity->getCustomerReference();
+                if (is_string($customerReference)) {
+                    $clientOptions->setCustomerReference($customerReference);
+                }
                 $cacheNameSpace .= $identity->getClientId();
             }
 
-            if (method_exists($identity, 'getVersion') and $version = $identity->getVersion()) {
-                $httpRestJsonClient->getOptions()->setVersion($version);
+            if (is_object($identity) && method_exists($identity, 'getVersion')) {
+                $version = $identity->getVersion();
+                if (is_int($version)) {
+                    $clientOptions->setVersion($version);
+                }
             }
         }
 
@@ -66,15 +95,14 @@ class ApiServiceFactory implements FactoryInterface
             $notificationsClientName = $config['cpms_api']['notifications_client']['alias'];
         }
 
-        /** @var NotificationsClient */
+        /** @var NotificationsClient $notificationsClient */
         $notificationsClient = $container->get($notificationsClientName);
 
-        /** @var ApiService $service */
         $service = new $serviceClass();
         $cache->getOptions()->setNamespace($cacheNameSpace);
         $service->setLogger($logger);
         $service->setClient($httpRestJsonClient);
-        $service->setOptions($httpRestJsonClient->getOptions());
+        $service->setOptions($clientOptions);
         $service->setCacheStorage($cache);
         $service->setEnableCache($enableCache);
         $service->setNotificationsClient($notificationsClient);

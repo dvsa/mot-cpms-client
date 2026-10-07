@@ -1,4 +1,6 @@
-<?php namespace CpmsClientTest;
+<?php
+
+namespace CpmsClientTest;
 
 use CpmsClient\Authenticate\IdentityProviderInterface;
 use CpmsClient\Authenticate\IdentityProviderTrait;

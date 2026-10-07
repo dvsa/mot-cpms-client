@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CpmsClient\Client;
 
 use CpmsClient\Utility\Util;
@@ -15,12 +17,12 @@ use Laminas\Stdlib\Parameters;
  * Class HttpRestJsonClient
  *
  * @package CpmsClient\Client
+ * @psalm-api
  */
 class HttpRestJsonClient
 {
     private const CONTENT_TYPE_FORMAT = 'application/vnd.dvsa-gov-uk.v%d%s; charset=UTF-8';
 
-    /** @var \CpmsClient\Client\ClientOptions */
     private ?ClientOptions $options = null;
 
     public function __construct(
@@ -33,35 +35,44 @@ class HttpRestJsonClient
     /**
      * Dispatch request and decode json response
      *
-     * @param      $url
-     * @param      $method
-     * @param null $data
+     * @param string $url
+     * @param string $method
+     * @param array<string, mixed>|null $data
      *
      * @return mixed
      */
-    public function dispatchRequestAndDecodeResponse($url, $method, $data = null): mixed
+    public function dispatchRequestAndDecodeResponse(string $url, string $method, ?array $data = null): mixed
     {
         $this->logger->debug("[" . HttpRestJsonClient::class . "]: Starting request dispatch");
-        $request = clone $this->getRequest();
+        $request = $this->getRequest();
+        $options = $this->getOptions();
 
-        $headers = $this->options->getHeaders();
+        if ($request === null || $options === null) {
+            throw new \LogicException('HTTP client request and options must be initialized before dispatch.');
+        }
+
+        $request = clone $request;
+
+        $headers = $options->getHeaders();
         $method  = strtoupper($method);
 
         if ($data) {
             if ($method == Request::METHOD_GET) {
-                $contentType = sprintf(self::CONTENT_TYPE_FORMAT, $this->getOptions()->getVersion(), '');
+                $contentType = sprintf(self::CONTENT_TYPE_FORMAT, $options->getVersion(), '');
                 $request->setQuery(new Parameters($data));
             } else {
-                $contentType = sprintf(self::CONTENT_TYPE_FORMAT, $this->getOptions()->getVersion(), '+json');
+                $contentType = sprintf(self::CONTENT_TYPE_FORMAT, $options->getVersion(), '+json');
                 $request->setContent(\json_encode($data));
             }
             $headers['Content-Type'] = $contentType;
         }
 
-        $endpoint = rtrim($this->options->getDomain(), '/') . '/' . ltrim($url, '/');
+        $endpoint = rtrim($options->getDomain(), '/') . '/' . ltrim($url, '/');
         $endpoint = Util::appendQueryString($endpoint);
 
-        $request->getHeaders()->addHeaders($headers);
+        /** @var Headers $requestHeaders */
+        $requestHeaders = $request->getHeaders();
+        $requestHeaders->addHeaders($headers);
         $request->setUri($endpoint);
         $request->setMethod($method);
 
@@ -88,39 +99,30 @@ class HttpRestJsonClient
     }
 
     /**
-     * @param $options
+     * @param ClientOptions $options
      */
     public function setOptions($options): void
     {
         $this->options = $options;
     }
 
-    /**
-     * @return ClientOptions
-     */
     public function getOptions(): ?ClientOptions
     {
         return $this->options;
     }
 
-    /**
-     * @param \Laminas\Http\Request $request
-     */
     public function setRequest(Request $request): void
     {
         $this->request = $request;
     }
 
-    /**
-     * @return \Laminas\Http\Request
-     */
     public function getRequest(): ?Request
     {
         return $this->request;
     }
 
     /**
-     * @param $httpClient
+     * @param HttpClient $httpClient
      */
     public function setHttpClient($httpClient): void
     {
@@ -140,12 +142,18 @@ class HttpRestJsonClient
      */
     public function resetHeaders(): AbstractMessage
     {
-        $headers = $this->getOptions()->getHeaders();
+        $options = $this->getOptions();
+
+        if ($options === null) {
+            throw new \LogicException('HTTP client options must be initialized before resetting headers.');
+        }
+
+        $headers = $options->getHeaders();
 
         if (isset($headers['Authorization'])) {
             unset($headers['Authorization']);
         }
-        $this->options->setHeaders($headers);
+        $options->setHeaders($headers);
 
         return $this->getHttpClient()->getRequest()->setHeaders(new Headers());
     }

@@ -1,4 +1,5 @@
 <?php
+
 namespace CpmsClientTest;
 
 use CpmsClient\Data\AccessToken;
@@ -11,14 +12,14 @@ use CpmsClient\Service\ApiService;
  */
 class MockApiService extends ApiService
 {
+    protected bool $done = false;
 
-    protected $done = false;
+    protected bool $forceRetry = false;
 
-    protected $forceRetry = false;
+    protected int $expiresIn = 1;
 
-    protected $expiresIn = 1;
-
-    public function getTokenForScope($scope, $salesReference = null)
+    #[\Override]
+    public function getTokenForScope(string $scope, ?string $salesReference = '')
     {
         $token = parent::getTokenForScope($scope, $salesReference);
 
@@ -31,12 +32,13 @@ class MockApiService extends ApiService
     /**
      * Make api request to get access token
      *
-     * @param $scope
-     * @param $salesReference
+     * @param string $scope
+     * @param string|null $salesReference
      *
      * @return mixed
      */
-    protected function getPaymentServiceAccessToken($scope, $salesReference = null)
+    #[\Override]
+    protected function getPaymentServiceAccessToken(string $scope, ?string $salesReference = null): mixed
     {
         $data = parent::getPaymentServiceAccessToken($scope, $salesReference);
         if (!$this->done) {
@@ -47,11 +49,11 @@ class MockApiService extends ApiService
     }
 
     /**
-     * @param $scope
+     * @param string $scope
      *
      * @return AccessToken
      */
-    private function simulateToken($scope)
+    private function simulateToken(string $scope): AccessToken
     {
         $data = array(
             'issued_at'    => time(),
@@ -63,7 +65,8 @@ class MockApiService extends ApiService
         return new AccessToken($data);
     }
 
-    public function isCacheDeletedFromRemote($return)
+    #[\Override]
+    public function isCacheDeletedFromRemote($return): bool
     {
         if ($this->forceRetry) {
             $this->forceRetry = false;
@@ -73,12 +76,12 @@ class MockApiService extends ApiService
         }
     }
 
-    public function setExpiresIn($value)
+    public function setExpiresIn(int $value): void
     {
         $this->expiresIn = $value;
     }
 
-    public function setForceRetry()
+    public function setForceRetry(): void
     {
         $this->forceRetry = true;
     }

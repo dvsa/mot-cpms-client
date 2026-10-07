@@ -3,6 +3,9 @@
 namespace CpmsClientTest;
 
 use Laminas\Mvc\Application;
+use Laminas\ServiceManager\ServiceManager;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 /**
  * Test bootstrap, for setting up auto loading
@@ -10,25 +13,20 @@ use Laminas\Mvc\Application;
  */
 class Bootstrap
 {
-
-    /** @var  \Laminas\ServiceManager\ServiceManager */
-    protected static $serviceManager;
+    protected static ServiceManager $serviceManager;
 
     /** @var  string This is the root directory where the test is run from which likely the test directory */
-    protected static $dir;
+    protected static string $dir;
 
-    protected static $application;
+    protected static mixed $application;
 
-    protected static $instance;
+    protected static ?self $instance = null;
 
     protected function __construct()
     {
     }
 
-    /**
-     * @return self
-     */
-    public static function getInstance()
+    public static function getInstance(): Bootstrap
     {
         if (!static::$instance) {
             static::$instance = new self();
@@ -38,16 +36,18 @@ class Bootstrap
     }
 
     /**
-     * @param        $dir
-     * @param string $testModule
+     * @param string $dir
+     * @param array<int, string>|string|null $testModule
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
-    public function init($dir, $testModule = null)
+    public function init(string $dir, array|string|null $testModule = null): void
     {
         static::$dir = $dir;
 
         $this->setPaths();
 
-        $zf2ModulePaths = array(dirname(dirname($dir)));
+        $zf2ModulePaths = array(dirname($dir, 2));
         if (($path = static::findParentPath('vendor'))) {
             $zf2ModulePaths[] = $path;
         }
@@ -55,8 +55,12 @@ class Bootstrap
             $zf2ModulePaths[] = $path;
         }
 
-        $zf2ModulePaths[] = './';
-
+        /**
+         * @var array{
+         *     modules: array<int, string>,
+         *     module_listener_options: array<string, mixed>
+         * } $config
+         */
         $config = include $dir . '/../config/application.config.php';
 
         if (!empty($testModule)) {
@@ -74,6 +78,7 @@ class Bootstrap
 
         $serviceManager->setAllowOverride(true);
 
+        /** @var array<string, mixed> $appConfig */
         $appConfig = $serviceManager->get('config');
 
         $appConfig['mot_logger'] = [
@@ -94,12 +99,13 @@ class Bootstrap
         static::$application    = $application;
     }
 
-    /**
-     * set paths
-     */
-    protected function setPaths()
+    protected function setPaths(): void
     {
-        $basePath = realpath(static::$dir) . '/';
+        $basePath = realpath(static::$dir);
+        if ($basePath === false) {
+            throw new \RuntimeException('Unable to resolve the test bootstrap directory.');
+        }
+        $basePath .= '/';
 
         set_include_path(
             implode(
@@ -113,10 +119,11 @@ class Bootstrap
         );
 
         if (file_exists(static::$dir . "/autoload_classmap.php")) {
+            /** @var array<string, string> $classList */
             $classList = include static::$dir . "/autoload_classmap.php";
 
             spl_autoload_register(
-                function ($class) use ($classList, $basePath) {
+                function ($class) use ($classList) {
                     if (isset($classList[$class])) {
                         include $classList[$class];
                     } else {
@@ -135,34 +142,19 @@ class Bootstrap
      *
      * @return boolean|string false if the path cannot be found
      */
-    protected function findParentPath($path)
+    protected function findParentPath(string $path): bool|string
     {
         $srcDir = realpath(static::$dir . '/../');
 
         return $srcDir . '/' . $path;
     }
 
-    /**
-     * @return \Laminas\ServiceManager\ServiceManager
-     */
-    public function getServiceManager()
+    public function getServiceManager(): ServiceManager
     {
         return static::$serviceManager;
-    }
-
-    /**
-     * @return mixed
-     */
-    public static function getApplication()
-    {
-        return self::$application;
     }
 
     private function __clone()
     {
     }
 }
-
-$path = realpath(__DIR__ . '/../');
-chdir(dirname($path));
-Bootstrap::getInstance()->init($path, array('CpmsClientTest'));

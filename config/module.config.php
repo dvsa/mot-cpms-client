@@ -2,6 +2,10 @@
 
 use CpmsClient\Client\NotificationsClientFactory;
 use CpmsClient\Client\RestClientFactory;
+use CpmsClient\Controller\Plugin\GetApiDomain;
+use CpmsClient\Controller\Plugin\GetRestClient;
+use CpmsClient\Factory\GetApiDomainFactory;
+use CpmsClient\Factory\GetRestClientFactory;
 use CpmsClient\Service\ApiDomainServiceFactory;
 use CpmsClient\Service\ApiService;
 use CpmsClient\Service\ApiServiceFactory;
@@ -22,6 +26,8 @@ return [
             'cpms\service\domain'         => ApiDomainServiceFactory::class,
             'cpms\client\rest'            => RestClientFactory::class,
             'cpms\client\notifications'   => NotificationsClientFactory::class,
+            GetApiDomain::class           => GetApiDomainFactory::class,
+            GetRestClient::class          => GetRestClientFactory::class,
             MotLogger::class              => MotLoggerFactory::class,
         ],
     ],

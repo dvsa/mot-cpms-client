@@ -1,4 +1,5 @@
 <?php
+
 namespace CpmsClient\Utility;
 
 /**
@@ -11,8 +12,8 @@ class Util
     /**
      * Method to append any additional data to the clientUrl
      *
-     * @param $url
-     * @param $requiredParams
+     * @param string $url
+     * @param array<string, mixed>|null $requiredParams
      *
      * @return string
      */

@@ -1,19 +1,30 @@
 <?php
+
 namespace ApplicationTest\Service;
 
+use CpmsClient\Client\HttpRestJsonClient;
+use CpmsClient\Client\NotificationsClient;
 use CpmsClient\Data\AccessToken;
 use CpmsClient\Exceptions\CpmsNotificationAcknowledgementFailed;
 use CpmsClient\Service\ApiService;
 use CpmsClientTest\Bootstrap;
+use CpmsClientTest\MockApiService;
 use CpmsClientTest\MockUser;
 use CpmsClientTest\SampleController;
 use DateTime;
 use DVSA\CPMS\Notifications\Ids\ValueBuilders\GenerateNotificationId;
 use DVSA\CPMS\Notifications\Messages\Maps\MapNotificationTypes;
 use DVSA\CPMS\Notifications\Messages\Values\PaymentNotificationV1;
+use DVSA\CPMS\Queues\QueueAdapters\Values\QueueMessage;
+use Laminas\Cache\Exception\ExceptionInterface;
+use Laminas\Http\Client\Adapter\Test as TestAdapter;
 use Laminas\Filter\Word\UnderscoreToCamelCase;
 use Laminas\Http\Response;
+use Laminas\Mvc\Controller\ControllerManager;
+use Laminas\ServiceManager\ServiceManager;
 use Laminas\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 /**
  * Class ApiDomainTest
@@ -23,48 +34,82 @@ use Laminas\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
  */
 class ApiServiceTest extends AbstractHttpControllerTestCase
 {
-    /** @var \CpmsClientTest\MockApiService $service */
-    protected $service;
-    /** @var  SampleController */
-    protected $controller;
-    /** @var  \Laminas\ServiceManager\ServiceManager */
-    protected $serviceManager;
+    protected MockApiService $service;
+    protected SampleController $controller;
+    protected ServiceManager $serviceManager;
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    #[\Override]
     public function setUp(): void
     {
         $this->controller = new SampleController();
+        /** @var array<string, mixed> $applicationConfig */
+        $applicationConfig = include __DIR__ . '/../../../' . 'config/application.config.php';
         $this->setApplicationConfig(
-            include __DIR__ . '/../../../' . 'config/application.config.php'
+            $applicationConfig
         );
 
         $this->serviceManager = Bootstrap::getInstance()->getServiceManager();
-        $this->setApplicationConfig($this->serviceManager->get('ApplicationConfig'));
+        /** @var array<string, mixed> $applicationConfig */
+        $applicationConfig = $this->serviceManager->get('ApplicationConfig');
+        $this->setApplicationConfig($applicationConfig);
 
-        /** @var \CpmsClient\Service\ApiService $service */
-        $this->service = $this->serviceManager->get('cpms\service\api');
+        /** @var MockApiService $service */
+        $service = $this->serviceManager->get('cpms\service\api');
+        $this->service = $service;
         $this->serviceManager->setAllowOverride(true);
         parent::setUp();
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    private function setTestResponse(Response $response): void
+    {
+        /** @var HttpRestJsonClient $client */
+        $client = $this->serviceManager->get('cpms\client\rest');
+        $adapter = $client->getHttpClient()->getAdapter();
 
+        if (!$adapter instanceof TestAdapter) {
+            throw new \RuntimeException('Expected Laminas test adapter in test environment.');
+        }
+
+        $adapter->setResponse($response);
+        $client->getHttpClient()->getResponse()->setStatusCode(200);
+        $this->service->setClient($client);
+    }
+
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @return void
+     */
     public function testControllerPlugin()
     {
-        $loader = $this->getApplicationServiceLocator()->get('ControllerManager');
+        /** @var ControllerManager $loader */
+        $loader = $this->getApplicationServiceLocator()->get(ControllerManager::class);
         /** @var SampleController $controller */
         $controller = $loader->get('CpmsClientTest\Sample');
-        $plugin     = $controller->getCpmsRestClient();
-        $this->assertInstanceOf('CpmsClient\Service\ApiService', $plugin);
+        /** @phpstan-ignore method.notFound */
+        $plugin = $controller->getCpmsRestClient();
+        $this->assertInstanceOf(ApiService::class, $plugin);
     }
 
     /**
      * @medium
+     * @throws ExceptionInterface
+     * @return void
      */
     public function testTokenGenerationNoCache()
     {
         $this->service->setEnableCache(false);
-        /** @var \CpmsClient\Data\AccessToken $token */
         $token = $this->service->getTokenForScope(ApiService::SCOPE_CARD);
-        $this->assertInstanceOf('CpmsClient\Data\AccessToken', $token);
+        $this->assertInstanceOf(AccessToken::class, $token);
 
         $this->assertSame('CARD', $token->getScope());
         $this->assertSame('Bearer', $token->getTokenType());
@@ -72,12 +117,14 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
 
     /**
      * @medium
+     * @throws ExceptionInterface
+     * @return void
      */
     public function testTokenGenerationCached()
     {
         $this->service->setEnableCache(true);
         $token = $this->service->getTokenForScope(ApiService::SCOPE_CARD);
-        $this->assertInstanceOf('CpmsClient\Data\AccessToken', $token);
+        $this->assertInstanceOf(AccessToken::class, $token);
 
         $invalidEndPoint = $this->service->getEndpoint('invalid');
         $this->assertSame('invalid', $invalidEndPoint);
@@ -85,6 +132,10 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
 
     /**
      * @medium
+     * @throws ContainerExceptionInterface
+     * @throws ExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @return void
      */
     public function testProcessRequestGet()
     {
@@ -95,11 +146,7 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
         $this->service->getTokenForScope(ApiService::SCOPE_QUERY_TXN);
         $this->service->setExpiresIn(1);
 
-        /** @var \CpmsClient\Client\HttpRestJsonClient $client */
-        $client = $this->serviceManager->get('cpms\client\rest');
-        $client->getHttpClient()->getAdapter()->setResponse($response);
-        $client->getHttpClient()->getResponse()->setStatusCode(200);
-        $this->service->setClient($client);
+        $this->setTestResponse($response);
 
         $return = $this->service->get('transaction', ApiService::SCOPE_QUERY_TXN, array('time' => time()));
         $this->assertNotEmpty($return);
@@ -108,6 +155,10 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
 
     /**
      * @medium
+     * @throws ContainerExceptionInterface
+     * @throws ExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @return void
      */
     public function testProcessRequestGetWithSalesRef()
     {
@@ -120,11 +171,7 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
         $this->service->getTokenForScope(ApiService::SCOPE_QUERY_TXN, $salesRef);
         $this->service->setExpiresIn(1);
 
-        /** @var \CpmsClient\Client\HttpRestJsonClient $client */
-        $client = $this->serviceManager->get('cpms\client\rest');
-        $client->getHttpClient()->getAdapter()->setResponse($response);
-        $client->getHttpClient()->getResponse()->setStatusCode(200);
-        $this->service->setClient($client);
+        $this->setTestResponse($response);
         /** @var MockUser $user */
         $user = $this->serviceManager->get('mock_user');
 
@@ -137,7 +184,9 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
             ]
         ];
         $return = $this->service->get(
-            'transaction', ApiService::SCOPE_QUERY_TXN, $data
+            'transaction',
+            ApiService::SCOPE_QUERY_TXN,
+            $data
         );
         $this->assertNotEmpty($return);
         $this->service->setExpiresIn(1);
@@ -145,6 +194,10 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
 
     /**
      * @medium
+     * @throws ContainerExceptionInterface
+     * @throws ExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @return void
      */
     public function testProcessRequestGetWithPaymentDataNoSalesRef()
     {
@@ -152,17 +205,10 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
         $response = new Response();
         $response->setContent('{"token":"test"}');
 
-        $salesRef = 'salesRef';
-
         $this->service->setExpiresIn(360);
-        $token = $this->service->getTokenForScope(ApiService::SCOPE_QUERY_TXN, $salesRef);
         $this->service->setExpiresIn(1);
 
-        /** @var \CpmsClient\Client\HttpRestJsonClient $client */
-        $client = $this->serviceManager->get('cpms\client\rest');
-        $client->getHttpClient()->getAdapter()->setResponse($response);
-        $client->getHttpClient()->getResponse()->setStatusCode(200);
-        $this->service->setClient($client);
+        $this->setTestResponse($response);
 
         $return = $this->service->get('transaction', ApiService::SCOPE_QUERY_TXN, ['payment_data' => []]);
         $this->assertNotEmpty($return);
@@ -172,6 +218,10 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
 
     /**
      * @medium
+     * @throws ContainerExceptionInterface
+     * @throws ExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @return void
      */
     public function testProcessRequestGetRetry()
     {
@@ -183,11 +233,7 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
         $this->service->getTokenForScope(ApiService::SCOPE_QUERY_TXN);
         $this->service->setExpiresIn(1);
 
-        /** @var \CpmsClient\Client\HttpRestJsonClient $client */
-        $client = $this->serviceManager->get('cpms\client\rest');
-        $client->getHttpClient()->getAdapter()->setResponse($response);
-        $client->getHttpClient()->getResponse()->setStatusCode(200);
-        $this->service->setClient($client);
+        $this->setTestResponse($response);
         $this->service->setForceRetry();
 
         $return = $this->service->get('transaction', ApiService::SCOPE_QUERY_TXN, array('time' => time()));
@@ -198,6 +244,8 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
 
     /**
      * @medium
+     * @throws ExceptionInterface
+     * @return void
      */
     public function testProcessRequestPut()
     {
@@ -207,6 +255,8 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
 
     /**
      * @medium
+     * @throws ExceptionInterface
+     * @return void
      */
     public function testProcessRequestDelete()
     {
@@ -216,16 +266,22 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
 
     /**
      * @medium
+     * @throws ExceptionInterface
+     * @return void
      */
     public function testInvalidProcessRequest()
     {
         $return = $this->service->post('transaction', 'wrong-data', array());
 
         $this->assertNotEmpty($return);
+        /** @var array<string, mixed> $return */
         $this->assertArrayHasKey('code', $return);
         $this->assertArrayHasKey('message', $return);
     }
 
+    /**
+     * @return void
+     */
     public function testAccessTokenData()
     {
         $filter = new UnderscoreToCamelCase();
@@ -241,7 +297,9 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
         $header = $token->getAuthorisationHeader();
 
         foreach ($data as $key => $value) {
-            $method    = 'get' . $filter->filter($key);
+            /** @var string $filteredKey */
+            $filteredKey = $filter->filter($key);
+            $method      = 'get' . $filteredKey;
             $testValue = $token->$method();
             $this->assertSame($value, $testValue);
         }
@@ -250,14 +308,21 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
         $this->assertFalse($token->isExpired());
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @return void
+     */
     public function testLoggerAlias()
     {
+        /** @var array{cpms_api: array<string, mixed>} $config */
         $config                             = $this->serviceManager->get('config');
         $config['cpms_api']['logger_alias'] = 'logger';
         $this->serviceManager->setService('config', $config);
 
+        /** @var ApiService $apiService */
         $apiService = $this->serviceManager->get('cpms\service\api');
-        $this->assertInstanceOf('CpmsClient\Service\ApiService', $apiService);
+        $this->assertInstanceOf(ApiService::class, $apiService);
     }
 
     /**
@@ -265,11 +330,21 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
      */
     protected function provideNotificationsClient()
     {
-        return $this->service->getNotificationsClient();
+        $notificationsClient = $this->service->getNotificationsClient();
+
+        if (!$notificationsClient instanceof NotificationsClient) {
+            throw new \RuntimeException('Expected notifications client to be configured in tests.');
+        }
+
+        return $notificationsClient;
     }
 
     /**
      * @covers ::acknowledgeNotification
+     * @return void
+     * @throws ContainerExceptionInterface
+     * @throws CpmsNotificationAcknowledgementFailed
+     * @throws NotFoundExceptionInterface
      */
     public function testCanAcknowledgeANotification()
     {
@@ -281,11 +356,7 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
         $response = new Response();
         $response->setContent('{"code":"000"}');
 
-        /** @var \CpmsClient\Client\HttpRestJsonClient $client */
-        $client = $this->serviceManager->get('cpms\client\rest');
-        $client->getHttpClient()->getAdapter()->setResponse($response);
-        $client->getHttpClient()->getResponse()->setStatusCode(200);
-        $this->service->setClient($client);
+        $this->setTestResponse($response);
 
         // we need to put a message onto this queue and read it off again
         // so that we have the metadata required for acknowledgement
@@ -304,10 +375,13 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
             "CPMS-123456-67890",
             3.14
         );
-        $mapper = new MapNotificationTypes;
+
+        /** @psalm-suppress InvalidArgument */
+        /** @psalm-suppress InvalidCast */
+        /** @phpstan-ignore-next-line argument.type */
         $queuesClient->writeMessageToQueue("notifications", $expectedNotification);
+
         $actualNotifications = $this->service->getNotifications();
-        $this->assertTrue(is_array($actualNotifications));
         $this->assertCount(1, $actualNotifications);
 
         $this->assertGreaterThan(0, $notificationsClient->getQueuesClient()->getNumberOfMessagesInQueue("notifications"));
@@ -325,21 +399,19 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
 
     /**
      * @covers ::acknowledgeNotification
+     * @return void
+     * @throws ContainerExceptionInterface
+     * @throws CpmsNotificationAcknowledgementFailed
+     * @throws ExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function testThrowsExceptionIfAcknowledgementFailsWithNoCode()
     {
-        // ----------------------------------------------------------------
-        // setup your test
-
         $this->expectException(CpmsNotificationAcknowledgementFailed::class);
         $response = new Response();
         $response->setContent('{"message":"success"}');
 
-        /** @var \CpmsClient\Client\HttpRestJsonClient $client */
-        $client = $this->serviceManager->get('cpms\client\rest');
-        $client->getHttpClient()->getAdapter()->setResponse($response);
-        $client->getHttpClient()->getResponse()->setStatusCode(200);
-        $this->service->setClient($client);
+        $this->setTestResponse($response);
 
         // we need to put a message onto this queue and read it off again
         // so that we have the metadata required for acknowledgement
@@ -358,41 +430,34 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
             "CPMS-123456-67890",
             3.14
         );
-        $mapper = new MapNotificationTypes;
+
+        /** @psalm-suppress InvalidArgument */
+        /** @psalm-suppress InvalidCast */
+        /** @phpstan-ignore-next-line argument.type */
         $queuesClient->writeMessageToQueue("notifications", $expectedNotification);
+
         $actualNotifications = $this->service->getNotifications();
-        $this->assertTrue(is_array($actualNotifications));
         $this->assertCount(1, $actualNotifications);
 
-        // ----------------------------------------------------------------
-        // perform the change
-
         $this->service->acknowledgeNotification($actualNotifications[0]['metadata'], $actualNotifications[0]['message']);
-
-        // ----------------------------------------------------------------
-        // test the results
-        //
-        // we should never get here
     }
 
     /**
      * @covers ::acknowledgeNotification
      * @dataProvider provideInvalidResponseCode
+     * @return void
+     * @throws ContainerExceptionInterface
+     * @throws CpmsNotificationAcknowledgementFailed
+     * @throws ExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
-    public function testThrowsExceptionIfAcknowledgementFailsWithWrongCode($response)
+    public function testThrowsExceptionIfAcknowledgementFailsWithWrongCode()
     {
-        // ----------------------------------------------------------------
-        // setup your test
-
         $this->expectException(CpmsNotificationAcknowledgementFailed::class);
         $response = new Response();
         $response->setContent('{"code":"999"}');
 
-        /** @var \CpmsClient\Client\HttpRestJsonClient $client */
-        $client = $this->serviceManager->get('cpms\client\rest');
-        $client->getHttpClient()->getAdapter()->setResponse($response);
-        $client->getHttpClient()->getResponse()->setStatusCode(200);
-        $this->service->setClient($client);
+        $this->setTestResponse($response);
 
         // we need to put a message onto this queue and read it off again
         // so that we have the metadata required for acknowledgement
@@ -411,26 +476,25 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
             "CPMS-123456-67890",
             3.14
         );
-        $mapper = new MapNotificationTypes;
+
+        /** @psalm-suppress InvalidArgument */
+        /** @psalm-suppress InvalidCast */
+        /** @phpstan-ignore-next-line argument.type */
         $queuesClient->writeMessageToQueue("notifications", $expectedNotification);
+
         $actualNotifications = $notificationsClient->getNotifications();
-        $this->assertTrue(is_array($actualNotifications));
         $this->assertCount(1, $actualNotifications);
 
-        // ----------------------------------------------------------------
-        // perform the change
-
         $this->service->acknowledgeNotification($actualNotifications[0]['metadata'], $actualNotifications[0]['message']);
-
-        // ----------------------------------------------------------------
-        // test the results
-        //
-        // we should never get here
     }
 
-    public function provideInvalidResponseCode()
+    /**
+     * @return array<int, array{0: array{code: mixed}}>
+     */
+    public function provideInvalidResponseCode(): array
     {
         // our dataset to test with
+        /** @var array<int, array{0: array{code: mixed}}> $retval */
         static $retval = [];
 
         // PHPUnit 4.0 appears to call data providers multiple times?
@@ -443,7 +507,7 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
         for ($a = 48; $a < 58; $a++) {
             for ($b = 48; $b < 58; $b++) {
                 for ($c = 49; $c < 58; $c++) {
-                    $retval[] = [ ['code' => chr($a).chr($b).chr($c) ] ];
+                    $retval[] = [ ['code' => chr($a) . chr($b) . chr($c) ] ];
                 }
             }
         }

@@ -17,6 +17,7 @@ use Psr\Container\NotFoundExceptionInterface;
  * Class RestClientFactory
  *
  * @package CpmsClient\Client
+ * @psalm-api
  */
 class RestClientFactory implements FactoryInterface
 {
@@ -26,19 +27,33 @@ class RestClientFactory implements FactoryInterface
      * @param ContainerInterface $container
      *
      * @param $requestedName
-     * @param array|null $options
+     * @param array<array-key, mixed>|null $options
      * @return HttpRestJsonClient
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
+    #[\Override]
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null): HttpRestJsonClient
     {
-        $domain                = $container->get('cpms\service\domain');
+        /** @var string $domain */
+        $domain = $container->get('cpms\service\domain');
+
+        /**
+         * @var array{
+         *     cpms_api: array{
+         *         rest_client: array{
+         *             adapter: string,
+         *             options: array<string, mixed>
+         *         }
+         *     }
+         * } $config
+         */
         $config                = $container->get('config');
         $adapter               = $config['cpms_api']['rest_client']['adapter'];
         $restOptions           = $config['cpms_api']['rest_client']['options'];
         $restOptions['domain'] = $domain;
 
+        /** @var MotLogger $logger */
         $logger = $container->get(MotLogger::class);
 
         $options                 = new ClientOptions($restOptions);

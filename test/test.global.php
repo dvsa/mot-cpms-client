@@ -2,6 +2,7 @@
 
 use CpmsClientTest\MockLogger;
 use CpmsClientTest\MockUser;
+use CpmsClientTest\SampleController;
 use DvsaLogger\Logger\MotLogger;
 
 return [
@@ -56,7 +57,7 @@ return [
     ],
     'controllers'       => [
         'invokables' => [
-            'CpmsClientTest\Sample' => 'CpmsClientTest\SampleController',
+            'CpmsClientTest\Sample' => SampleController::class,
         ],
     ],
     'cpms_api'          => [

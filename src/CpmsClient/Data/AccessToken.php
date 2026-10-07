@@ -1,4 +1,5 @@
 <?php
+
 namespace CpmsClient\Data;
 
 use Laminas\Stdlib\AbstractOptions;
@@ -7,24 +8,17 @@ use Laminas\Stdlib\AbstractOptions;
  * Class AccessToken
  *
  * @package CpmsClient\Data
+ * @extends AbstractOptions<mixed>
  */
 class AccessToken extends AbstractOptions
 {
-    const INVALID_ACCESS_TOKEN = 114;
-    /**
-     * @var string
-     */
-    protected $expiresIn;
-    /** @var  string */
-    protected $tokenType;
-    /** @var  string */
-    protected $accessToken;
-    /** @var  string */
-    protected $scope;
-    /** @var  int */
-    protected $issuedAt;
-    /** @var  string */
-    protected $salesReference;
+    public const INVALID_ACCESS_TOKEN = 114;
+    protected string|int $expiresIn;
+    protected string $tokenType;
+    protected string $accessToken;
+    protected string $scope;
+    protected int $issuedAt;
+    protected string $salesReference;
 
     public function __construct($options = null)
     {
@@ -34,8 +28,9 @@ class AccessToken extends AbstractOptions
 
     /**
      * @param int $issuedAt
+     * @psalm-suppress PossiblyUnusedMethod
      */
-    public function setIssuedAt($issuedAt)
+    public function setIssuedAt($issuedAt): void
     {
         $this->issuedAt = $issuedAt;
     }
@@ -43,15 +38,16 @@ class AccessToken extends AbstractOptions
     /**
      * @return int
      */
-    public function getIssuedAt()
+    public function getIssuedAt(): int
     {
         return $this->issuedAt;
     }
 
     /**
      * @param string $accessToken
+     * @psalm-suppress PossiblyUnusedMethod
      */
-    public function setAccessToken($accessToken)
+    public function setAccessToken($accessToken): void
     {
         $this->accessToken = $accessToken;
     }
@@ -59,31 +55,33 @@ class AccessToken extends AbstractOptions
     /**
      * @return string
      */
-    public function getAccessToken()
+    public function getAccessToken(): string
     {
         return $this->accessToken;
     }
 
     /**
-     * @param string $expiresIn
+     * @param string|int $expiresIn
+     * @psalm-suppress PossiblyUnusedMethod
      */
-    public function setExpiresIn($expiresIn)
+    public function setExpiresIn($expiresIn): void
     {
         $this->expiresIn = $expiresIn;
     }
 
     /**
-     * @return int
+     * @return int|string
      */
-    public function getExpiresIn()
+    public function getExpiresIn(): int|string
     {
         return $this->expiresIn;
     }
 
     /**
      * @param string $scope
+     * @psalm-suppress PossiblyUnusedMethod
      */
-    public function setScope($scope)
+    public function setScope($scope): void
     {
         $this->scope = $scope;
     }
@@ -91,15 +89,16 @@ class AccessToken extends AbstractOptions
     /**
      * @return string
      */
-    public function getScope()
+    public function getScope(): string
     {
         return $this->scope;
     }
 
     /**
      * @param string $tokenType
+     * @psalm-suppress PossiblyUnusedMethod
      */
-    public function setTokenType($tokenType)
+    public function setTokenType($tokenType): void
     {
         $this->tokenType = $tokenType;
     }
@@ -107,7 +106,7 @@ class AccessToken extends AbstractOptions
     /**
      * @return string
      */
-    public function getTokenType()
+    public function getTokenType(): string
     {
         return $this->tokenType;
     }
@@ -117,9 +116,9 @@ class AccessToken extends AbstractOptions
      *
      * @return bool
      */
-    public function isExpired()
+    public function isExpired(): bool
     {
-        $expiryTime = (int)$this->getIssuedAt() + $this->getExpiresIn();
+        $expiryTime = (int) $this->getIssuedAt() + (int) $this->getExpiresIn();
 
         return ($expiryTime < time());
     }
@@ -129,15 +128,16 @@ class AccessToken extends AbstractOptions
      *
      * @return string
      */
-    public function getAuthorisationHeader()
+    public function getAuthorisationHeader(): string
     {
         return 'Bearer ' . $this->getAccessToken();
     }
 
     /**
      * @param string $salesReference
+     * @psalm-suppress PossiblyUnusedMethod
      */
-    public function setSalesReference($salesReference)
+    public function setSalesReference($salesReference): void
     {
         $this->salesReference = $salesReference;
     }

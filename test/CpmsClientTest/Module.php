@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @package      CPMS Payment
@@ -15,21 +16,26 @@ namespace CpmsClientTest;
  */
 class Module
 {
-
-    public function getConfig()
+    /**
+     * @return mixed
+     */
+    public function getConfig(): mixed
     {
         return include __DIR__ . '/../test.global.php';
     }
 
-    public function getAutoloaderConfig()
+    /**
+     * @return array<string, array<string, mixed>>
+     */
+    public function getAutoloaderConfig(): array
     {
-        return array(
-            'Laminas\Loader\StandardAutoloader' => array(
-                'namespaces' => array(
+        return [
+            'Laminas\Loader\StandardAutoloader' => [
+                'namespaces' => [
                     'Laminas\Console' => realpath('./src/Laminas/Console'),
                     __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
     }
 }

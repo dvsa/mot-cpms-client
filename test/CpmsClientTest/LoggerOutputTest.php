@@ -7,11 +7,29 @@ namespace CpmsClientTest;
 use DvsaLogger\Logger\MotLogger;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
-use Monolog\Logger as MonologLogger;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
+/**
+ * @phpstan-type LoggerWriter array{
+ *     type: string,
+ *     path?: string,
+ *     formatter?: string,
+ *     level?: string,
+ *     enabled?: bool
+ * }
+ * @phpstan-type LoggerDefinition array{
+ *     channel: string,
+ *     environment_levels?: array<string, string>,
+ *     writers: list<LoggerWriter>
+ * }
+ * @phpstan-type LoggerConfig array{
+ *     loggers?: array<string, LoggerDefinition>,
+ *     writers?: list<LoggerWriter>,
+ *     channel?: string
+ * }
+ */
 class LoggerOutputTest extends TestCase
 {
     /**
@@ -21,6 +39,7 @@ class LoggerOutputTest extends TestCase
     public function testMotLoggerConfigurationIsLoaded(): void
     {
         $serviceManager = Bootstrap::getInstance()->getServiceManager();
+        /** @var array{mot_logger: LoggerConfig} $config */
         $config = $serviceManager->get('config');
 
         $this->assertArrayHasKey(
@@ -37,6 +56,7 @@ class LoggerOutputTest extends TestCase
     public function testMotLoggerHasContent(): void
     {
         $serviceManager = Bootstrap::getInstance()->getServiceManager();
+        /** @var array{mot_logger: LoggerConfig} $config */
         $config = $serviceManager->get('config');
         $motLoggerConfig = $config['mot_logger'];
 
@@ -51,6 +71,7 @@ class LoggerOutputTest extends TestCase
 
     public function testCpmsApiClientLoggerConfiguredInProduction(): void
     {
+        /** @var array{mot_logger: array{loggers: array<string, LoggerDefinition>}} $productionConfig */
         $productionConfig = require __DIR__ . '/../../config/autoload/cpms-client.global.php';
         $motLoggerConfig = $productionConfig['mot_logger'];
 
@@ -70,6 +91,7 @@ class LoggerOutputTest extends TestCase
 
     public function testCpmsClientLoggerHasCorrectChannel(): void
     {
+        /** @var array{mot_logger: array{loggers: array<string, LoggerDefinition>}} $productionConfig */
         $productionConfig = require __DIR__ . '/../../config/autoload/cpms-client.global.php';
         $cpmsLogger = $productionConfig['mot_logger']['loggers']['cpms-api-client'];
 
@@ -88,6 +110,7 @@ class LoggerOutputTest extends TestCase
 
     public function testCpmsClientLoggerHasWritersConfigured(): void
     {
+        /** @var array{mot_logger: array{loggers: array<string, LoggerDefinition>}} $productionConfig */
         $productionConfig = require __DIR__ . '/../../config/autoload/cpms-client.global.php';
         $cpmsLogger = $productionConfig['mot_logger']['loggers']['cpms-api-client'];
 
@@ -106,6 +129,7 @@ class LoggerOutputTest extends TestCase
 
     public function testCpmsClientLoggerWritersHaveCorrectStructure(): void
     {
+        /** @var array{mot_logger: array{loggers: array<string, LoggerDefinition>}} $productionConfig */
         $productionConfig = require __DIR__ . '/../../config/autoload/cpms-client.global.php';
         $writers = $productionConfig['mot_logger']['loggers']['cpms-api-client']['writers'];
 
@@ -153,6 +177,7 @@ class LoggerOutputTest extends TestCase
             'MotLogger service must be registered in container'
         );
 
+        /** @var MotLogger $logger */
         $logger = $serviceManager->get(MotLogger::class);
         $this->assertInstanceOf(MotLogger::class, $logger);
     }
@@ -166,6 +191,7 @@ class LoggerOutputTest extends TestCase
         $tempFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'cpms-logger-' . uniqid() . '.log';
 
         $serviceManager = Bootstrap::getInstance()->getServiceManager();
+        /** @var MotLogger $motLogger */
         $motLogger = $serviceManager->get(MotLogger::class);
 
         $monolog = $motLogger->getLogger();
@@ -181,10 +207,9 @@ class LoggerOutputTest extends TestCase
 
         $this->assertFileExists($tempFile, "Expected log file at {$tempFile}");
         $content = file_get_contents($tempFile);
+        $this->assertIsString($content);
         $this->assertStringContainsString($unique, $content, 'Logged message should be present in file');
 
         @unlink($tempFile);
     }
 }
-
-

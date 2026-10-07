@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CpmsClientTest\Client;
 
 use CpmsClient\Client\NotificationsClient;
@@ -10,9 +12,22 @@ use DVSA\CPMS\Queues\QueueAdapters\InMemory\InMemoryQueues;
 use PHPUnit\Framework\TestCase;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use Laminas\ServiceManager\ServiceManager;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 /**
  * @coversDefaultClass \CpmsClient\Client\NotificationsClientFactory
+ *
+ * @phpstan-type CpmsApiConfig array{
+ *     cpms_api: array{
+ *     notifications_client: array{adapter: class-string<InMemoryQueues>, options: array{queues: array{notifications: array{Middleware: array{MultipartMessage: array{"mapper": class-string<MapNotificationTypes>}}}}}},
+ *     enable_cache: bool,
+ *     service_class: class-string<NotificationsClient>,
+ *     cache_storage: string,
+ *     identity_provider: string,
+ *     logger_alias?: string
+ *     }
+ * }
  */
 class NotificationsClientFactoryTest extends TestCase
 {
@@ -21,29 +36,27 @@ class NotificationsClientFactoryTest extends TestCase
      *
      * @var ServiceManager
      */
-    protected $serviceManager;
+    protected ServiceManager $serviceManager;
 
     /**
      * the config from ZF2's ServiceManager
      *
-     * @var array
+     * @var array<string, mixed>
      */
-    protected $smConfig;
+    protected array $smConfig;
 
     /**
- * automatically called by PHPUnit before every test
- *
- * it provides a working Zend ServiceManager. we'll use this to make sure
- * that our factory is compatible with ZF2
- *
- *
- */
+     * automatically called by PHPUnit before every test
+     *
+     * it provides a working Zend ServiceManager. we'll use this to make sure
+     * that our factory is compatible with ZF2
+     *
+     */
+    #[\Override]
     public function setUp(): void
     {
-        // our Zend ServiceManager
         $this->serviceManager = Bootstrap::getInstance()->getServiceManager();
 
-        // so that we can inject test-specific config
         $this->serviceManager->setAllowOverride(true);
 
         // ZF2's ServiceManager does *not* get created from scratch at the
@@ -53,7 +66,9 @@ class NotificationsClientFactoryTest extends TestCase
         // we need to restore that config after each test
         //
         // if we do not do this, the legacy unit tests all break (grrrr)
-        $this->smConfig = $this->serviceManager->get('config');
+        /** @var array<string, mixed> $config */
+        $config = $this->serviceManager->get('config');
+        $this->smConfig = $config;
     }
 
     /**
@@ -61,6 +76,7 @@ class NotificationsClientFactoryTest extends TestCase
      *
      * @return void
      */
+    #[\Override]
     public function tearDown(): void
     {
         // restore ServiceManager's original config, in case our test
@@ -73,18 +89,9 @@ class NotificationsClientFactoryTest extends TestCase
     /**
      * @coversNothing
      */
-    public function testCanInstantiate()
+    public function testCanInstantiate(): void
     {
-        // ----------------------------------------------------------------
-        // setup your test
-
-        // ----------------------------------------------------------------
-        // perform the change
-
-        $unit = new NotificationsClientFactory;
-
-        // ----------------------------------------------------------------
-        // test the results
+        $unit = new NotificationsClientFactory();
 
         $this->assertInstanceOf(NotificationsClientFactory::class, $unit);
     }
@@ -92,30 +99,20 @@ class NotificationsClientFactoryTest extends TestCase
     /**
      * @coversNothing
      */
-    public function testIsServiceManagerFactory()
+    public function testIsServiceManagerFactory(): void
     {
-        // ----------------------------------------------------------------
-        // setup your test
-
-        // ----------------------------------------------------------------
-        // perform the change
-
-        $unit = new NotificationsClientFactory;
-
-        // ----------------------------------------------------------------
-        // test the results
+        $unit = new NotificationsClientFactory();
 
         $this->assertInstanceOf(FactoryInterface::class, $unit);
     }
 
-    public function testCanCreateNotificationsClient()
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function testCanCreateNotificationsClient(): void
     {
-        // ----------------------------------------------------------------
-        // setup your test
-        //
-        // we need to inject the config that our factories will ultimately
-        // consume
-
+        /** @var array{cpms_api: array{notifications_client: array<string, mixed>, logger_alias?: string}} $config */
         $config = $this->smConfig;
         $config['cpms_api']['notifications_client'] = [
             'adapter' => InMemoryQueues::class,
@@ -133,25 +130,18 @@ class NotificationsClientFactoryTest extends TestCase
         ];
         $this->serviceManager->setService('config', $config);
 
-        // ----------------------------------------------------------------
-        // perform the change
-
         $client = $this->serviceManager->get('cpms\client\notifications');
-
-        // ----------------------------------------------------------------
-        // test the results
 
         $this->assertInstanceOf(NotificationsClient::class, $client);
     }
 
-    public function testUsesTheDefaultLoggerIfOneIsNotConfigured()
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function testUsesTheDefaultLoggerIfOneIsNotConfigured(): void
     {
-        // ----------------------------------------------------------------
-        // setup your test
-        //
-        // this config does *not* specify any logger at all in the 'cpms_api'
-        // section
-
+        /** @var array{cpms_api: array{notifications_client: array<string, mixed>, logger_alias?: string}} $config */
         $config = $this->smConfig;
         $config['cpms_api']['notifications_client'] = [
             'adapter' => InMemoryQueues::class,
@@ -172,15 +162,8 @@ class NotificationsClientFactoryTest extends TestCase
         }
         $this->serviceManager->setService('config', $config);
 
-        // ----------------------------------------------------------------
-        // perform the change
-
         $client = $this->serviceManager->get('cpms\client\notifications');
-
-        // ----------------------------------------------------------------
-        // test the results
 
         $this->assertInstanceOf(NotificationsClient::class, $client);
     }
-
 }
