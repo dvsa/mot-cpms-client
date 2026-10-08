@@ -14,7 +14,7 @@ class MockApiService extends ApiService
     protected int $expiresIn = 1;
 
     #[\Override]
-    public function getTokenForScope(string $scope, ?string $salesReference = '')
+    public function getTokenForScope(string $scope, ?string $salesReference = ''): mixed
     {
         $token = parent::getTokenForScope($scope, $salesReference);
 

@@ -81,7 +81,14 @@ class NotificationsClientFactoryTest extends TestCase
      */
     public function testCanCreateNotificationsClient(): void
     {
-        /** @var array{cpms_api: array{notifications_client: array<string, mixed>, logger_alias?: string}} $config */
+        /**
+         * @var array{
+         *     cpms_api: array{
+         *         notifications_client: array<string, mixed>,
+         *         logger_alias?: string
+         *     }
+         * } $config
+         */
         $config = $this->smConfig;
         $config['cpms_api']['notifications_client'] = [
             'adapter' => InMemoryQueues::class,
@@ -110,7 +117,14 @@ class NotificationsClientFactoryTest extends TestCase
      */
     public function testUsesTheDefaultLoggerIfOneIsNotConfigured(): void
     {
-        /** @var array{cpms_api: array{notifications_client: array<string, mixed>, logger_alias?: string}} $config */
+        /**
+         * @var array{
+         *     cpms_api: array{
+         *         notifications_client: array<string, mixed>,
+         *         logger_alias?: string
+         *     }
+         * } $config
+         */
         $config = $this->smConfig;
         $config['cpms_api']['notifications_client'] = [
             'adapter' => InMemoryQueues::class,
@@ -142,10 +156,22 @@ class NotificationsClientFactoryTest extends TestCase
      */
     public function testIncorrectLoggerThrowsException(): void
     {
+        /** @var MotLogger $originalLogger */
         $originalLogger = $this->serviceManager->get(MotLogger::class);
 
         $this->serviceManager->setService(MotLogger::class, new \stdClass());
 
+        /**
+         * @var array{
+         *      cpms_api: array{
+         *          notifications_client: array{
+         *             adapter: class-string<InMemoryQueues>,
+         *             options: array<string, mixed>
+         *          },
+         *          logger_alias?: string
+         *      }
+         * } $config
+         */
         $config = $this->smConfig;
         $config['cpms_api']['notifications_client'] = [
             'adapter' => InMemoryQueues::class,
@@ -167,7 +193,8 @@ class NotificationsClientFactoryTest extends TestCase
 
         try {
             (new NotificationsClientFactory())(
-                $this->serviceManager, 'cpms\\client\\notifications',
+                $this->serviceManager,
+                'cpms\\client\\notifications',
             );
         } finally {
             $this->serviceManager->setService(MotLogger::class, $originalLogger);
@@ -180,6 +207,14 @@ class NotificationsClientFactoryTest extends TestCase
      */
     public function testIncorrectQueueAdapterThrowsException(): void
     {
+        /**
+         * @var array{
+         *     cpms_api: array{
+         *         notifications_client: array<string, mixed>,
+         *         logger_alias?: string
+         *     }
+         * } $config
+         */
         $config = $this->smConfig;
         $config['cpms_api']['notifications_client'] = [
             'adapter' => \stdClass::class,
@@ -200,7 +235,8 @@ class NotificationsClientFactoryTest extends TestCase
         $this->expectException(\UnexpectedValueException::class);
 
         (new NotificationsClientFactory())(
-            $this->serviceManager, 'cpms\\client\\notifications',
+            $this->serviceManager,
+            'cpms\\client\\notifications',
         );
     }
 }

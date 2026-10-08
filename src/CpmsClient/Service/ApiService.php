@@ -249,10 +249,12 @@ class ApiService
     }
 
     /**
+     * @param string $scope
+     * @param string|null $salesReference
      * @return mixed
      * @throws ExceptionInterface
      */
-    public function getTokenForScope(string $scope, ?string $salesReference = '')
+    public function getTokenForScope(string $scope, ?string $salesReference = ''): mixed
     {
         $key = $this->generateCacheKey($scope, $salesReference);
 
