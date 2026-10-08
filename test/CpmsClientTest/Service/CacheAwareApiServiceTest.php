@@ -1,6 +1,8 @@
 <?php
 
-namespace ApplicationTest\Service;
+declare(strict_types=1);
+
+namespace CpmsClientTest\Service;
 
 use CpmsClient\Service\ApiService;
 use CpmsClient\Service\CacheAwareApiService;
@@ -15,9 +17,9 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
 /**
- * Class ClientAwareApiServiceTest
+ * Class CacheAwareApiServiceTest
  *
- * @package ApplicationTest\Service
+ * @package CpmsClientTest\Service
  */
 class CacheAwareApiServiceTest extends AbstractHttpControllerTestCase
 {

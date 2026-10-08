@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CpmsClient\Exceptions;
 
 use Exception;
@@ -10,13 +12,7 @@ use Exception;
  */
 class CpmsNotificationAcknowledgementFailed extends Exception
 {
-    /**
-     * @param string $message
-     *        why the response was rejected
-     * @param mixed $response
-     *        the rejected response
-     */
-    public function __construct($message, $response)
+    public function __construct(string $message, mixed $response)
     {
         $message = $message . "; response is: " . print_r($response, true);
         parent::__construct($message, 500);

@@ -2,15 +2,16 @@
 
 declare(strict_types=1);
 
-namespace CpmsClient\Client;
+namespace CpmsClient\Factory;
 
+use CpmsClient\Client\ClientOptions;
+use CpmsClient\Client\HttpRestJsonClient;
 use DvsaLogger\Logger\MotLogger;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\ContainerInterface;
 use Laminas\Http\Client;
-use Laminas\Http\Client as HttpClient;
 use Laminas\Http\Request;
 use Laminas\ServiceManager\Factory\FactoryInterface;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
 /**
@@ -58,7 +59,7 @@ class RestClientFactory implements FactoryInterface
 
         $options                 = new ClientOptions($restOptions);
         $clientOption['timeout'] = $options->getTimeout();
-        $httpClient              = new HttpClient(null, $clientOption);
+        $httpClient              = new Client(null, $clientOption);
         $request                 = new Request();
         $httpRestJsonClient      = new HttpRestJsonClient($httpClient, $logger, $request);
 

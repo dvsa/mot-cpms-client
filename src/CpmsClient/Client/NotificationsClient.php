@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CpmsClient\Client;
 
 use DVSA\CPMS\Queues\QueueAdapters\Interfaces\Queues;
@@ -9,18 +11,8 @@ use RuntimeException;
 
 class NotificationsClient
 {
-    /**
-     * In our config, what is the name of the queue we need to read
-     * new notifications from?
-     */
     public const NOTIFICATIONS_QUEUE_NAME = "notifications";
 
-    /**
-     * @param Queues $queuesClient
-     *        how we will talk to our queues
-     * @param MotLogger $logger
-     *        how we will report on what happens
-     */
     public function __construct(
         private readonly Queues $queuesClient,
         private readonly MotLogger $logger
@@ -62,29 +54,11 @@ class NotificationsClient
         return $notificationsArray;
     }
 
-    /**
-     * Confirm that a message can be dropped from the queue that it
-     * came from.
-     *
-     * @param  QueueMessage $metadata
-     *         the metadata message that we're done with
-     */
     public function confirmMessageHandled(QueueMessage $metadata): void
     {
         $this->queuesClient->confirmMessageHandled($metadata);
     }
 
-    // ==================================================================
-    //
-    // Helpers go here
-    //
-    // ------------------------------------------------------------------
-
-    /**
-     * returns the client we are using to talk to our queues
-     *
-     * mainly here to help with unit testing
-     */
     public function getQueuesClient(): Queues
     {
         return $this->queuesClient;

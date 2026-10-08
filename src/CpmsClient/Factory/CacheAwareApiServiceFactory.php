@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-namespace CpmsClient\Service;
+namespace CpmsClient\Factory;
 
+use CpmsClient\Service\ApiService;
+use CpmsClient\Service\CacheAwareApiService;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
-use Laminas\ServiceManager\Factory\FactoryInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
 /**

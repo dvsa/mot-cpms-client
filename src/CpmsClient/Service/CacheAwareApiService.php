@@ -24,17 +24,11 @@ class CacheAwareApiService
     {
     }
 
-    /**
-     * @return StorageInterface
-     */
     public function getCacheStorage(): StorageInterface
     {
         return $this->cacheStorage;
     }
 
-    /**
-     * @param StorageInterface $cacheStorage
-     */
     public function setCacheStorage(StorageInterface $cacheStorage): void
     {
         $this->cacheStorage = $cacheStorage;
@@ -65,19 +59,11 @@ class CacheAwareApiService
         }
     }
 
-    /**
-     * @param string $method
-     *
-     * @return bool
-     */
-    public function useCache($method): bool
+    public function useCache(string $method): bool
     {
         return ($method == strtolower($method));
     }
 
-    /**
-     * @return ApiService
-     */
     public function getServiceProxy(): ApiService
     {
         return $this->serviceProxy;

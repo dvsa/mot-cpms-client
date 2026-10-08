@@ -1,12 +1,15 @@
 <?php
 
-namespace CpmsClient\Client;
+declare(strict_types=1);
 
+namespace CpmsClient\Factory;
+
+use CpmsClient\Client\NotificationsClient;
 use DVSA\CPMS\Queues\QueueAdapters\Interfaces\Queues;
 use DvsaLogger\Logger\MotLogger;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
-use Laminas\ServiceManager\Factory\FactoryInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
 class NotificationsClientFactory implements FactoryInterface

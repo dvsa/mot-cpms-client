@@ -1,11 +1,6 @@
 <?php
 
-/**
- *
- * @package      CPMS Payment
- * @subpackage   controller
- * @author       Pele Odiase <pele.odiase@valtech.co.uk>
- */
+declare(strict_types=1);
 
 namespace CpmsClientTest;
 

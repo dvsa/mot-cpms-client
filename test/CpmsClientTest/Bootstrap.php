@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CpmsClientTest;
 
 use Laminas\Mvc\Application;

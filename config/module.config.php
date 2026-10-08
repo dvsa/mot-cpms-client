@@ -1,15 +1,15 @@
 <?php
 
-use CpmsClient\Client\NotificationsClientFactory;
-use CpmsClient\Client\RestClientFactory;
 use CpmsClient\Controller\Plugin\GetApiDomain;
 use CpmsClient\Controller\Plugin\GetRestClient;
+use CpmsClient\Factory\ApiServiceFactory;
+use CpmsClient\Factory\CacheAwareApiServiceFactory;
 use CpmsClient\Factory\GetApiDomainFactory;
 use CpmsClient\Factory\GetRestClientFactory;
+use CpmsClient\Factory\NotificationsClientFactory;
+use CpmsClient\Factory\RestClientFactory;
 use CpmsClient\Service\ApiDomainServiceFactory;
 use CpmsClient\Service\ApiService;
-use CpmsClient\Service\ApiServiceFactory;
-use CpmsClient\Service\CacheAwareApiServiceFactory;
 use DVSA\CPMS\Notifications\Messages\Maps\MapNotificationTypes;
 use DVSA\CPMS\Queues\QueueAdapters\AmazonSqs\AmazonSqsQueues;
 use DvsaLogger\Factory\MotLoggerFactory;

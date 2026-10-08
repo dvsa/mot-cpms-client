@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CpmsClient\Service;
 
 use CpmsClient\Utility\Util;

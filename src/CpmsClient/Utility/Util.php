@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CpmsClient\Utility;
 
 /**
@@ -17,7 +19,7 @@ class Util
      *
      * @return string
      */
-    public static function appendQueryString($url, array $requiredParams = null)
+    public static function appendQueryString(string $url, array $requiredParams = null): string
     {
         if (!empty($url) and stripos($url, 'http') !== 0) {
             $url = 'http://' . $url;
@@ -41,7 +43,7 @@ class Util
      *
      * @return string
      */
-    public static function processException(\Exception $e)
+    public static function processException(\Exception $e): string
     {
         $trace = $e->getTraceAsString();
         $i     = 1;

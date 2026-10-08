@@ -1,15 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CpmsClientTest;
 
 use CpmsClient\Data\AccessToken;
 use CpmsClient\Service\ApiService;
 
-/**
- * Class TestApiService
- *
- * @package CpmsClientTest
- */
 class MockApiService extends ApiService
 {
     protected bool $done = false;
@@ -31,11 +28,6 @@ class MockApiService extends ApiService
 
     /**
      * Make api request to get access token
-     *
-     * @param string $scope
-     * @param string|null $salesReference
-     *
-     * @return mixed
      */
     #[\Override]
     protected function getPaymentServiceAccessToken(string $scope, ?string $salesReference = null): mixed
@@ -48,11 +40,6 @@ class MockApiService extends ApiService
         return $this->simulateToken($scope)->toArray();
     }
 
-    /**
-     * @param string $scope
-     *
-     * @return AccessToken
-     */
     private function simulateToken(string $scope): AccessToken
     {
         $data = array(
@@ -66,7 +53,7 @@ class MockApiService extends ApiService
     }
 
     #[\Override]
-    public function isCacheDeletedFromRemote($return): bool
+    public function isCacheDeletedFromRemote(mixed $return): bool
     {
         if ($this->forceRetry) {
             $this->forceRetry = false;

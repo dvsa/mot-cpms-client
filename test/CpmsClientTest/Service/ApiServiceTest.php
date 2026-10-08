@@ -1,6 +1,6 @@
 <?php
 
-namespace ApplicationTest\Service;
+namespace CpmsClientTest\Service;
 
 use CpmsClient\Client\HttpRestJsonClient;
 use CpmsClient\Client\NotificationsClient;
@@ -29,7 +29,7 @@ use Psr\Container\NotFoundExceptionInterface;
 /**
  * Class ApiDomainTest
  *
- * @package ApplicationTest\Service
+ * @package CpmsClientTest\Service
  * @coversDefaultClass CpmsClient\Service\ApiService
  */
 class ApiServiceTest extends AbstractHttpControllerTestCase
@@ -87,9 +87,8 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
     /**
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
-     * @return void
      */
-    public function testControllerPlugin()
+    public function testControllerPlugin(): void
     {
         /** @var ControllerManager $loader */
         $loader = $this->getApplicationServiceLocator()->get(ControllerManager::class);
@@ -103,9 +102,8 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
     /**
      * @medium
      * @throws ExceptionInterface
-     * @return void
      */
-    public function testTokenGenerationNoCache()
+    public function testTokenGenerationNoCache(): void
     {
         $this->service->setEnableCache(false);
         $token = $this->service->getTokenForScope(ApiService::SCOPE_CARD);
@@ -118,9 +116,8 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
     /**
      * @medium
      * @throws ExceptionInterface
-     * @return void
      */
-    public function testTokenGenerationCached()
+    public function testTokenGenerationCached(): void
     {
         $this->service->setEnableCache(true);
         $token = $this->service->getTokenForScope(ApiService::SCOPE_CARD);
@@ -135,9 +132,8 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
      * @throws ContainerExceptionInterface
      * @throws ExceptionInterface
      * @throws NotFoundExceptionInterface
-     * @return void
      */
-    public function testProcessRequestGet()
+    public function testProcessRequestGet(): void
     {
         $response = new Response();
         $response->setContent('{"token":"test"}');
@@ -158,9 +154,8 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
      * @throws ContainerExceptionInterface
      * @throws ExceptionInterface
      * @throws NotFoundExceptionInterface
-     * @return void
      */
-    public function testProcessRequestGetWithSalesRef()
+    public function testProcessRequestGetWithSalesRef(): void
     {
         $response = new Response();
         $response->setContent('{"token":"test"}');
@@ -197,9 +192,8 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
      * @throws ContainerExceptionInterface
      * @throws ExceptionInterface
      * @throws NotFoundExceptionInterface
-     * @return void
      */
-    public function testProcessRequestGetWithPaymentDataNoSalesRef()
+    public function testProcessRequestGetWithPaymentDataNoSalesRef(): void
     {
         ob_start();
         $response = new Response();
@@ -221,9 +215,8 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
      * @throws ContainerExceptionInterface
      * @throws ExceptionInterface
      * @throws NotFoundExceptionInterface
-     * @return void
      */
-    public function testProcessRequestGetRetry()
+    public function testProcessRequestGetRetry(): void
     {
         ob_start();
         $response = new Response();
@@ -245,9 +238,8 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
     /**
      * @medium
      * @throws ExceptionInterface
-     * @return void
      */
-    public function testProcessRequestPut()
+    public function testProcessRequestPut(): void
     {
         $return = $this->service->put('transaction', ApiService::SCOPE_QUERY_TXN, array());
         $this->assertNotEmpty($return);
@@ -256,9 +248,8 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
     /**
      * @medium
      * @throws ExceptionInterface
-     * @return void
      */
-    public function testProcessRequestDelete()
+    public function testProcessRequestDelete(): void
     {
         $return = $this->service->delete('transaction', ApiService::SCOPE_QUERY_TXN);
         $this->assertNotEmpty($return);
@@ -267,9 +258,8 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
     /**
      * @medium
      * @throws ExceptionInterface
-     * @return void
      */
-    public function testInvalidProcessRequest()
+    public function testInvalidProcessRequest(): void
     {
         $return = $this->service->post('transaction', 'wrong-data', array());
 
@@ -279,10 +269,7 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
         $this->assertArrayHasKey('message', $return);
     }
 
-    /**
-     * @return void
-     */
-    public function testAccessTokenData()
+    public function testAccessTokenData(): void
     {
         $filter = new UnderscoreToCamelCase();
         $data   = array(
@@ -313,7 +300,7 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
      * @throws NotFoundExceptionInterface
      * @return void
      */
-    public function testLoggerAlias()
+    public function testLoggerAlias(): void
     {
         /** @var array{cpms_api: array<string, mixed>} $config */
         $config                             = $this->serviceManager->get('config');
@@ -328,7 +315,7 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
     /**
      * @return NotificationsClient
      */
-    protected function provideNotificationsClient()
+    protected function provideNotificationsClient(): NotificationsClient
     {
         $notificationsClient = $this->service->getNotificationsClient();
 
@@ -346,7 +333,7 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
      * @throws CpmsNotificationAcknowledgementFailed
      * @throws NotFoundExceptionInterface
      */
-    public function testCanAcknowledgeANotification()
+    public function testCanAcknowledgeANotification(): void
     {
         // ----------------------------------------------------------------
         // setup your test
@@ -405,7 +392,7 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
      * @throws ExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function testThrowsExceptionIfAcknowledgementFailsWithNoCode()
+    public function testThrowsExceptionIfAcknowledgementFailsWithNoCode(): void
     {
         $this->expectException(CpmsNotificationAcknowledgementFailed::class);
         $response = new Response();
@@ -451,7 +438,7 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
      * @throws ExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function testThrowsExceptionIfAcknowledgementFailsWithWrongCode()
+    public function testThrowsExceptionIfAcknowledgementFailsWithWrongCode(): void
     {
         $this->expectException(CpmsNotificationAcknowledgementFailed::class);
         $response = new Response();

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CpmsClientTest;
 
 use DvsaLogger\Logger\MotLogger;

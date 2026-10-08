@@ -2,21 +2,21 @@
 
 declare(strict_types=1);
 
-namespace CpmsClientTest\Client;
+namespace CpmsClientTest\Factory;
 
 use CpmsClient\Client\NotificationsClient;
-use CpmsClient\Client\NotificationsClientFactory;
+use CpmsClient\Factory\NotificationsClientFactory;
 use CpmsClientTest\Bootstrap;
 use DVSA\CPMS\Notifications\Messages\Maps\MapNotificationTypes;
 use DVSA\CPMS\Queues\QueueAdapters\InMemory\InMemoryQueues;
-use PHPUnit\Framework\TestCase;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use Laminas\ServiceManager\ServiceManager;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
 /**
- * @coversDefaultClass \CpmsClient\Client\NotificationsClientFactory
+ * @coversDefaultClass \CpmsClient\Factory\NotificationsClientFactory
  *
  * @phpstan-type CpmsApiConfig array{
  *     cpms_api: array{
@@ -45,13 +45,6 @@ class NotificationsClientFactoryTest extends TestCase
      */
     protected array $smConfig;
 
-    /**
-     * automatically called by PHPUnit before every test
-     *
-     * it provides a working Zend ServiceManager. we'll use this to make sure
-     * that our factory is compatible with ZF2
-     *
-     */
     #[\Override]
     public function setUp(): void
     {
@@ -71,11 +64,6 @@ class NotificationsClientFactoryTest extends TestCase
         $this->smConfig = $config;
     }
 
-    /**
-     * automatically called by PHPUnit after every test
-     *
-     * @return void
-     */
     #[\Override]
     public function tearDown(): void
     {
@@ -86,9 +74,6 @@ class NotificationsClientFactoryTest extends TestCase
         $this->serviceManager->setService('config', $this->smConfig);
     }
 
-    /**
-     * @coversNothing
-     */
     public function testCanInstantiate(): void
     {
         $unit = new NotificationsClientFactory();
@@ -96,9 +81,6 @@ class NotificationsClientFactoryTest extends TestCase
         $this->assertInstanceOf(NotificationsClientFactory::class, $unit);
     }
 
-    /**
-     * @coversNothing
-     */
     public function testIsServiceManagerFactory(): void
     {
         $unit = new NotificationsClientFactory();

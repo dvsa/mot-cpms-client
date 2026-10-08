@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CpmsClient\Factory;
 
 use CpmsClient\Controller\Plugin\GetRestClient;
 use Psr\Container\ContainerInterface;
-use Interop\Container\Exception\ContainerException;
 use Laminas\ServiceManager\Exception\ServiceNotCreatedException;
 use Laminas\ServiceManager\Exception\ServiceNotFoundException;
 use Laminas\ServiceManager\Factory\FactoryInterface;

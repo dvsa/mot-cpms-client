@@ -98,10 +98,7 @@ class HttpRestJsonClient
         return $decodedData;
     }
 
-    /**
-     * @param ClientOptions $options
-     */
-    public function setOptions($options): void
+    public function setOptions(ClientOptions $options): void
     {
         $this->options = $options;
     }
@@ -121,25 +118,16 @@ class HttpRestJsonClient
         return $this->request;
     }
 
-    /**
-     * @param HttpClient $httpClient
-     */
-    public function setHttpClient($httpClient): void
+    public function setHttpClient(HttpClient $httpClient): void
     {
         $this->httpClient = $httpClient;
     }
 
-    /**
-     * @return HttpClient
-     */
     public function getHttpClient(): HttpClient
     {
         return $this->httpClient;
     }
 
-    /**
-     * @return AbstractMessage
-     */
     public function resetHeaders(): AbstractMessage
     {
         $options = $this->getOptions();

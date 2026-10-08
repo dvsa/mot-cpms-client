@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CpmsClient\Data;
 
 use Laminas\Stdlib\AbstractOptions;
@@ -27,117 +29,86 @@ class AccessToken extends AbstractOptions
     }
 
     /**
-     * @param int $issuedAt
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function setIssuedAt($issuedAt): void
+    public function setIssuedAt(int $issuedAt): void
     {
         $this->issuedAt = $issuedAt;
     }
 
-    /**
-     * @return int
-     */
     public function getIssuedAt(): int
     {
         return $this->issuedAt;
     }
 
     /**
-     * @param string $accessToken
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function setAccessToken($accessToken): void
+    public function setAccessToken(string $accessToken): void
     {
         $this->accessToken = $accessToken;
     }
 
-    /**
-     * @return string
-     */
     public function getAccessToken(): string
     {
         return $this->accessToken;
     }
 
     /**
-     * @param string|int $expiresIn
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function setExpiresIn($expiresIn): void
+    public function setExpiresIn(int|string $expiresIn): void
     {
         $this->expiresIn = $expiresIn;
     }
 
-    /**
-     * @return int|string
-     */
     public function getExpiresIn(): int|string
     {
         return $this->expiresIn;
     }
 
     /**
-     * @param string $scope
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function setScope($scope): void
+    public function setScope(string $scope): void
     {
         $this->scope = $scope;
     }
 
-    /**
-     * @return string
-     */
     public function getScope(): string
     {
         return $this->scope;
     }
 
     /**
-     * @param string $tokenType
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function setTokenType($tokenType): void
+    public function setTokenType(string $tokenType): void
     {
         $this->tokenType = $tokenType;
     }
 
-    /**
-     * @return string
-     */
     public function getTokenType(): string
     {
         return $this->tokenType;
     }
 
-    /**
-     * Is token expired
-     *
-     * @return bool
-     */
     public function isExpired(): bool
     {
-        $expiryTime = (int) $this->getIssuedAt() + (int) $this->getExpiresIn();
+        $expiryTime = $this->getIssuedAt() + (int) $this->getExpiresIn();
 
         return ($expiryTime < time());
     }
 
-    /**
-     * Get Auth Header
-     *
-     * @return string
-     */
     public function getAuthorisationHeader(): string
     {
         return 'Bearer ' . $this->getAccessToken();
     }
 
     /**
-     * @param string $salesReference
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function setSalesReference($salesReference): void
+    public function setSalesReference(string $salesReference): void
     {
         $this->salesReference = $salesReference;
     }
