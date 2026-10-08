@@ -48,6 +48,7 @@ class NotificationsClientFactory implements FactoryInterface
 
         $adapterName = $config['cpms_api']['notifications_client']['adapter'];
         $adapter = new $adapterName($queueOptions);
+
         if (!$adapter instanceof Queues) {
             throw new \UnexpectedValueException('The notifications adapter must implement the Queues interface.');
         }

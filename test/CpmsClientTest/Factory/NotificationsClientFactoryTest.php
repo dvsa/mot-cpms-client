@@ -9,6 +9,7 @@ use CpmsClient\Factory\NotificationsClientFactory;
 use CpmsClientTest\Bootstrap;
 use DVSA\CPMS\Notifications\Messages\Maps\MapNotificationTypes;
 use DVSA\CPMS\Queues\QueueAdapters\InMemory\InMemoryQueues;
+use DvsaLogger\Logger\MotLogger;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use Laminas\ServiceManager\ServiceManager;
 use PHPUnit\Framework\TestCase;
@@ -31,20 +32,17 @@ use Psr\Container\NotFoundExceptionInterface;
  */
 class NotificationsClientFactoryTest extends TestCase
 {
-    /**
-     * ZF2's ServiceManager
-     *
-     * @var ServiceManager
-     */
     protected ServiceManager $serviceManager;
 
     /**
-     * the config from ZF2's ServiceManager
-     *
      * @var array<string, mixed>
      */
     protected array $smConfig;
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     #[\Override]
     public function setUp(): void
     {
@@ -52,13 +50,6 @@ class NotificationsClientFactoryTest extends TestCase
 
         $this->serviceManager->setAllowOverride(true);
 
-        // ZF2's ServiceManager does *not* get created from scratch at the
-        // start of each test (grrrr)
-        //
-        // we need to preserve its original config before each test, and
-        // we need to restore that config after each test
-        //
-        // if we do not do this, the legacy unit tests all break (grrrr)
         /** @var array<string, mixed> $config */
         $config = $this->serviceManager->get('config');
         $this->smConfig = $config;
@@ -67,10 +58,6 @@ class NotificationsClientFactoryTest extends TestCase
     #[\Override]
     public function tearDown(): void
     {
-        // restore ServiceManager's original config, in case our test
-        // has gone and modified it
-        //
-        // if we do not do this, the legacy unit tests all break (grrrr)
         $this->serviceManager->setService('config', $this->smConfig);
     }
 
@@ -147,5 +134,73 @@ class NotificationsClientFactoryTest extends TestCase
         $client = $this->serviceManager->get('cpms\client\notifications');
 
         $this->assertInstanceOf(NotificationsClient::class, $client);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function testIncorrectLoggerThrowsException(): void
+    {
+        $originalLogger = $this->serviceManager->get(MotLogger::class);
+
+        $this->serviceManager->setService(MotLogger::class, new \stdClass());
+
+        $config = $this->smConfig;
+        $config['cpms_api']['notifications_client'] = [
+            'adapter' => InMemoryQueues::class,
+            'options' => [
+                'queues' => [
+                    'notifications' => [
+                        'Middleware' => [
+                            'MultipartMessage' => [
+                                "mapper" => MapNotificationTypes::class,
+                            ],
+                        ],
+                    ],
+                ]
+            ]
+        ];
+        $this->serviceManager->setService('config', $config);
+
+        $this->expectException(\UnexpectedValueException::class);
+
+        try {
+            (new NotificationsClientFactory())(
+                $this->serviceManager, 'cpms\\client\\notifications',
+            );
+        } finally {
+            $this->serviceManager->setService(MotLogger::class, $originalLogger);
+        }
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function testIncorrectQueueAdapterThrowsException(): void
+    {
+        $config = $this->smConfig;
+        $config['cpms_api']['notifications_client'] = [
+            'adapter' => \stdClass::class,
+            'options' => [
+                'queues' => [
+                    'notifications' => [
+                        'Middleware' => [
+                            'MultipartMessage' => [
+                                "mapper" => MapNotificationTypes::class,
+                            ],
+                        ],
+                    ],
+                ]
+            ]
+        ];
+        $this->serviceManager->setService('config', $config);
+
+        $this->expectException(\UnexpectedValueException::class);
+
+        (new NotificationsClientFactory())(
+            $this->serviceManager, 'cpms\\client\\notifications',
+        );
     }
 }
