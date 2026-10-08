@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CpmsClientTest\Service;
 
 use CpmsClient\Client\HttpRestJsonClient;
@@ -290,7 +292,6 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
     /**
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
-     * @return void
      */
     public function testLoggerAlias(): void
     {
@@ -304,9 +305,6 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
         $this->assertInstanceOf(ApiService::class, $apiService);
     }
 
-    /**
-     * @return NotificationsClient
-     */
     protected function provideNotificationsClient(): NotificationsClient
     {
         $notificationsClient = $this->service->getNotificationsClient();
@@ -319,26 +317,18 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
     }
 
     /**
-     * @covers ::acknowledgeNotification
-     * @return void
      * @throws ContainerExceptionInterface
      * @throws CpmsNotificationAcknowledgementFailed
+     * @throws ExceptionInterface
      * @throws NotFoundExceptionInterface
      */
     public function testCanAcknowledgeANotification(): void
     {
-        // ----------------------------------------------------------------
-        // setup your test
-        //
-        // there's a lot going on here :)
-
         $response = new Response();
         $response->setContent('{"code":"000"}');
 
         $this->setTestResponse($response);
 
-        // we need to put a message onto this queue and read it off again
-        // so that we have the metadata required for acknowledgement
         $notificationsClient = $this->provideNotificationsClient();
         $queuesClient = $notificationsClient->getQueuesClient();
 
@@ -365,20 +355,12 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
 
         $this->assertGreaterThan(0, $notificationsClient->getQueuesClient()->getNumberOfMessagesInQueue("notifications"));
 
-        // ----------------------------------------------------------------
-        // perform the change
-
         $this->service->acknowledgeNotification($actualNotifications[0]['metadata'], $actualNotifications[0]['message']);
-
-        // ----------------------------------------------------------------
-        // test the results
 
         $this->assertEquals(0, $notificationsClient->getQueuesClient()->getNumberOfMessagesInQueue("notifications"));
     }
 
     /**
-     * @covers ::acknowledgeNotification
-     * @return void
      * @throws ContainerExceptionInterface
      * @throws CpmsNotificationAcknowledgementFailed
      * @throws ExceptionInterface
@@ -392,8 +374,6 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
 
         $this->setTestResponse($response);
 
-        // we need to put a message onto this queue and read it off again
-        // so that we have the metadata required for acknowledgement
         $notificationsClient = $this->provideNotificationsClient();
         $queuesClient = $notificationsClient->getQueuesClient();
 
@@ -422,9 +402,7 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
     }
 
     /**
-     * @covers ::acknowledgeNotification
      * @dataProvider provideInvalidResponseCode
-     * @return void
      * @throws ContainerExceptionInterface
      * @throws CpmsNotificationAcknowledgementFailed
      * @throws ExceptionInterface
@@ -438,8 +416,6 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
 
         $this->setTestResponse($response);
 
-        // we need to put a message onto this queue and read it off again
-        // so that we have the metadata required for acknowledgement
         $notificationsClient = $this->provideNotificationsClient();
         $queuesClient = $notificationsClient->getQueuesClient();
 
@@ -472,7 +448,6 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
      */
     public function provideInvalidResponseCode(): array
     {
-        // our dataset to test with
         /** @var array<int, array{0: array{code: mixed}}> $retval */
         static $retval = [];
 
@@ -503,7 +478,6 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
         $retval[] = [ [ 'code' => 0 ] ];
         $retval[] = [ [ 'code' => '0' ] ];
 
-        // all done
         return $retval;
     }
 }
