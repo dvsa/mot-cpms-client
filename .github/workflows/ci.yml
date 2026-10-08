@@ -16,19 +16,19 @@ concurrency:
 
 jobs:
   static:
-    uses: dvsa/.github/.github/workflows/php-static.yml@v4.1.0
+    uses: dvsa/.github/.github/workflows/php-static.yml@v6
     with:
       php-version: "8.2"
       composer-version: '2.2.24'
 
   test:
-    uses: dvsa/.github/.github/workflows/php-tests.yml@v4.1.0
+    uses: dvsa/.github/.github/workflows/php-tests.yml@v6
     with:
       php-versions: "[\"8.2\"]"
       composer-version: '2.2.24'
 
   security:
-    uses: dvsa/.github/.github/workflows/php-security.yml@v4.1.0
+    uses: dvsa/.github/.github/workflows/php-security.yml@v6
     with:
      php-version: "8.2"
     secrets:
