@@ -3,6 +3,8 @@ name: CI
 permissions:
   id-token: write
   contents: write
+  actions: read
+  security-events: write
 
 on:
   push:
