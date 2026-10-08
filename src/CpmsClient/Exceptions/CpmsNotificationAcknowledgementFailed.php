@@ -6,10 +6,6 @@ namespace CpmsClient\Exceptions;
 
 use Exception;
 
-/**
- * this exception is thrown when an attempted notification acknowledgement
- * fails
- */
 class CpmsNotificationAcknowledgementFailed extends Exception
 {
     public function __construct(string $message, mixed $response)

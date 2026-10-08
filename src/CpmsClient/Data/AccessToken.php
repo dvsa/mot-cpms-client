@@ -7,9 +7,6 @@ namespace CpmsClient\Data;
 use Laminas\Stdlib\AbstractOptions;
 
 /**
- * Class AccessToken
- *
- * @package CpmsClient\Data
  * @extends AbstractOptions<mixed>
  */
 class AccessToken extends AbstractOptions

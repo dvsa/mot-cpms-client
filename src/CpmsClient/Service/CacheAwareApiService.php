@@ -8,13 +8,10 @@ use Laminas\Cache\Exception\ExceptionInterface;
 use Laminas\Cache\Storage\StorageInterface;
 
 /**
- * Class ApiService
  * @method mixed get(string $endPointAlias, string $scope, array<string, mixed> $data = [])
  * @method mixed post(string $endPointAlias, string $scope, array<string, mixed> $data)
  * @method mixed put(string $endPointAlias, string $scope, array<string, mixed> $data)
  * @method mixed delete(string $endPointAlias, string $scope)
- *
- * @package CpmsClient\Service
  */
 class CacheAwareApiService
 {

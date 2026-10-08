@@ -10,23 +10,15 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
 /**
- * Test bootstrap, for setting up auto loading
  * @method setUpDatabase()
  */
 class Bootstrap
 {
     protected static ServiceManager $serviceManager;
 
-    /** @var  string This is the root directory where the test is run from which likely the test directory */
-    protected static string $dir;
-
+    protected static string $testDirectory;
     protected static mixed $application;
-
     protected static ?self $instance = null;
-
-    protected function __construct()
-    {
-    }
 
     public static function getInstance(): Bootstrap
     {
@@ -45,7 +37,7 @@ class Bootstrap
      */
     public function init(string $dir, array|string|null $testModule = null): void
     {
-        static::$dir = $dir;
+        static::$testDirectory = $dir;
 
         $this->setPaths();
 
@@ -103,7 +95,7 @@ class Bootstrap
 
     protected function setPaths(): void
     {
-        $basePath = realpath(static::$dir);
+        $basePath = realpath(static::$testDirectory);
         if ($basePath === false) {
             throw new \RuntimeException('Unable to resolve the test bootstrap directory.');
         }
@@ -120,9 +112,9 @@ class Bootstrap
             )
         );
 
-        if (file_exists(static::$dir . "/autoload_classmap.php")) {
+        if (file_exists(static::$testDirectory . "/autoload_classmap.php")) {
             /** @var array<string, string> $classList */
-            $classList = include static::$dir . "/autoload_classmap.php";
+            $classList = include static::$testDirectory . "/autoload_classmap.php";
 
             spl_autoload_register(
                 function ($class) use ($classList) {
@@ -139,14 +131,9 @@ class Bootstrap
         }
     }
 
-    /**
-     * @param string $path
-     *
-     * @return boolean|string false if the path cannot be found
-     */
     protected function findParentPath(string $path): bool|string
     {
-        $srcDir = realpath(static::$dir . '/../');
+        $srcDir = realpath(static::$testDirectory . '/../');
 
         return $srcDir . '/' . $path;
     }
@@ -154,9 +141,5 @@ class Bootstrap
     public function getServiceManager(): ServiceManager
     {
         return static::$serviceManager;
-    }
-
-    private function __clone()
-    {
     }
 }

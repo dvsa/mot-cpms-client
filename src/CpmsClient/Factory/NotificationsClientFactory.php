@@ -15,8 +15,6 @@ use Psr\Container\NotFoundExceptionInterface;
 class NotificationsClientFactory implements FactoryInterface
 {
     /**
-     * create the notifications client
-     *
      * @param ContainerInterface $container
      * @param $requestedName
      * @param array<array-key, mixed>|null $options

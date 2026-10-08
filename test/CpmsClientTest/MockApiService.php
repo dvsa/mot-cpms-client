@@ -10,9 +10,7 @@ use CpmsClient\Service\ApiService;
 class MockApiService extends ApiService
 {
     protected bool $done = false;
-
     protected bool $forceRetry = false;
-
     protected int $expiresIn = 1;
 
     #[\Override]

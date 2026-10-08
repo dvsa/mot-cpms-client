@@ -12,9 +12,6 @@ use Laminas\ServiceManager\Exception\ServiceNotFoundException;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 /**
- * Class GetApiDomainFactory
- *
- * @package CpmsClient\Factory
  * @psalm-api
  */
 class GetApiDomainFactory implements FactoryInterface

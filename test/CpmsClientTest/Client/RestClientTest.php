@@ -22,10 +22,6 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
 /**
- * Class RestClientTest
- *
- * @package CpmsClientTest\Service
- *
  * @phpstan-type CpmsApiConfig array{
  *     cpms_api: array{
  *         rest_client: array{alias: string, options: array{domain: string}},

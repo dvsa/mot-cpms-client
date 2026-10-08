@@ -4,12 +4,6 @@ declare(strict_types=1);
 
 namespace CpmsClient\Authenticate;
 
-/**
- * Class IdentityProviderTrait
- * CPMS API Identity provider trait
- *
- * @package CpmsClient\Authenticate
- */
 trait IdentityProviderTrait
 {
     protected string $userId;

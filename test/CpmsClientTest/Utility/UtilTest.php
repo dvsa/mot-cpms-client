@@ -7,11 +7,6 @@ namespace CpmsClientTest\Utility;
 use CpmsClient\Utility\Util;
 use PHPUnit\Framework\TestCase;
 
-/**
- * Class UtilTest
- *
- * @package CpmsClientTest\Utility
- */
 class UtilTest extends TestCase
 {
     public function testAppendQueryParam(): void

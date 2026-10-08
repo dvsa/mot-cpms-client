@@ -7,9 +7,6 @@ namespace CpmsClient\Client;
 use Laminas\Stdlib\AbstractOptions;
 
 /**
- * Class ClientOptions
- *
- * @package CpmsClient\Client
  * @psalm-api
  * @extends AbstractOptions<mixed>
  */

@@ -11,16 +11,11 @@ use Laminas\ServiceManager\Exception\ServiceNotFoundException;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 /**
- * Class GetRestClientFactory
- *
- * @package CpmsClient\Factory
  * @psalm-api
  */
 class GetRestClientFactory implements FactoryInterface
 {
     /**
-     * Create an object
-     *
      * @param  ContainerInterface $container
      * @param  string $requestedName
      * @param  null|array<array-key, mixed> $options

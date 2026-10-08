@@ -12,17 +12,11 @@ use Laminas\ServiceManager\Factory\FactoryInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
 /**
- * Class ApiDomainServiceFactory
- *
- * @package CpmsClient\Service
- *
  * @psalm-api
  */
 class ApiDomainServiceFactory implements FactoryInterface
 {
     /**
-     * Create service
-     *
      * @param ContainerInterface $container
      *
      * @param $requestedName

@@ -15,16 +15,11 @@ use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
 /**
- * Class RestClientFactory
- *
- * @package CpmsClient\Client
  * @psalm-api
  */
 class RestClientFactory implements FactoryInterface
 {
     /**
-     * Create service
-     *
      * @param ContainerInterface $container
      *
      * @param $requestedName

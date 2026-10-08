@@ -11,12 +11,7 @@ use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 use Psr\Container\NotFoundExceptionInterface;
 
 /**
- * Class GetApiDomain
  * @method AbstractRestfulController getController()
- *
- * @package     CpmsCommon\Controller\Plugin
- * @author      Pele Odiase <pele.odiase@valtech.co.uk>
- * @since       22 June 2014
  */
 class GetApiDomain extends AbstractPlugin
 {

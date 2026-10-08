@@ -4,16 +4,8 @@ declare(strict_types=1);
 
 namespace CpmsClientTest;
 
-/**
- * Class Module
- *
- * @package ApplicationTest
- */
 class Module
 {
-    /**
-     * @return mixed
-     */
     public function getConfig(): mixed
     {
         return include __DIR__ . '/../test.global.php';

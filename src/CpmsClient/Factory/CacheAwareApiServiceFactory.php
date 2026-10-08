@@ -12,10 +12,6 @@ use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
 /**
- * Rest API service
- * Class ApiService
- *
- * @package CpmsClient\Service
  * @psalm-api
  */
 class CacheAwareApiServiceFactory implements FactoryInterface

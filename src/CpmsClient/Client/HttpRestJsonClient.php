@@ -14,9 +14,6 @@ use Laminas\Http\Response;
 use Laminas\Stdlib\Parameters;
 
 /**
- * Class HttpRestJsonClient
- *
- * @package CpmsClient\Client
  * @psalm-api
  */
 class HttpRestJsonClient
@@ -33,8 +30,6 @@ class HttpRestJsonClient
     }
 
     /**
-     * Dispatch request and decode json response
-     *
      * @param string $url
      * @param string $method
      * @param array<string, mixed>|null $data

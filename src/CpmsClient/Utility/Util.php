@@ -4,11 +4,6 @@ declare(strict_types=1);
 
 namespace CpmsClient\Utility;
 
-/**
- * Class Util
- *
- * @package CpmsClient\Utility
- */
 class Util
 {
     /**
@@ -40,7 +35,6 @@ class Util
      * Format exception
      *
      * @param \Exception $e
-     *
      * @return string
      */
     public static function processException(\Exception $e): string

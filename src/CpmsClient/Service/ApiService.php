@@ -19,11 +19,6 @@ use Laminas\Cache\Storage\StorageInterface;
 use Laminas\Http\Request;
 use Laminas\ServiceManager\ServiceManager;
 
-/**
- * Class ApiService
- *
- * @package CpmsClient\Service
- */
 class ApiService
 {
     public const SCOPE_CARD         = 'CARD';

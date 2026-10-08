@@ -16,11 +16,6 @@ use Laminas\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
-/**
- * Class CacheAwareApiServiceTest
- *
- * @package CpmsClientTest\Service
- */
 class CacheAwareApiServiceTest extends AbstractHttpControllerTestCase
 {
     protected CacheAwareApiService $service;

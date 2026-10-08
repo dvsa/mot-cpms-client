@@ -8,11 +8,6 @@ use Laminas\Http\Response;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
 
-/**
- * Class SampleController
- *
- * @package CpmsClientTest
- */
 class SampleController extends AbstractActionController
 {
     #[\Override]

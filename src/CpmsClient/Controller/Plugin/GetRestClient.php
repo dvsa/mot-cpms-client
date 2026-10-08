@@ -12,10 +12,7 @@ use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 use Psr\Container\NotFoundExceptionInterface;
 
 /**
- * Class GetRestClient
  * @method AbstractActionController getController()
- *
- * @package CpmsClient\Controller\Plugin
  */
 class GetRestClient extends AbstractPlugin
 {

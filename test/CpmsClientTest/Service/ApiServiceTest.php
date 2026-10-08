@@ -13,9 +13,7 @@ use CpmsClientTest\MockUser;
 use CpmsClientTest\SampleController;
 use DateTime;
 use DVSA\CPMS\Notifications\Ids\ValueBuilders\GenerateNotificationId;
-use DVSA\CPMS\Notifications\Messages\Maps\MapNotificationTypes;
 use DVSA\CPMS\Notifications\Messages\Values\PaymentNotificationV1;
-use DVSA\CPMS\Queues\QueueAdapters\Values\QueueMessage;
 use Laminas\Cache\Exception\ExceptionInterface;
 use Laminas\Http\Client\Adapter\Test as TestAdapter;
 use Laminas\Filter\Word\UnderscoreToCamelCase;
@@ -26,12 +24,6 @@ use Laminas\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
-/**
- * Class ApiDomainTest
- *
- * @package CpmsClientTest\Service
- * @coversDefaultClass CpmsClient\Service\ApiService
- */
 class ApiServiceTest extends AbstractHttpControllerTestCase
 {
     protected MockApiService $service;
