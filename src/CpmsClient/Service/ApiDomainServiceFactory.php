@@ -53,14 +53,19 @@ class ApiDomainServiceFactory implements FactoryInterface
     /**
      * Determine the CPMS API domain if not set in the config
      *
-     * @param \Laminas\Http\PhpEnvironment\Request $request
+     * @param mixed $request
      * @param array<string, mixed> $config
      *
      * @return string
      */
-    public function determineLocalDomain(\Laminas\Http\PhpEnvironment\Request $request, array $config): string
+    public function determineLocalDomain(mixed $request, array $config): string
     {
-        $currentDomain = $request->getServer('HTTP_HOST');
+        $currentDomain = '';
+
+        if (is_object($request) && method_exists($request, 'getServer')) {
+            $currentDomain = $request->getServer('HTTP_HOST');
+        }
+
         if (!is_string($currentDomain) || $currentDomain === '') {
             $cpmsApi = $config['cpms_api'] ?? [];
             $homeDomain = is_array($cpmsApi) ? ($cpmsApi['home_domain'] ?? '') : '';

@@ -4,15 +4,41 @@ declare(strict_types=1);
 
 namespace CpmsClient\Authenticate;
 
+/**
+ * Interface IdentityProviderInterface
+ *
+ * @package CpmsClient\Authenticate
+ */
 interface IdentityProviderInterface
 {
-    public function getClientId(): string;
+    /**
+     * OAuth 2.0 client_id
+     *
+     * @return string
+     */
+    public function getClientId();
 
-    public function getClientSecret(): string;
+    /**
+     * OAuth 2.0 client_secret
+     *
+     * @return string
+     */
+    public function getClientSecret();
 
-    public function getUserId(): string;
+    /**
+     * Logged in user (OpenAM UUID)
+     *
+     * @return string
+     */
+    public function getUserId();
 
-    public function getCustomerReference(): mixed;
+    /**
+     * Get the reference to the customer the payment is for
+     *
+     * @return mixed
+     */
+    public function getCustomerReference();
 
-    public function getCostCentre(): string;
+    /** @return string */
+    public function getCostCentre();
 }

@@ -16,6 +16,7 @@ use CpmsClientTest\SampleController;
 use DateTime;
 use DVSA\CPMS\Notifications\Ids\ValueBuilders\GenerateNotificationId;
 use DVSA\CPMS\Notifications\Messages\Values\PaymentNotificationV1;
+use JsonException;
 use Laminas\Cache\Exception\ExceptionInterface;
 use Laminas\Http\Client\Adapter\Test as TestAdapter;
 use Laminas\Filter\Word\UnderscoreToCamelCase;
@@ -403,16 +404,17 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
 
     /**
      * @dataProvider provideInvalidResponseCode
+     * @param array{code: mixed} $responseData
      * @throws ContainerExceptionInterface
      * @throws CpmsNotificationAcknowledgementFailed
      * @throws ExceptionInterface
-     * @throws NotFoundExceptionInterface
+     * @throws NotFoundExceptionInterface|JsonException
      */
-    public function testThrowsExceptionIfAcknowledgementFailsWithWrongCode(): void
+    public function testThrowsExceptionIfAcknowledgementFailsWithWrongCode(array $responseData): void
     {
         $this->expectException(CpmsNotificationAcknowledgementFailed::class);
         $response = new Response();
-        $response->setContent('{"code":"999"}');
+        $response->setContent(json_encode($responseData, JSON_THROW_ON_ERROR));
 
         $this->setTestResponse($response);
 

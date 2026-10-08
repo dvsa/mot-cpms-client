@@ -17,8 +17,8 @@ composer require dvsa/mot-cpms-client
 ```
  
 ## Configuration
-         
-Modify the configuration in the `client-config.global.php` file as follows:
+
+Modify `config/autoload/cpms-client.global.php` (or copy `config/client-config.global.php.dist`) as follows:
 
      return [
          'cpms_api'                => [
