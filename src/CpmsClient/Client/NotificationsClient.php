@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CpmsClient\Client;
 
 use DVSA\CPMS\Queues\QueueAdapters\Interfaces\Queues;
@@ -9,18 +11,8 @@ use RuntimeException;
 
 class NotificationsClient
 {
-    /**
-     * In our config, what is the name of the queue we need to read
-     * new notifications from?
-     */
-    const NOTIFICATIONS_QUEUE_NAME = "notifications";
+    public const NOTIFICATIONS_QUEUE_NAME = "notifications";
 
-    /**
-     * @param Queues $queuesClient
-     *        how we will talk to our queues
-     * @param MotLogger $logger
-     *        how we will report on what happens
-     */
     public function __construct(
         private readonly Queues $queuesClient,
         private readonly MotLogger $logger
@@ -30,6 +22,8 @@ class NotificationsClient
     /**
      * Get the next batch of messages from the notifications queue
      * if there are no messages, this will return an empty list.
+     *
+     * @return array<int, array{metadata: QueueMessage, message: object}>
      */
     public function getNotifications(): array
     {
@@ -37,8 +31,10 @@ class NotificationsClient
         $queuesClient = $this->queuesClient;
         $this->logger->debug("[" . NotificationsClient::class . "]: Reading messages from queue: " . self::NOTIFICATIONS_QUEUE_NAME);
 
+        /** @var QueueMessage[] $qMessages */
         $qMessages = $queuesClient->receiveMessagesFromQueue(self::NOTIFICATIONS_QUEUE_NAME);
 
+        /** @var array<int, array{metadata: QueueMessage, message: object}> $notificationsArray */
         $notificationsArray = [];
         foreach ($qMessages as $qMessage) {
             $notification = $qMessage->getPayload();
@@ -58,29 +54,11 @@ class NotificationsClient
         return $notificationsArray;
     }
 
-    /**
-     * Confirm that a message can be dropped from the queue that it
-     * came from.
-     *
-     * @param  QueueMessage $metadata
-     *         the metadata message that we're done with
-     */
     public function confirmMessageHandled(QueueMessage $metadata): void
     {
         $this->queuesClient->confirmMessageHandled($metadata);
     }
 
-    // ==================================================================
-    //
-    // Helpers go here
-    //
-    // ------------------------------------------------------------------
-
-    /**
-     * returns the client we are using to talk to our queues
-     *
-     * mainly here to help with unit testing
-     */
     public function getQueuesClient(): Queues
     {
         return $this->queuesClient;

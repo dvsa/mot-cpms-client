@@ -2,7 +2,10 @@
 
 use CpmsClientTest\MockLogger;
 use CpmsClientTest\MockUser;
+use CpmsClientTest\SampleController;
 use DvsaLogger\Logger\MotLogger;
+use DVSA\CPMS\Notifications\Messages\Maps\MapNotificationTypes;
+use DVSA\CPMS\Queues\QueueAdapters\InMemory\InMemoryQueues;
 
 return [
     'application_env'   => 'testing',
@@ -56,7 +59,7 @@ return [
     ],
     'controllers'       => [
         'invokables' => [
-            'CpmsClientTest\Sample' => 'CpmsClientTest\SampleController',
+            'CpmsClientTest\Sample' => SampleController::class,
         ],
     ],
     'cpms_api'          => [
@@ -69,6 +72,21 @@ return [
                 'domain'  => 'http://payment-service.psqa-ap01.ps.npm',
             ],
             'adapter' => 'Laminas\Http\Client\Adapter\Test',
+        ],
+        'notifications_client' => [
+            'adapter' => InMemoryQueues::class,
+            'options' => [
+                'queues' => [
+                    'notifications' => [
+                        'active' => true,
+                        'Middleware' => [
+                            'MultipartMessage' => [
+                                'mapper' => MapNotificationTypes::class,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
         ],
     ],
     'service_manager'   => [
