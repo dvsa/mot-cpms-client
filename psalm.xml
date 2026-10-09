@@ -14,6 +14,8 @@
 
         <ignoreFiles>
             <directory name="vendor" />
+            <!-- Ignore the local Laminas Console shim used only for testing; -->
+            <file name="src/Laminas.Console/Console.php" />
         </ignoreFiles>
     </projectFiles>
 

@@ -4,3 +4,5 @@ parameters:
     paths:
         - src
         - test
+    excludePaths:
+        - src/Laminas.Console/Console.php
