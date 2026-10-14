@@ -1,13 +1,12 @@
-<?php namespace CpmsClientTest;
+<?php
+
+declare(strict_types=1);
+
+namespace CpmsClientTest;
 
 use CpmsClient\Authenticate\IdentityProviderInterface;
 use CpmsClient\Authenticate\IdentityProviderTrait;
 
-/**
- * Class MockUser
- *
- * @package CpmsClientTest
- */
 class MockUser implements IdentityProviderInterface
 {
     use IdentityProviderTrait;

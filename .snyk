@@ -1,0 +1,25 @@
+ignore:
+    'SNYK-PHP-GUZZLEHTTPGUZZLE-18306774':
+        - "*":
+            reason: "Vulnerability is in a 'dvsa/mot-cpms-queues' dependency, which needs to be updated to a newer version of 'aws-sdk-php' to resolve the issue."
+            expires: "2026-11-20T23:59:59Z"
+    'SNYK-PHP-GUZZLEHTTPGUZZLE-18543664':
+        - "*":
+            reason: "Vulnerability is in a 'dvsa/mot-cpms-queues' dependency, which needs to be updated to a newer version of 'aws-sdk-php' to resolve the issue."
+            expires: "2026-11-20T23:59:59Z"
+    'SNYK-PHP-GUZZLEHTTPGUZZLE-18306780':
+        - "*":
+            reason: "Vulnerability is in a 'dvsa/mot-cpms-queues' dependency, which needs to be updated to a newer version of 'aws-sdk-php' to resolve the issue."
+            expires: "2026-11-20T23:59:59Z"
+    'SNYK-PHP-GUZZLEHTTPGUZZLE-18306770':
+        - "*":
+            reason: "Vulnerability is in a 'dvsa/mot-cpms-queues' dependency, which needs to be updated to a newer version of 'aws-sdk-php' to resolve the issue."
+            expires: "2026-11-20T23:59:59Z"
+    'SNYK-PHP-GUZZLEHTTPGUZZLE-18543681':
+        - "*":
+            reason: "Vulnerability is in a 'dvsa/mot-cpms-queues' dependency, which needs to be updated to a newer version of 'aws-sdk-php' to resolve the issue."
+            expires: "2026-11-20T23:59:59Z"
+    'SNYK-PHP-GUZZLEHTTPGUZZLE-18306777':
+        - "*":
+            reason: "Vulnerability is in a 'dvsa/mot-cpms-queues' dependency, which needs to be updated to a newer version of 'aws-sdk-php' to resolve the issue."
+            expires: "2026-11-20T23:59:59Z"

@@ -1,21 +1,22 @@
 <?php
+
+declare(strict_types=1);
+
 namespace CpmsClientTest;
 
+use Laminas\Http\Response;
 use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\View\Model\ViewModel;
 
-/**
- * Class SampleController
- *
- * @package CpmsClientTest
- */
 class SampleController extends AbstractActionController
 {
-    public function indexAction()
+    #[\Override]
+    public function indexAction(): ViewModel
     {
-        /** @var \Laminas\Http\Response $response */
+        /** @var Response $response */
         $response = $this->getResponse();
         $response->setStatusCode(200);
         $response->setContent('foo');
-        return $response;
+        return new ViewModel(['response' => $response]);
     }
 }

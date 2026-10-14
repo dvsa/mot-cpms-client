@@ -1,7 +1,8 @@
 parameters:
-    checkMissingIterableValueType: false
-    checkGenericClassInNonGenericObjectType: false
     level: max
+    treatPhpDocTypesAsCertain: false
     paths:
         - src
         - test
+    excludePaths:
+        - src/Laminas.Console/Console.php

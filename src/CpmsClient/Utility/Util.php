@@ -1,22 +1,20 @@
 <?php
+
+declare(strict_types=1);
+
 namespace CpmsClient\Utility;
 
-/**
- * Class Util
- *
- * @package CpmsClient\Utility
- */
 class Util
 {
     /**
      * Method to append any additional data to the clientUrl
      *
-     * @param $url
-     * @param $requiredParams
+     * @param string $url
+     * @param array<string, mixed>|null $requiredParams
      *
      * @return string
      */
-    public static function appendQueryString($url, array $requiredParams = null)
+    public static function appendQueryString(string $url, array $requiredParams = null): string
     {
         if (!empty($url) and stripos($url, 'http') !== 0) {
             $url = 'http://' . $url;
@@ -37,10 +35,9 @@ class Util
      * Format exception
      *
      * @param \Exception $e
-     *
      * @return string
      */
-    public static function processException(\Exception $e)
+    public static function processException(\Exception $e): string
     {
         $trace = $e->getTraceAsString();
         $i     = 1;

@@ -1,8 +1,8 @@
 <?php
 
+declare(strict_types=1);
 
 namespace Laminas\Console;
-
 
 // Ugly workaround to get integration tests working...
 // We are not using Console requests - this is only to allow tests to run with PHP 8.

@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace CpmsClient\Service;
 
 use CpmsClient\Client\ClientOptions;
@@ -7,95 +10,68 @@ use CpmsClient\Client\NotificationsClient;
 use CpmsClient\Data\AccessToken;
 use CpmsClient\Exceptions\CpmsNotificationAcknowledgementFailed;
 use CpmsClient\Utility\Util;
+use DVSA\CPMS\Queues\QueueAdapters\Interfaces\Queues;
 use DVSA\CPMS\Queues\QueueAdapters\Values\QueueMessage;
 use DvsaLogger\Logger\MotLogger;
 use Exception;
 use Laminas\Cache\Exception\ExceptionInterface;
 use Laminas\Cache\Storage\StorageInterface;
 use Laminas\Http\Request;
-use Psr\Log\LoggerInterface;
+use Laminas\ServiceManager\ServiceManager;
 
-/**
- * Class ApiService
- *
- * @package CpmsClient\Service
- */
 class ApiService
 {
-    const SCOPE_CARD         = 'CARD';
-    const SCOPE_CNP          = 'CNP';
-    const SCOPE_DIRECT_DEBIT = 'DIRECT_DEBIT';
-    const SCOPE_CHEQUE       = 'CHEQUE';
-    const SCOPE_REFUND       = 'REFUND';
-    const SCOPE_QUERY_TXN    = 'QUERY_TXN';
-    const SCOPE_STORED_CARD  = 'STORED_CARD';
-    const SCOPE_CHARGE_BACK  = 'CHARGE_BACK';
-    const SCOPE_CASH         = 'CASH';
-    const SCOPE_POSTAL_ORDER = 'POSTAL_ORDER';
-    const SCOPE_CHIP_PIN     = 'CHIP_PIN';
-    const SCOPE_ADJUSTMENT   = 'ADJUSTMENT';
-    const SCOPE_REPORT       = 'REPORT';
-    const CHEQUE_RD          = 'CHEQUE_RD'; // refer to drawer
-    const DIRECT_DEBIT_IC    = 'DIRECT_DEBIT_IC'; // indemnity claim
-    const REALLOCATE_PAYMENT = 'REALLOCATE'; // Reallocate payments by switch customer reference
-    const MAX_RETIRES        = 3;
+    public const SCOPE_CARD         = 'CARD';
+    public const SCOPE_CNP          = 'CNP';
+    public const SCOPE_DIRECT_DEBIT = 'DIRECT_DEBIT';
+    public const SCOPE_CHEQUE       = 'CHEQUE';
+    public const SCOPE_REFUND       = 'REFUND';
+    public const SCOPE_QUERY_TXN    = 'QUERY_TXN';
+    public const SCOPE_STORED_CARD  = 'STORED_CARD';
+    public const SCOPE_CHARGE_BACK  = 'CHARGE_BACK';
+    public const SCOPE_CASH         = 'CASH';
+    public const SCOPE_POSTAL_ORDER = 'POSTAL_ORDER';
+    public const SCOPE_CHIP_PIN     = 'CHIP_PIN';
+    public const SCOPE_ADJUSTMENT   = 'ADJUSTMENT';
+    public const SCOPE_REPORT       = 'REPORT';
+    public const CHEQUE_RD          = 'CHEQUE_RD'; // refer to drawer
+    public const DIRECT_DEBIT_IC    = 'DIRECT_DEBIT_IC'; // indemnity claim
+    public const REALLOCATE_PAYMENT = 'REALLOCATE'; // Reallocate payments by switch customer reference
+    public const MAX_RETIRES        = 3;
 
     protected ?MotLogger $logger = null;
+    protected StorageInterface $cacheStorage;
+    protected HttpRestJsonClient $client;
+    protected ClientOptions $options;
+    protected bool $enableCache = true;
+    protected ?NotificationsClient $queuesClient = null;
+    public const CPMS_CODE_SUCCESS = '000';
 
-    /** @var  StorageInterface */
-    protected $cacheStorage;
-    /**
-     * @var \CpmsClient\Client\HttpRestJsonClient
-     */
-    protected $client;
-
-    /** @var  \Laminas\ServiceManager\ServiceManager */
-    protected $serviceManager;
-
-    /** @var array */
-    protected $tokens = array();
-
-    /** @var ClientOptions */
-    protected $options;
-
-    /** @var bool */
-    protected $enableCache = true;
-
-    /** @var \DVSA\CPMS\Queues\QueueAdapters\Queues */
-    protected $queuesClient;
-
-    // we need to refactor the code to put these in a common package
-    // that can be shared by both the client and the server :(
-    const CPMS_CODE_SUCCESS = '000';
-
-    /**
-     * Number of retries to get a valid token
-     *
-     * @var int
-     */
-    private static $retries = 0;
+    private static int $tokenRetrieveAttempts = 0;
 
     /**
      * Process API request
      *
-     * @param        $endPointAlias
-     * @param        $scope (CARD, DIRECT_DEBIT)
+     * @param string $endPointAlias
+     * @param string $scope (CARD, DIRECT_DEBIT)
      * @param string $method HTTP Method (GET, POST, DELETE, PUT)
-     * @param null $params
+     * @param array<string, mixed>|null $params
      *
      * @return array|mixed
      * @throws ExceptionInterface
      */
-protected function processRequest($endPointAlias, $scope, $method, $params = null)
-    {
-        $this->logger->info("Starting processing request for endpoint: $endPointAlias, scope: $scope, method: $method");
+    protected function processRequest(
+        string $endPointAlias,
+        string $scope,
+        string $method,
+        ?array $params = null,
+    ): mixed {
+        $this->logger?->info("Starting processing request for endpoint: $endPointAlias, scope: $scope, method: $method");
 
         try {
-            $method         = (string)$method;
-            $scope          = (string)$scope;
             $salesReference = $this->getSalesReferenceFromParams($params);
+            $params         ??= [];
 
-            //Get access token
             $token = $this->getTokenForScope($scope, $salesReference);
 
             if ($token instanceof AccessToken) {
@@ -106,12 +82,12 @@ protected function processRequest($endPointAlias, $scope, $method, $params = nul
 
                 $this->getOptions()->setHeaders($headers);
 
-                if (empty($data['customer_reference'])) {
-                    $data['customer_reference'] = $this->options->getCustomerReference();
+                if (empty($params['customer_reference'])) {
+                    $params['customer_reference'] = $this->options->getCustomerReference();
                 }
 
-                if (empty($data['user_id'])) {
-                    $data['user_id'] = $this->options->getUserId();
+                if (empty($params['user_id'])) {
+                    $params['user_id'] = $this->options->getUserId();
                 }
 
                 $decodedResponse = $this->getClient()->dispatchRequestAndDecodeResponse($url, $method, $params);
@@ -125,113 +101,115 @@ protected function processRequest($endPointAlias, $scope, $method, $params = nul
                  * We delete the local cache and try to get a valid access for token in 3 attempts
                  */
                 if ($this->isCacheDeletedFromRemote($decodedResponse)) {
-
-                    self::$retries++;
+                    self::$tokenRetrieveAttempts++;
 
                     $cacheKey = $this->generateCacheKey($scope, $salesReference);
                     $this->getCacheStorage()->removeItem($cacheKey);
                     $this->getClient()->resetHeaders();
 
-                    $this->getLogger()->debug('Invalid access token retrying, attempt : ' . self::$retries);
+                    $this->getLogger()?->debug('Invalid access token retrying, attempt : ' . self::$tokenRetrieveAttempts);
 
                     return $this->processRequest($endPointAlias, $scope, $method, $params);
                 }
 
-                $this->logger->info("Request processed successfully for endpoint: $endPointAlias, scope: $scope, method: $method");
+                $this->logger?->info("Request processed successfully for endpoint: $endPointAlias, scope: $scope, method: $method");
                 return $decodedResponse;
             } else {
                 return $token;
             }
         } catch (\Exception $exception) {
-            $this->logger->error("Exception occurred while processing request for endpoint: $endPointAlias, scope: $scope, method: $method. Exception: " . $exception->getMessage());
+            $this->logger?->error("Exception occurred while processing request for endpoint: $endPointAlias, scope: $scope, method: $method. Exception: " . $exception->getMessage());
             return $this->returnErrorMessage(null, $exception);
         }
     }
 
-    /**
-     * Is the cache invalid
-     *
-     * @param $return
-     *
-     * @return bool
-     */
-    protected function isCacheDeletedFromRemote($return)
+    protected function isCacheDeletedFromRemote(mixed $return): bool
     {
-        return (self::$retries <= self::MAX_RETIRES
+        return (self::$tokenRetrieveAttempts <= self::MAX_RETIRES
             && $this->getEnableCache()
+            && is_array($return)
             && isset($return['code'])
             && $return['code'] == AccessToken::INVALID_ACCESS_TOKEN
         );
     }
 
     /**
-     * @param       $endPointAlias
-     * @param       $scope
-     * @param array $data
+     * @param string $endPointAlias
+     * @param string $scope
+     * @param array<string, mixed> $data
      *
      * @return array|mixed
      * @throws ExceptionInterface
      */
-    public function get($endPointAlias, $scope, $data = array())
-    {
+    public function get(
+        string $endPointAlias,
+        string $scope,
+        array $data = [],
+    ): mixed {
         return $this->processRequest($endPointAlias, $scope, Request::METHOD_GET, $data);
     }
 
     /**
-     * @param $endPointAlias
-     * @param $scope
-     * @param $data
+     * @param string $endPointAlias
+     * @param string $scope
+     * @param array<string, mixed> $data
      *
      * @return array|mixed
      * @throws ExceptionInterface
      */
-    public function post($endPointAlias, $scope, $data)
-    {
+    public function post(
+        string $endPointAlias,
+        string $scope,
+        array $data,
+    ): mixed {
         return $this->processRequest($endPointAlias, $scope, Request::METHOD_POST, $data);
     }
 
     /**
-     * @param $endPointAlias
-     * @param $scope
-     * @param $data
+     * @param string $endPointAlias
+     * @param string $scope
+     * @param array<string, mixed> $data
      *
      * @return array|mixed
      * @throws ExceptionInterface
      */
-    public function put($endPointAlias, $scope, $data)
-    {
+    public function put(
+        string $endPointAlias,
+        string $scope,
+        array $data,
+    ): mixed {
         return $this->processRequest($endPointAlias, $scope, Request::METHOD_PUT, $data);
     }
 
     /**
+     * @param string $endPointAlias
+     * @param string $scope
+     * @param array<string, mixed> $data
+     * @return mixed
      * @throws ExceptionInterface
+     * @psalm-suppress PossiblyUnusedMethod
      */
-    public function patch(string $endPointAlias, string $scope, array $data): array|string
-    {
+    public function patch(
+        string $endPointAlias,
+        string $scope,
+        array $data,
+    ): mixed {
         return $this->processRequest($endPointAlias, $scope, Request::METHOD_PATCH, $data);
     }
 
     /**
-     * @param $endPointAlias
-     * @param $scope
+     * @param string $endPointAlias
+     * @param string $scope
      *
      * @return array|mixed
      * @throws ExceptionInterface
      */
-    public function delete($endPointAlias, $scope)
+    public function delete(string $endPointAlias, string $scope): mixed
     {
         return $this->processRequest($endPointAlias, $scope, Request::METHOD_DELETE);
     }
 
-    /**
-     * Add header to request
-     *
-     * @param string $key
-     * @param string $value
-     *
-     * @return $this
-     */
-    public function addHeader($key, $value)
+    public function addHeader(string $key, string $value): static
     {
         $headers       = $this->getOptions()->getHeaders();
         $headers[$key] = $value;
@@ -240,69 +218,50 @@ protected function processRequest($endPointAlias, $scope, $method, $params = nul
         return $this;
     }
 
-    /**
-     * @param StorageInterface $cacheStorage
-     */
-    public function setCacheStorage($cacheStorage)
+    public function setCacheStorage(StorageInterface $cacheStorage): void
     {
         $this->cacheStorage = $cacheStorage;
     }
 
-    /**
-     * @return StorageInterface
-     */
-    public function getCacheStorage()
+    public function getCacheStorage(): StorageInterface
     {
         return $this->cacheStorage;
     }
 
-    /**
-     * @param HttpRestJsonClient $client
-     */
-    public function setClient($client)
+    public function setClient(HttpRestJsonClient $client): void
     {
         $this->client = $client;
     }
 
-    /**
-     * @return HttpRestJsonClient
-     */
-    public function getClient()
+    public function getClient(): HttpRestJsonClient
     {
         return $this->client;
     }
 
-    /**
-     * @param ClientOptions $options
-     */
-    public function setOptions($options)
+    public function setOptions(ClientOptions $options): void
     {
         $this->options = $options;
     }
 
-    /**
-     * @return ClientOptions
-     */
-    public function getOptions()
+    public function getOptions(): ClientOptions
     {
         return $this->options;
     }
 
     /**
-     * @param $scope
-     * @param string $salesReference
-     *
-     * @return AccessToken
+     * @param string $scope
+     * @param string|null $salesReference
+     * @return mixed
      * @throws ExceptionInterface
      */
-    public function getTokenForScope($scope, $salesReference = '')
+    public function getTokenForScope(string $scope, ?string $salesReference = ''): mixed
     {
-        /** @var \CpmsClient\Data\AccessToken $token */
         $key = $this->generateCacheKey($scope, $salesReference);
 
         if ($this->getEnableCache() && $this->getCacheStorage()->hasItem($key)) {
             $cache = $this->getCacheStorage()->getItem($key);
-            $token = new AccessToken($cache);
+            /** @var array<string, mixed> $cache */
+            $token = is_array($cache) ? new AccessToken($cache) : null;
         } else {
             $token = null;
         }
@@ -310,7 +269,8 @@ protected function processRequest($endPointAlias, $scope, $method, $params = nul
         if (empty($token) || $token->isExpired()) {
             $data = $this->getPaymentServiceAccessToken($scope, $salesReference);
 
-            if (isset($data['access_token'])) {
+            if (is_array($data) && isset($data['access_token'])) {
+                /** @var array<string, mixed> $data */
                 $data['issued_at'] = time();
 
                 if ($this->getEnableCache()) {
@@ -318,8 +278,7 @@ protected function processRequest($endPointAlias, $scope, $method, $params = nul
                 }
                 $token = new AccessToken($data);
             } else {
-                $this->getLogger()->warn('Unable to create access token with data: ' . print_r($data, true));
-
+                $this->getLogger()?->warn('Unable to create access token with data: ' . print_r($data, true));
                 return $data;
             }
         }
@@ -327,26 +286,15 @@ protected function processRequest($endPointAlias, $scope, $method, $params = nul
         return $token;
     }
 
-    /**
-     * @param $scope
-     * @param $salesRef
-     *
-     * @return string
-     */
-    public function generateCacheKey($scope, $salesRef = null)
+    public function generateCacheKey(string $scope, ?string $salesRef = null): string
     {
         return 'token-' . md5($scope . $salesRef . $this->getOptions()->getClientId());
     }
 
-    /**
-     * @param $key
-     *
-     * @return string
-     */
-    public function getEndpoint($key)
+    public function getEndpoint(string $key): string
     {
         $endPoints = $this->getOptions()->getEndPoints();
-        if (isset($endPoints[$key])) {
+        if (isset($endPoints[$key]) && is_string($endPoints[$key])) {
             return $endPoints[$key];
         } else {
             return $key;
@@ -355,14 +303,11 @@ protected function processRequest($endPointAlias, $scope, $method, $params = nul
 
     /**
      * Make api request to get access token
-     *
-     * @param $scope
-     * @param $salesReference
-     *
-     * @return mixed
      */
-    protected function getPaymentServiceAccessToken($scope, $salesReference = null)
-    {
+    protected function getPaymentServiceAccessToken(
+        string $scope,
+        ?string $salesReference = null,
+    ): mixed {
         $payload = [
             'client_id'     => $this->getOptions()->getClientId(),
             'client_secret' => $this->getOptions()->getClientSecret(),
@@ -387,18 +332,12 @@ protected function processRequest($endPointAlias, $scope, $method, $params = nul
         );
     }
 
-    /**
-     * @param boolean $enableCache
-     */
-    public function setEnableCache($enableCache)
+    public function setEnableCache(bool $enableCache): void
     {
         $this->enableCache = $enableCache;
     }
 
-    /**
-     * @return bool
-     */
-    public function getEnableCache()
+    public function getEnableCache(): bool
     {
         return $this->enableCache;
     }
@@ -407,9 +346,9 @@ protected function processRequest($endPointAlias, $scope, $method, $params = nul
      * @param Request|null $request
      * @param Exception|null $exception
      *
-     * @return array
+     * @return array<string, mixed>
      */
-    private function returnErrorMessage(Request $request = null, Exception $exception = null)
+    private function returnErrorMessage(Request $request = null, Exception $exception = null): array
     {
         $errorId   = $this->getErrorId();
         $message[] = $errorId;
@@ -422,8 +361,8 @@ protected function processRequest($endPointAlias, $scope, $method, $params = nul
             $message[] = Util::processException($exception);
         }
 
-        $this->logger->error("An CPMS client error occurred, ID $errorId\n" . implode('\n', $message));
-   
+        $this->logger?->error("An CPMS client error occurred, ID $errorId\n" . implode('\\n', $message));
+
         return array(
             'code'    => 105,
             'message' => sprintf("An CPMS client error occurred, ID %s\n%s", $errorId, implode('\n', $message)),
@@ -431,44 +370,32 @@ protected function processRequest($endPointAlias, $scope, $method, $params = nul
     }
 
     /**
-     * @param $params
+     * @param array<string, mixed>|null $params
      *
      * @return string|null
      */
-    private function getSalesReferenceFromParams($params)
+    private function getSalesReferenceFromParams(?array $params): ?string
     {
-        if (!isset($params['payment_data'])) {
+        if (!isset($params['payment_data']) || !is_array($params['payment_data'])) {
             return null;
         }
 
         $paymentRow = current($params['payment_data']);
 
-        if (is_array($paymentRow) && isset($paymentRow['sales_reference'])) {
+        if (is_array($paymentRow) && isset($paymentRow['sales_reference']) && is_string($paymentRow['sales_reference'])) {
             return $paymentRow['sales_reference'];
         }
 
         return null;
     }
 
-    /**
-     * Set logger object
-     *
-     * @param MotLogger $logger
-     *
-     * @return mixed
-     */
-    public function setLogger(MotLogger $logger)
+    public function setLogger(MotLogger $logger): static
     {
         $this->logger = $logger;
 
         return $this;
     }
 
-    /**
-     * Get logger object
-     *
-     * @return MotLogger|null
-     */
     public function getLogger(): ?MotLogger
     {
         return $this->logger;
@@ -476,32 +403,18 @@ protected function processRequest($endPointAlias, $scope, $method, $params = nul
 
     /**
      * Return a unique identifier for the error message for tracking in the the logs
-     *
-     * @return string
      */
-    private function getErrorId()
+    private function getErrorId(): string
     {
         return md5(uniqid('API'));
     }
 
-    // ==================================================================
-    //
-    // Notification support
-    //
-    // ------------------------------------------------------------------
-
-    /**
-     * @return NotificationsClient|null
-     */
-    public function getNotificationsClient()
+    public function getNotificationsClient(): ?NotificationsClient
     {
         return $this->queuesClient;
     }
 
-    /**
-     * @param NotificationsClient $client
-     */
-    public function setNotificationsClient(NotificationsClient $notificationsClient)
+    public function setNotificationsClient(NotificationsClient $notificationsClient): void
     {
         $this->queuesClient = $notificationsClient;
     }
@@ -517,9 +430,9 @@ protected function processRequest($endPointAlias, $scope, $method, $params = nul
      * - 'message' is the notification from CPMS
      * - 'metadata' is information from the queueing system
      *
-     * @return array
+     * @return array<int, array{metadata: QueueMessage, message: object}>
      */
-    public function getNotifications()
+    public function getNotifications(): array
     {
         // if we have no queues client, there are no notifications to get
         if ($this->queuesClient === null) {
@@ -533,27 +446,33 @@ protected function processRequest($endPointAlias, $scope, $method, $params = nul
      * call this when a notification has been applied to the scheme's
      * own data
      *
-     * @param  QueueMessage $metadata
-     *         the metadata for the notification that has been applied
-     * @param  object $message
-     *         the notification that has been applied
-     * @return void
+     * @throws CpmsNotificationAcknowledgementFailed
+     * @throws ExceptionInterface
      */
-    public function acknowledgeNotification(QueueMessage $metadata, $message)
+    public function acknowledgeNotification(QueueMessage $metadata, object $message): void
     {
-        // shorthand
+        /* @var NotificationsClient|null $queuesClient */
         $queuesClient = $this->getNotificationsClient();
 
         // contact cpms/payment-service, tell it that we have successfully
         // processed this notification
-        $response = $this->put("/api/notifications/" . $message->getNotificationId() . '/acknowledged', 'NOTIFICATION', []);
-        if (!isset($response['code']) || $response['code'] !== self::CPMS_CODE_SUCCESS) {
+        if (!method_exists($message, 'getNotificationId')) {
+            throw new CpmsNotificationAcknowledgementFailed('Notification does not expose an ID', []);
+        }
+
+        $notificationIdValue = call_user_func([$message, 'getNotificationId']);
+        if (!is_scalar($notificationIdValue)) {
+            throw new CpmsNotificationAcknowledgementFailed('Notification ID is not scalar', []);
+        }
+        $notificationId = (string) $notificationIdValue;
+        $response = $this->put("/api/notifications/" . $notificationId . '/acknowledged', 'NOTIFICATION', []);
+        if (!is_array($response) || !isset($response['code']) || $response['code'] !== self::CPMS_CODE_SUCCESS) {
             $msg = "response from HttpClient does not contain expected 'code' field";
-            $this->logger->warn($msg, $response);
+            $this->logger?->warn($msg, is_array($response) ? $response : []);
             throw new CpmsNotificationAcknowledgementFailed($msg, $response);
         }
 
         // at this point, it is safe to delete the message from the queue
-        $queuesClient->confirmMessageHandled($metadata);
+        $queuesClient?->confirmMessageHandled($metadata);
     }
 }

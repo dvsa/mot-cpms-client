@@ -1,32 +1,42 @@
 <?php
+
+declare(strict_types=1);
+
 namespace CpmsClient\Service;
 
 use CpmsClient\Utility\Util;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Laminas\Http\Request;
 use Laminas\ServiceManager\Factory\FactoryInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 /**
- * Class ApiDomainServiceFactory
- *
- * @package CpmsClient\Service
+ * @psalm-api
  */
 class ApiDomainServiceFactory implements FactoryInterface
 {
     /**
-     * Create service
-     *
      * @param ContainerInterface $container
      *
      * @param $requestedName
-     * @param array|null $options
+     * @param array<array-key, mixed>|null $options
      * @return mixed
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @psalm-suppress LessSpecificImplementedReturnType
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    #[\Override]
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null): mixed
     {
-
+        /**
+         * @var array{
+         *     cpms_api: array{
+         *         rest_client: array{options: array{domain?: string}},
+         *         home_domain?: string
+         *     }
+         * } $config
+         */
         $config = $container->get('config');
 
         if (empty($config['cpms_api']['rest_client']['options']['domain'])) {
@@ -37,28 +47,31 @@ class ApiDomainServiceFactory implements FactoryInterface
             $apiDomain = $config['cpms_api']['rest_client']['options']['domain'];
         }
 
-        $apiDomain = Util::appendQueryString($apiDomain);
-
-        return $apiDomain;
+        return Util::appendQueryString($apiDomain);
     }
 
     /**
      * Determine the CPMS API domain if not set in the config
      *
-     * @param $request
-     * @param $config
+     * @param mixed $request
+     * @param array<string, mixed> $config
      *
-     * @return mixed
+     * @return string
      */
-    public function determineLocalDomain($request, $config)
+    public function determineLocalDomain(mixed $request, array $config): string
     {
-        /** @var \Laminas\Http\PhpEnvironment\Request $request */
-        if ($request instanceof Request) {
+        $currentDomain = '';
+
+        if (is_object($request) && method_exists($request, 'getServer')) {
             $currentDomain = $request->getServer('HTTP_HOST');
-        } else {
-            $currentDomain = $config['cpms_api']['home_domain'];
         }
 
-        return str_replace('payment-app', 'payment-service', $currentDomain ?? '');
+        if (!is_string($currentDomain) || $currentDomain === '') {
+            $cpmsApi = $config['cpms_api'] ?? [];
+            $homeDomain = is_array($cpmsApi) ? ($cpmsApi['home_domain'] ?? '') : '';
+            $currentDomain = is_string($homeDomain) ? $homeDomain : '';
+        }
+
+        return str_replace('payment-app', 'payment-service', $currentDomain);
     }
 }
