@@ -17,7 +17,7 @@ class AccessToken extends AbstractOptions
     protected string $accessToken;
     protected string $scope;
     protected int $issuedAt;
-    protected string $salesReference;
+    protected ?string $salesReference = null;
 
     public function __construct($options = null)
     {
@@ -105,7 +105,7 @@ class AccessToken extends AbstractOptions
     /**
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function setSalesReference(string $salesReference): void
+    public function setSalesReference(?string $salesReference): void
     {
         $this->salesReference = $salesReference;
     }
