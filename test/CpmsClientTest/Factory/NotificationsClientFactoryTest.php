@@ -157,9 +157,9 @@ class NotificationsClientFactoryTest extends TestCase
     public function testIncorrectLoggerThrowsException(): void
     {
         /** @var MotLogger $originalLogger */
-        $originalLogger = $this->serviceManager->get(MotLogger::class);
+        $originalLogger = $this->serviceManager->get('cpms-api-logger');
 
-        $this->serviceManager->setService(MotLogger::class, new \stdClass());
+        $this->serviceManager->setService('cpms-api-logger', new \stdClass());
 
         /**
          * @var array{
@@ -197,7 +197,7 @@ class NotificationsClientFactoryTest extends TestCase
                 'cpms\\client\\notifications',
             );
         } finally {
-            $this->serviceManager->setService(MotLogger::class, $originalLogger);
+            $this->serviceManager->setService('cpms-api-logger', $originalLogger);
         }
     }
 

@@ -173,12 +173,12 @@ class LoggerOutputTest extends TestCase
         $serviceManager = Bootstrap::getInstance()->getServiceManager();
 
         $this->assertTrue(
-            $serviceManager->has(MotLogger::class),
+            $serviceManager->has('cpms-api-logger'),
             'MotLogger service must be registered in container'
         );
 
         /** @var MotLogger $logger */
-        $logger = $serviceManager->get(MotLogger::class);
+        $logger = $serviceManager->get('cpms-api-logger');
         $this->assertInstanceOf(MotLogger::class, $logger);
     }
 
@@ -192,7 +192,7 @@ class LoggerOutputTest extends TestCase
 
         $serviceManager = Bootstrap::getInstance()->getServiceManager();
         /** @var MotLogger $motLogger */
-        $motLogger = $serviceManager->get(MotLogger::class);
+        $motLogger = $serviceManager->get('cpms-api-logger');
 
         $monolog = $motLogger->getLogger();
         // push a StreamHandler that writes to a temp file to verify writing

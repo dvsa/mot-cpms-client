@@ -50,7 +50,7 @@ class RestClientFactory implements FactoryInterface
         $restOptions['domain'] = $domain;
 
         /** @var MotLogger $logger */
-        $logger = $container->get(MotLogger::class);
+        $logger = $container->get('cpms-api-logger');
 
         $options                 = new ClientOptions($restOptions);
         $clientOption['timeout'] = $options->getTimeout();
