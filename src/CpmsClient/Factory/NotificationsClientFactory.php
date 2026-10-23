@@ -39,7 +39,7 @@ class NotificationsClientFactory implements FactoryInterface
          */
         $config = $container->get('config');
 
-        $logger = $container->get(MotLogger::class);
+        $logger = $container->get('cpms-api-logger');
         if (!$logger instanceof MotLogger) {
             throw new \UnexpectedValueException('The logger service must be a MotLogger.');
         }

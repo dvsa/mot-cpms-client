@@ -13,7 +13,6 @@ use CpmsClient\Service\ApiService;
 use DVSA\CPMS\Notifications\Messages\Maps\MapNotificationTypes;
 use DVSA\CPMS\Queues\QueueAdapters\AmazonSqs\AmazonSqsQueues;
 use DvsaLogger\Factory\MotLoggerFactory;
-use DvsaLogger\Logger\MotLogger;
 
 return [
     'service_manager'    => [
@@ -28,7 +27,7 @@ return [
             'cpms\client\notifications'   => NotificationsClientFactory::class,
             GetApiDomain::class           => GetApiDomainFactory::class,
             GetRestClient::class          => GetRestClientFactory::class,
-            MotLogger::class              => MotLoggerFactory::class,
+            'cpms-api-logger'             => MotLoggerFactory::class,
         ],
     ],
 

@@ -25,23 +25,27 @@ return [
         ],
     ],
     'mot_logger' => [
-        'channel' => 'cpms-api-client-test',
-        'writers' => [
-            [
-                'type' => 'stream',
-                'path' => 'php://stderr',
-                'formatter' => 'pipe',
-                'level' => 'error',
-                'enabled' => true,
+        'loggers' => [
+            'cpms-api-logger' => [
+                'channel' => 'cpms-api-client-test',
+                'writers' => [
+                    [
+                        'type' => 'stream',
+                        'path' => 'php://stderr',
+                        'formatter' => 'pipe',
+                        'level' => 'error',
+                        'enabled' => true,
+                    ],
+                    [
+                        'type' => 'stream',
+                        'path' => '/var/log/dvsa/cpms-api-client.log',
+                        'formatter' => 'json',
+                        'level' => 'error',
+                        'enabled' => false,
+                    ]
+                ],
             ],
-            [
-                'type' => 'stream',
-                'path' => '/var/log/dvsa/cpms-api-client.log',
-                'formatter' => 'json',
-                'level' => 'error',
-                'enabled' => false,
-            ]
-        ],
+        ]
     ],
 
     'view_manager'      => [

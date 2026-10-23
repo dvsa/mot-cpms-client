@@ -53,7 +53,7 @@ class ApiServiceFactory implements FactoryInterface
         $identityAlias = $config['cpms_api']['identity_provider'];
 
         /** @var MotLogger $logger */
-        $logger = $container->get(MotLogger::class);
+        $logger = $container->get('cpms-api-logger');
 
         /** @var HttpRestJsonClient $httpRestJsonClient */
         $httpRestJsonClient = $container->get($restClient);
