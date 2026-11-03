@@ -30,7 +30,6 @@ use Psr\Container\NotFoundExceptionInterface;
 class ApiServiceTest extends AbstractHttpControllerTestCase
 {
     protected MockApiService $service;
-    protected SampleController $controller;
     protected ServiceManager $serviceManager;
 
     /**
@@ -40,7 +39,6 @@ class ApiServiceTest extends AbstractHttpControllerTestCase
     #[\Override]
     public function setUp(): void
     {
-        $this->controller = new SampleController();
         /** @var array<string, mixed> $applicationConfig */
         $applicationConfig = include __DIR__ . '/../../../' . 'config/application.config.php';
         $this->setApplicationConfig(
